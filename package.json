@@ -1,0 +1,19 @@
+{
+  "name": "geosoft2_gruppe2",
+  "version": "1.0.0",
+  "description": "Github repo of Gruppe 2, Geosoftware 2",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dingensen/GeoSoft2_Gruppe2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dingensen/GeoSoft2_Gruppe2/issues"
+  },
+  "homepage": "https://github.com/Dingensen/GeoSoft2_Gruppe2#readme"
+}
