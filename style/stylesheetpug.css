@@ -1,0 +1,9 @@
+#menu{
+  float: left;
+  width: 30%;
+  height: 100%;
+  background-color: grey;}
+#map{
+  width: 70%;
+  height: 100%;
+}
