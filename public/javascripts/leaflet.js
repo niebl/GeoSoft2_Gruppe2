@@ -29,3 +29,22 @@ var map = L.map('map', {
 
 
 L.control.layers(baseMaps).addTo(map);
+
+/**
+  * @example loadDoc()
+  * Sets a marker using cookies via ajax request
+  * @author Dorian
+  */
+  /*
+function loadDoc() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      L.marker(JSON.parse(this.response)).addTo(map).bindPopup("I am an orange leaf.");
+
+    }
+  };
+  xhttp.open("GET", "/getdefaultlocation", true);
+  xhttp.send();
+}
+*/
