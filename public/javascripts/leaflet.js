@@ -31,8 +31,9 @@ var map = L.map('map', {
 L.control.layers(baseMaps).addTo(map);
 
 /**
+  * @example loadDoc()
   * Sets a marker using cookies via ajax request
-  *
+  * @author Dorian
   */
   /*
 function loadDoc() {
