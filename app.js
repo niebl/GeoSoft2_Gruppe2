@@ -48,7 +48,8 @@ app.get('/getdefaultlocation', function(req, res) {
     var location = req.cookies.coords;
     res.send(location);
 });
-app.get("/", (req, res)=>{res.send("hello world")});
+app.get("/", (req, res)=>{res.send("hello world");});
+
 app.get('/setdefaultlocation1/:lat/:lng', function(req, res){
   //res.clearCookie("coords");
   var position = [];
