@@ -16,7 +16,7 @@ app.set('view engine', 'pug');
 
 
 app.get('/', function(req, res) {
-  res.render('index');}
+  res.render('index');});
 
 // mongoose setup
 mongoose.connect('mongodb://localhost:27017/test', {useNewUrlParser: true, useUnifiedTopology: true});
