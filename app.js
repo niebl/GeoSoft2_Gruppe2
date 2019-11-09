@@ -65,8 +65,30 @@ app.get('/setdefaultlocation1/:lat/:lng', function(req, res){
 var exampleTweet = require('./exampleData/example-tweet.json')
 
 app.get('/tweets', (req, res) => {
-  return res.send(exampleTweet)
+  return res.send(tweetAPI(req, res))
 })
+
+/**
+* @function tweetAPI callback function
+* @desc callback function that looks at the arguments passed in the tweet API request and returns the according response
+* example http://localhost:3000/tweets?fields=id,text
+* @param req
+* @param res
+*/
+function tweetAPI(req, res){
+  var outJSON = {};
+
+  //access the provided parameters
+  let fields = req.query.fields;
+
+
+  fields = fields.split(",")
+  for (var field of fields){
+    outJSON[field] = exampleTweet[field];
+  }
+  console.log(outJSON);
+  return outJSON;
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -84,6 +106,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+//provisorischer listener.
 const port =  3000;
 app.listen(port, () =>
   console.log(`Example app listening on port ${port}!`),
