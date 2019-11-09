@@ -60,7 +60,13 @@ app.get('/setdefaultlocation1/:lat/:lng', function(req, res){
   res.send(req.params.lat);
 });
 
+//Tweet api
+//the example tweet, later to be replaced by the database
+var exampleTweet = require('./exampleData/example-tweet.json')
 
+app.get('/tweets', (req, res) => {
+  return res.send(testTweet)
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
