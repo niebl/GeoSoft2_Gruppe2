@@ -65,7 +65,7 @@ app.get('/setdefaultlocation1/:lat/:lng', function(req, res){
 var exampleTweet = require('./exampleData/example-tweet.json')
 
 app.get('/tweets', (req, res) => {
-  return res.send(testTweet)
+  return res.send(exampleTweet)
 })
 
 // catch 404 and forward to error handler
@@ -83,5 +83,10 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+const port =  3000;
+app.listen(port, () =>
+  console.log(`Example app listening on port ${port}!`),
+);
 
 module.exports = app;
