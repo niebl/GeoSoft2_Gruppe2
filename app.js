@@ -81,12 +81,17 @@ function tweetAPI(req, res){
   //access the provided parameters
   let fields = req.query.fields;
 
-
-  fields = fields.split(",")
-  for (var field of fields){
-    outJSON[field] = exampleTweet[field];
+  //if field params are passed, return requested fields only
+  if(fields != undefined){
+    fields = fields.split(",");
+    for (var field of fields){
+      outJSON[field] = exampleTweet[field];
+    }
+  } else {
+    //if no field params passed, return all fields
+    outJSON = exampleTweet;
   }
-  console.log(outJSON);
+
   return outJSON;
 }
 
