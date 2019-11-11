@@ -100,11 +100,11 @@ function tweetAPI(req, res){
     //traverse every tweet in the given list
     for (var entry of exampleTweet.tweets){
       //for every tweet, pick only the fields that are specified
+      let tweet = {};
       for (var field of fields){
-        let tweet = {};
         tweet[field] = entry[field];
-        outJSON.tweets.push(tweet);
       }
+      outJSON.tweets.push(tweet);
     }
   }
   //if no field params passed, return full tweet
