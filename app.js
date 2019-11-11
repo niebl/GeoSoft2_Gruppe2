@@ -88,22 +88,31 @@ app.get('/tweets', (req, res) => {
 * @author Felix
 */
 function tweetAPI(req, res){
-  var outJSON = {};
+  var outJSON = {"tweets" : []};
 
   //access the provided parameters
   let fields = req.query.fields;
 
+  //QUERY FIELDS
   //if field params are passed, return requested fields only
   if(fields != undefined){
     fields = fields.split(",");
-    for (var field of fields){
-      outJSON[field] = exampleTweet[field];
+    //traverse every tweet in the given list
+    for (var entry of exampleTweet.tweets){
+      //for every tweet, pick only the fields that are specified
+      for (var field of fields){
+        let tweet = {};
+        tweet[field] = entry[field];
+        outJSON.tweets.push(tweet);
+      }
     }
-  } else {
-    //if no field params passed, return full tweet
+  }
+  //if no field params passed, return full tweet
+  else{
     outJSON = exampleTweet;
   }
 
+  //return JSON of tweets
   return outJSON;
 }
 
