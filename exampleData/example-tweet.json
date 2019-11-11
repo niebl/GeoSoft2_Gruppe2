@@ -1,3 +1,5 @@
+{"tweets":
+	[
 {"created_at": "Fri Nov 08 21:21:28 +0000 2019",
   "id": 1192915062618542082,
   "id_str": "1192915062618542082",
@@ -67,4 +69,122 @@
   "retweeted": false,
   "possibly_sensitive": false,
   "lang": "tl"
+},
+
+{"created_at": "Fri Nov 08 21:21:28 +0000 2019",
+  "id": 1192915062618184624,
+  "id_str": "1192915062618184624",
+  "text": "where is everybody?",
+  "truncated": false,
+  "entities": {"hashtags": [],"symbols": [],"user_mentions": [],"urls": []},
+  "metadata": {"iso_language_code": "en","result_type": "recent"},
+  "source": "<a href='http://twitter.com/download/android' rel='nofollow'>Twitter for Android</a>",
+  "in_reply_to_status_id": null,
+  "in_reply_to_status_id_str": null,
+  "in_reply_to_user_id": null,
+  "in_reply_to_user_id_str": null,
+  "in_reply_to_screen_name": null,
+  "user": {
+    "id": 1333389876,
+    "id_str": "1333389876",  "name": "VARxf0x9fx91xa8xf0x9fx8fxbbu200dxf0x9fx8fxabxf0x9fx93xa1xf0x9fx93xb7xf0x9fx93xb8",
+    "screen_name": "Michael Collins",
+    "location": "behind the moon",
+    "description": "",
+    "url": "https://t.co/nonexistant",
+    "entities": null,
+    "protected": false,
+    "followers_count": 420,
+    "friends_count": 69,
+    "listed_count": 0,
+    "created_at": "Sun Jul 20 05:35:30 +0000 1969",
+    "favourites_count": 4946,
+    "utc_offset": null,
+    "time_zone": null,
+    "geo_enabled": true,
+    "verified": false,
+    "statuses_count": 5566,
+    "lang": null,
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false
+  },
+
+  "geo": null,
+  "coordinates": {
+    "coordinates":
+    [
+        51.808615,
+        8.833008
+    ],
+    "type":"Point"
+},
+  "place": {"id": "01cbb7f86211fef3",  "url": "https://api.twitter.com/1.1/geo/id/01cbb7f86211fef3.json",  "place_type": "city",  "name": "Damaturu",  "full_name": "Damaturu,  Nigeria",  "country_code": "NG",  "country": "Nigeria",  "contained_within": [],  "bounding_box": {"type": "Polygon",  "coordinates": [[[11.930547,  11.7201586],  [12.0167097,  11.7201586],  [12.0167097,  11.7820384],  [11.930547,  11.7820384]]]},  "attributes": {}},
+  "contributors": null,
+  "is_quote_status": true,
+  "retweet_count": 69,
+  "favorite_count": 420,
+  "favorited": false,
+  "retweeted": false,
+  "possibly_sensitive": false,
+  "lang": "en"
+},
+
+{"created_at": "Fri Nov 08 21:21:28 +0000 2019",
+  "id": 1192915062846207263,
+  "id_str": "1192915062846207263",
+  "text": "There is no reason for me to be here",
+  "truncated": false,
+  "entities": {"hashtags": [],"symbols": [],"user_mentions": [],"urls": []},
+  "metadata": {"iso_language_code": "en","result_type": "recent"},
+  "source": "<a href='http://twitter.com/download/android' rel='nofollow'>Twitter for Android</a>",
+  "in_reply_to_status_id": null,
+  "in_reply_to_status_id_str": null,
+  "in_reply_to_user_id": null,
+  "in_reply_to_user_id_str": null,
+  "in_reply_to_screen_name": null,
+  "user": {
+    "id": 1333389876,
+    "id_str": "1333389876",  "name": "VARxf0x9fx91xa8xf0x9fx8fxbbu200dxf0x9fx8fxabxf0x9fx93xa1xf0x9fx93xb7xf0x9fx93xb8",
+    "screen_name": "null meridian",
+    "location": "greenwich",
+    "description": "",
+    "url": "https://t.co/nonexistant",
+    "entities": null,
+    "protected": false,
+    "followers_count": 420,
+    "friends_count": 69,
+    "listed_count": 0,
+    "created_at": "Mon Nov 11 15:27:30 +0000 2019",
+    "favourites_count": 4946,
+    "utc_offset": null,
+    "time_zone": null,
+    "geo_enabled": true,
+    "verified": false,
+    "statuses_count": 5566,
+    "lang": null,
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false
+  },
+
+  "geo": null,
+  "coordinates": {
+    "coordinates":
+    [
+        51.4934,
+        0.00
+    ],
+    "type":"Point"
+},
+  "place": {"id":"3eb2c704fe8a50cb", "url":"https://api.twitter.com/1.1/geo/id/3eb2c704fe8a50cb.json", "place_type":"city", "name":"City of London", "full_name":"City of London, London", "country_code":"GB", "country":"United Kingdom", "contained_within":[], "bounding_box=BoundingBox":{"type":"Polygon", "coordinates":[[[-0.112442, 51.5068], [-0.0733794, 51.5068], [-0.0733794, 51.522161], [-0.112442, 51.522161]]]}, "attributes":{}},
+  "contributors": null,
+  "is_quote_status": true,
+  "retweet_count": 69,
+  "favorite_count": 420,
+  "favorited": false,
+  "retweeted": false,
+  "possibly_sensitive": false,
+  "lang": "en"
+},
+]
 }
