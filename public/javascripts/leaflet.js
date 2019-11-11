@@ -23,10 +23,13 @@ var baseMaps = {
   "Satellite": satellite
 };
 
+
 var map = L.map('map', {
   layers:  [topo]
-}).setView([0, 0], 4);
+});
 
+//map.setView(myView, 5);
+L.marker([lat, lng]).addTo(map);
 
 L.control.layers(baseMaps).addTo(map);
 

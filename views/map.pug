@@ -1,0 +1,12 @@
+extends layout
+
+block map
+  div#map
+  script.
+    var myView = !{JSON.stringify(defLocation)};
+    var lng = !{JSON.stringify(markerLng)};
+    var lat = !{JSON.stringify(markerLng)};
+  script(id="sript1" src="/leafletscript")
+  
+    
+    

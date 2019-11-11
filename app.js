@@ -50,25 +50,10 @@ app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leafle
   * @author Dorian
   * @problems what happens if cookie is empty??
   */
-app.get('/getdefaultlocation', function(req, res) {
+app.use('/getdefaultlocation', function(req, res) {
     var location = req.cookies.coords;
-    res.send(location);
-});
-
-/**
-  * sets the default location of a pair of a location
-  * e.g. a default Map view postion
-  *
-  * @author Dorian
-  * @problems  function has to be changed to post???? --> UI
-  */
-app.get('/setdefaultlocation/:lat/:lng', function(req, res){
-  //res.clearCookie("coords");
-  var position = [];
-  position.push(req.params.lat);
-  position.push(req.params.lng);
-  res.cookie('coords', position, {});
-  res.redirect('/getdefaultlocation');
+    //res.send(location);
+    map.setView(location, 4);
 });
 
 
