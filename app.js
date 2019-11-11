@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -71,7 +73,39 @@ app.get('/setdefaultlocation/:lat/:lng', function(req, res){
   res.redirect('/getdefaultlocation');
 });
 
+//Tweet api
+//the example tweet, later to be replaced by the database
+var exampleTweet = require('./exampleData/example-tweet.json');
 
+app.get('/tweets', (req, res) => {
+  return res.send(tweetAPI(req, res));
+});
+
+/**
+* @function tweetAPI callback function
+* @desc callback function that looks at the arguments passed in the tweet API request and returns the according response
+* example http://localhost:3000/tweets?fields=id,text
+* @author Felix
+*/
+function tweetAPI(req, res){
+  var outJSON = {};
+
+  //access the provided parameters
+  let fields = req.query.fields;
+
+  //if field params are passed, return requested fields only
+  if(fields != undefined){
+    fields = fields.split(",");
+    for (var field of fields){
+      outJSON[field] = exampleTweet[field];
+    }
+  } else {
+    //if no field params passed, return full tweet
+    outJSON = exampleTweet;
+  }
+
+  return outJSON;
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
