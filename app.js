@@ -86,35 +86,62 @@ app.get('/tweets', (req, res) => {
 * @desc callback function that looks at the arguments passed in the tweet API request and returns the according response
 * example http://localhost:3000/tweets?fields=id,text
 * @author Felix
+* TODO: make multiple queries at once possible.
+*       they need some sort of hierarchy
+* TODO: add error messages for invalid queries
+* TODO: getcapabilities
 */
 function tweetAPI(req, res){
   var outJSON = {"tweets" : []};
 
   //access the provided parameters
   let fields = req.query.fields;
+  let contains = req.query.contains;
 
-  //QUERY FIELDS
-  //if field params are passed, return requested fields only
-  if(fields != undefined){
-    fields = fields.split(",");
-    //traverse every tweet in the given list
-    for (var entry of exampleTweet.tweets){
-      //for every tweet, pick only the fields that are specified
-      let tweet = {};
-      for (var field of fields){
-        tweet[field] = entry[field];
+
+  //if no query params passed, return all tweets
+  if(req.query == undefined){
+    outJSON = exampleTweet;
+  } else {
+
+    //QUERY CONTAINS
+    //if contains params are passed, return tweets containing requested substrings only
+    if(contains != undefined){
+      //regex match all in quotes
+      contains = contains.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+
+      //traverse every tweet text for the given substrings
+      for (let entry of exampleTweet.tweets){
+        for (let string in contains){
+          //TODO: support for AND OR
+        }
       }
-      outJSON.tweets.push(tweet);
+    }
+
+    //QUERY FIELDS
+    //if field params are passed, return requested fields only
+    if(fields != undefined){
+      fields = fields.split(",");
+      //traverse every tweet in the given list
+      for (let entry of exampleTweet.tweets){
+        //for every tweet, pick only the fields that are specified
+        let tweet = {};
+        let fieldtweets = {"tweets" : []};
+        for (let field of fields){
+          tweet[field] = entry[field];
+        }
+        fieldtweets.tweets.push(tweet);
+        outJSON = fieldtweets;
+      }
     }
   }
-  //if no field params passed, return full tweet
-  else{
-    outJSON = exampleTweet;
-  }
-
   //return JSON of tweets
   return outJSON;
 }
+
+/**
+* @function searchTweets
+*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
