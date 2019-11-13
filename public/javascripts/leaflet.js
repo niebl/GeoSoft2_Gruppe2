@@ -24,8 +24,10 @@ var baseMaps = {
 };
 
 var map = L.map('map', {
-  layers:  [topo]
-}).setView([0, 0], 4);
+  layers:  [topo],
+  minZoom: 6,
+  maxBounds: [[42, -20], [60, 40]]
+}).setView([51, 10], 6);
 
 
 L.control.layers(baseMaps).addTo(map);
@@ -35,7 +37,7 @@ L.control.layers(baseMaps).addTo(map);
   * Sets a marker using cookies via ajax request
   * @author Dorian
   */
-  /*
+/*
 function loadDoc() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
