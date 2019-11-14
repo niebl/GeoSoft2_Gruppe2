@@ -9,7 +9,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
-
+var R = require('r-script');
 var app = express();
 
 // view engine setup
@@ -20,10 +20,7 @@ app.set('view engine', 'pug');
 
 
 // mongoose setup
-mongoose.connect('mongodb://localhost:27017/test', {useNewUrlParser: true, useUnifiedTopology: true});
-
-// twitter data in mongoose
-var twitter = mongoose.model('Tweet', {url: String, location: String, author: String, date: String, text: String});
+mongoose.connect('mongodb://localhost:27017/local', {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -45,6 +42,20 @@ app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
 
 
+
+// mongoDB models:
+var Tweet = require("./models/tweet");
+// const kitty = new Tweet({ json: '{"test": "1"}' });
+// kitty.save();
+
+app.get("/r", (req, res ) =>{
+
+  var out = R("testR.R")
+    .data(4, 20)
+    .callSync();
+  console.
+  res.send(out);
+});
 /**
   * sets the default location of a pair of a location
   * e.g. a default Map view postion
