@@ -10,6 +10,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var R = require('r-script');
+var fs = require('fs');
+var request = require('request');
 var app = express();
 
 // view engine setup
@@ -49,12 +51,19 @@ var Tweet = require("./models/tweet");
 // kitty.save();
 
 app.get("/r", (req, res ) =>{
+  var url = 'http://localhost:8000/data';
+  var requestSettings = {
+        url: url,
+        body: '{"a":[10, 9, 8, 7], "b":[51, 11, 41, 52]}',
+        method: 'GET',
+        encoding: null
+    };
 
-  var out = R("testR.R")
-    .data(4, 20)
-    .callSync();
-  console.
-  res.send(out);
+    request(requestSettings, function(error, response, body) {
+        res.set('Content-Type', 'image/png');
+        res.send(body);
+
+    });
 });
 /**
   * sets the default location of a pair of a location

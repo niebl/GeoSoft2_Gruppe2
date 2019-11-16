@@ -11,12 +11,14 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "fs": "0.0.1-security",
     "http-errors": "~1.6.3",
     "jquery": "^3.4.1",
     "leaflet": "^1.5.1",
     "mongoose": "^5.7.8",
     "morgan": "~1.9.1",
     "pug": "^2.0.4",
-    "r-script": "0.0.4"
+    "r-script": "0.0.4",
+    "request": "^2.88.0"
   }
 }
