@@ -17,6 +17,19 @@ var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/service
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
+
+var leafletRadarAttribution = L.tileLayer.wms("https://maps.dwd.de/geoserver/dwd/wms/", {
+		layers: 'dwd:FX-Produkt',  
+		format: 'image/png',
+		styles: '',
+		transparent: true,
+		opacity: 0.6,
+	});
+
+var overlayMaps = {
+    "Radar": leafletRadarAttribution
+};
+
 var baseMaps = {
 	"Topographic": topo,
 	"Streets": street,
@@ -25,10 +38,11 @@ var baseMaps = {
 
 var map = L.map('map', {
   layers:  [topo]
-}).setView([0, 0], 4);
+}).setView([52, 8], 5);
 
 
-L.control.layers(baseMaps).addTo(map);
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
 
 /**
   * @example loadDoc()
