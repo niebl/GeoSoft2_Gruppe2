@@ -4,7 +4,7 @@
  * The API to retreive tweets `/TweetAPI`  
     accesses the tweetdb resource
   |method| path|
-  |----|-----|
+  |------|-----|
   |  GET | `/TweetAPI/search` |
   | POST | `/TweetAPI`|
   | DELETE | `/TweetAPI`|
@@ -13,7 +13,7 @@
     accesses the geoserver resource   
    ####TODO: add the following to following chapters as well####
   |method| path|
-  |----|-----|
+  |------|-----|
   |  GET | `/Radar/getCapabilities` |
   |  GET | `/Radar/raster` |
   |  GET | `/Radar/vector` |
