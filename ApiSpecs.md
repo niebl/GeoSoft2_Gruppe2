@@ -3,7 +3,7 @@
  ### Available Methods
  * The API to retreive tweets `/TweetAPI`  
     accesses the tweetdb resource  
-  |method| path|
+  |**method**|**path**|
   |------|-----|
   |  GET | `/TweetAPI/search` |
   | POST | `/TweetAPI`|
@@ -12,7 +12,7 @@
  * The endpoint to retreive radar data `/Radar`  
     accesses the geoserver resource   
    ####TODO: add the following to following chapters as well####  
-  |method| path|
+  |**method**|**path**|
   |------|-----|
   |  GET | `/Radar/getCapabilities` |
   |  GET | `/Radar/raster` |
