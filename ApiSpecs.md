@@ -3,6 +3,7 @@
  ### Available Methods
  * The API to retreive tweets `/TweetAPI`  
     accesses the tweetdb resource  
+
   |**method**|**path**|
   |------|-----|
   |  GET | `/TweetAPI/search` |
@@ -12,6 +13,7 @@
  * The endpoint to retreive radar data `/Radar`  
     accesses the geoserver resource   
    ####TODO: add the following to following chapters as well####  
+
   |**method**|**path**|
   |------|-----|
   |  GET | `/Radar/getCapabilities` |
@@ -72,11 +74,13 @@
 ## Parameters
 ### Tweet-Search
 #### Request
+
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
 |`tweetAPI/search`| GET |Search for tweets within a location, optionally containing strings
 
 #### General Search Parameters
+
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
 |bbox|number array|required|bounding box of 2 coordinates in the WGS84 format, represented as an array of four numbers: `bbox={lat northwest corner},{lon northwest corner},{lat southeast corner},{lon southeast corner}`|
@@ -89,6 +93,7 @@
 
 ### Tweet-POST
 #### Request
+
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
 |`/TweetAPI`|POST|POST request to add a tweet to the database|
@@ -96,6 +101,7 @@
 ####TODO: convey that body contains all of tweets information
 
 #### General Search Parameters
+
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
 
@@ -103,11 +109,13 @@
 
 ### Tweet-DELETE
 #### Request
+
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
 |`/TweetAPI` |DELETE  	  |Delete request  |
 
 #### General Search Parameters
+
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
 |TweetID|String|required|the id of the tweet, as it is contained in the "id"-field|
