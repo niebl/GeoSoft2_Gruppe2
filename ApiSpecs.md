@@ -7,17 +7,17 @@
  * The API to retreive tweets `/TweetAPI`  
     accesses the tweetdb resource  
 
-  |**method**|**path**|
+|**method**|**path**|
   |------|-----|
   |  GET | `/TweetAPI/search` |
   | POST | `/TweetAPI`|
-  | DELETE | `/TweetAPI`|
+  | ##DELETE | ##`/TweetAPI`|
 
  * The endpoint to retreive radar data `/Radar`  
     accesses the geoserver resource   
    ####TODO: add the following to following chapters as well####  
 
-  |**method**|**path**|
+|**method**|**path**|
   |------|-----|
   |  GET | `/Radar/getCapabilities` |
   |  GET | `/Radar/raster` |
@@ -87,8 +87,8 @@
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
 |bbox|number array|required|bounding box of 2 coordinates in the WGS84 format, represented as an array of four numbers: `bbox={lat northwest corner},{lon northwest corner},{lat southeast corner},{lon southeast corner}`|
-|include|string|optional|a string that is to be included in the returned tweets' texts. may contain a regular expression|
-|exclude|string|optional|a string that is not to be contained within the returned tweets' texts. may contain a regular expression|
+|include|string|optional|a string that is to be included in the returned tweets' texts. may contain a regular expression (experimental)|
+|exclude|string|optional|a string that is not to be contained within the returned tweets' texts. may contain a regular expression (experimental)|
 |fields|string array|optional|The fields that are to be included in the returned tweets' JSON. formatted as an array of strings: `fields=field1,field2,...,fieldN`|
 |latest|Boolean|optional|If true, only the latest tweet that meets all the queries will be returned|
 
@@ -110,7 +110,8 @@
 
 <hr>
 
-### Tweet-DELETE
+### ##Tweet-DELETE
+AUSGEKLAMMERT, please ignore
 #### Request
 
 | **Name** | **Method** | **Description**|

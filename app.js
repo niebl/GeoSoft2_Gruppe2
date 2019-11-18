@@ -90,8 +90,9 @@ app.delete('/tweetAPI', (req, res) => {
 * TODO: finish each query parameters
 */
 function tweetSearch(req,res){
-  var outJSON = {"tweets" : []};
-  const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]}
+  let outJSON = {"tweets" : []};
+  let newOutJSON = {"tweets":[]};
+  const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
 
   //access the provided parameters
   let bbox = req.query.bbox;
@@ -100,29 +101,67 @@ function tweetSearch(req,res){
   let fields = req.query.fields;
   let latest = req.query.latest;
 
-  //BoundingBox
+  //QUERY BoundingBox
   //create boundingBox geojson from given parameters
   bbox = bbox.split(",");
-  var boundingBox = geoJSONtemplate
-  boundingBox.features[0].geometry.type = "polygon"
+  let boundingBox = geoJSONtemplate;
+  boundingBox.features[0].geometry.type = "polygon";
   boundingBox.features[0].geometry.coordinates.push([bbox[1],bbox[0]]); //NW
   boundingBox.features[0].geometry.coordinates.push([bbox[2],bbox[0]]); //NE
   boundingBox.features[0].geometry.coordinates.push([bbox[2],bbox[3]]); //SE
   boundingBox.features[0].geometry.coordinates.push([bbox[1],bbox[3]]); //SW
   boundingBox.features[0].geometry.coordinates.push([bbox[0],bbox[1]]); //NW
 
+  //call to function that will look for tweets on TweetDB within bounding box.
+  //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
+  outJSON.tweets = SearchWithin(bbox);
+
   //delete later
-  console.log(boundingBox.features[0].geometry.coordinates)
+  console.log(boundingBox.features[0].geometry.coordinates);
 
-  //TODO function that makes a spatial query for points inside the bounding box.
-
-  //include
+  //QUERY include
   include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+  let userRegEx = new RegExp(include);
+  for(let tweet in outJSON.tweets){
+    //if there is a match, push tweet to outJSON
+    if(
+      tweet.text.includes(include) ||
+      tweet.text.match(userRegEx)
+    ){newOutJSON.push(tweet);}
+  }
+  //make newOutJSON the new outJSON, reset the former
+  outJSON = newOutJSON;
+  newOutJSON = {"tweets":[]};
 
-  //exclude
-  include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+  //QUERY exclude
+  exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+  for(var i= outJSON.length-1; i >= 0; i--){
+    if(
+      outJSON.tweets[i].text.includes(include) ||
+      outJSON.tweets[i].text.match(userRegEx)
+      //NOTE: UNSURE IF FOLLOWING WORKS CORRECTLY
+    ){
+      outJSON.splice(i,1)
+    }
+  }
 
-
+  //QUERY FIELDS
+  //TODO: an funktion anpassen, WIP
+  //if field params are passed, return requested fields only
+  if(fields != undefined){
+    fields = fields.split(",");
+    //traverse every tweet in the given list
+    for (let entry of Out.tweets){
+      //for every tweet, pick only the fields that are specified
+      let tweet = {};
+      let fieldtweets = {"tweets" : []};
+      for (let field of fields){
+        tweet[field] = entry[field];
+      }
+      fieldtweets.tweets.push(tweet);
+      outJSON = fieldtweets;
+    }
+  }
 
 }
 
