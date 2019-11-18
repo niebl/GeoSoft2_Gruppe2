@@ -6,7 +6,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 //TODO change request to include turf
-var turf = require('turf');
+var turf = require('@turf/turf');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -87,72 +87,92 @@ app.delete('/tweetAPI', (req, res) => {
 * @desc callback function that looks at the arguments passed in the tweet API request and returns the according response
 * example http://localhost:3000/tweets?fields=id,text
 * @author Felix
-* TODO: make multiple queries at once possible.
-*       they need some sort of hierarchy
-* TODO: add error messages for invalid queries
-* TODO: getcapabilities
+* TODO: finish each query parameters
 */
 function tweetSearch(req,res){
   var outJSON = {"tweets" : []};
-  var BoundingBox = {
-    "NW":[], "NE":[],
-    "SW":[], "SE":[]};
-
-    //access the provided parameters
-    let bbox = req.query.bbox;
-    let include = req.query.include;
-    let exclude = req.query.exclude;
-    let fields = req.query.fields;
-    let latest = req.query.latest;
-}
-
-function tweetAPI(req, res){
-  var outJSON = {"tweets" : []};
+  const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]}
 
   //access the provided parameters
+  let bbox = req.query.bbox;
+  let include = req.query.include;
+  let exclude = req.query.exclude;
   let fields = req.query.fields;
-  let contains = req.query.contains;
+  let latest = req.query.latest;
+
+  //BoundingBox
+  //create boundingBox geojson from given parameters
+  bbox = bbox.split(",");
+  var boundingBox = geoJSONtemplate
+  boundingBox.features[0].geometry.type = "polygon"
+  boundingBox.features[0].geometry.coordinates.push([bbox[1],bbox[0]]); //NW
+  boundingBox.features[0].geometry.coordinates.push([bbox[2],bbox[0]]); //NE
+  boundingBox.features[0].geometry.coordinates.push([bbox[2],bbox[3]]); //SE
+  boundingBox.features[0].geometry.coordinates.push([bbox[1],bbox[3]]); //SW
+  boundingBox.features[0].geometry.coordinates.push([bbox[0],bbox[1]]); //NW
+
+  //delete later
+  console.log(boundingBox.features[0].geometry.coordinates)
+
+  //TODO function that makes a spatial query for points inside the bounding box.
+
+  //include
+  include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+
+  //exclude
+  include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
 
 
-  //if no query params passed, return all tweets
-  if(req.query == undefined){
-    outJSON = exampleTweet;
-  } else {
 
-    //QUERY CONTAINS
-    //if contains params are passed, return tweets containing requested substrings only
-    if(contains != undefined){
-      //regex match all in quotes
-      contains = contains.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
-
-      //traverse every tweet text for the given substrings
-      for (let entry of exampleTweet.tweets){
-        for (let string in contains){
-          //TODO: support for AND OR
-        }
-      }
-    }
-
-    //QUERY FIELDS
-    //if field params are passed, return requested fields only
-    if(fields != undefined){
-      fields = fields.split(",");
-      //traverse every tweet in the given list
-      for (let entry of exampleTweet.tweets){
-        //for every tweet, pick only the fields that are specified
-        let tweet = {};
-        let fieldtweets = {"tweets" : []};
-        for (let field of fields){
-          tweet[field] = entry[field];
-        }
-        fieldtweets.tweets.push(tweet);
-        outJSON = fieldtweets;
-      }
-    }
-  }
-  //return JSON of tweets
-  return outJSON;
 }
+
+// function tweetAPI(req, res){
+//   var outJSON = {"tweets" : []};
+//
+//   //access the provided parameters
+//   let fields = req.query.fields;
+//   let contains = req.query.contains;
+//
+//
+//   //if no query params passed, return all tweets
+//   if(req.query == undefined){
+//     outJSON = exampleTweet;
+//   } else {
+//
+//     //QUERY CONTAINS
+//     //if contains params are passed, return tweets containing requested substrings only
+//     if(contains != undefined){
+//       //regex match all in quotes
+//       contains = contains.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+//
+//       //traverse every tweet text for the given substrings
+//       for (let entry of exampleTweet.tweets){
+//         for (let string in contains){
+//           //TODO: support for AND OR
+//         }
+//       }
+//     }
+//
+//     //QUERY FIELDS
+//     //if field params are passed, return requested fields only
+//     if(fields != undefined){
+//       fields = fields.split(",");
+//       //traverse every tweet in the given list
+//       for (let entry of exampleTweet.tweets){
+//         //for every tweet, pick only the fields that are specified
+//         let tweet = {};
+//         let fieldtweets = {"tweets" : []};
+//         for (let field of fields){
+//           tweet[field] = entry[field];
+//         }
+//         fieldtweets.tweets.push(tweet);
+//         outJSON = fieldtweets;
+//       }
+//     }
+//   }
+//   //return JSON of tweets
+//   return outJSON;
+// }
 
 /**
 * @function searchTweets
