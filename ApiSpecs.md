@@ -29,8 +29,11 @@
 * #### GET `/TweetAPI/search`  
   Search the tweet-database for tweets containing certain strings in their text-field.  
 
+  Needs a specified boundingbox.
   Allows to search for tweets that INCLUDE certain strings.  
   Allows to EXCLUDE tweets containing certain strings.  
+  Allows to single out specific fields.
+  Allows to only return the latest entry.
 
   **Parameters**  
   * `bbox` the geographical boundaries in which the tweets are located (WGS84)  
@@ -38,19 +41,6 @@
   * `exclude` the string to be excluded  
   * `fields` specify which fields to return in the response JSON  
   * `latest` if TRUE, return only the latest tweet
-
-
-  <hr>
-
-* #### GET `/TweetAPI/search`  
-  Search the tweet-database for tweets containing certain strings in their text-field.  
-
-  Allows to search for tweets that INCLUDE certain strings.  
-  Allows to EXCLUDE tweets containing certain strings.  
-
-  **Parameters**  
-  * `include` the string to be included  
-  * `exclude` the string to be excluded  
 
 
   <hr>
