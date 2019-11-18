@@ -5,6 +5,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+//TODO change request to include turf
+var turf = require('turf');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -65,12 +67,23 @@ app.get('/setdefaultlocation1/:lat/:lng', function(req, res){
 //the example tweet, later to be replaced by the database
 var exampleTweet = require('./exampleData/example-tweet.json');
 
-app.get('/tweets', (req, res) => {
-  return res.send(tweetAPI(req, res));
+//API-endpoints
+app.get('/tweetAPI/search', (req, res) => {
+  return res.send(tweetSearch(req, res));
+});
+
+app.post('/tweetAPI', (req, res) => {
+  //post here
+  res.send('POST request to the homepage');
+});
+
+app.delete('/tweetAPI', (req, res) => {
+  //delete here https://dustinpfister.github.io/2018/06/21/express-app-delete/
+  res.send('DELETE request to the homepage');
 });
 
 /**
-* @function tweetAPI callback function
+* @function tweetSearch callback function
 * @desc callback function that looks at the arguments passed in the tweet API request and returns the according response
 * example http://localhost:3000/tweets?fields=id,text
 * @author Felix
@@ -79,6 +92,20 @@ app.get('/tweets', (req, res) => {
 * TODO: add error messages for invalid queries
 * TODO: getcapabilities
 */
+function tweetSearch(req,res){
+  var outJSON = {"tweets" : []};
+  var BoundingBox = {
+    "NW":[], "NE":[],
+    "SW":[], "SE":[]};
+
+    //access the provided parameters
+    let bbox = req.query.bbox;
+    let include = req.query.include;
+    let exclude = req.query.exclude;
+    let fields = req.query.fields;
+    let latest = req.query.latest;
+}
+
 function tweetAPI(req, res){
   var outJSON = {"tweets" : []};
 
@@ -148,7 +175,7 @@ app.use(function(err, req, res, next) {
 });
 
 //provisorischer listener.
-const port =  3000;
+const port =  3001;
 app.listen(port, () =>
   console.log(`Example app listening on port ${port}!`)
 );
