@@ -1,4 +1,7 @@
 # API specifications
+
+[Based on](https://idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html)
+
 ## Resource Descriptions
  ### Available Methods
  * The API to retreive tweets `/TweetAPI`  
@@ -32,7 +35,7 @@
   Allows to search for tweets that INCLUDE certain strings.  
   Allows to EXCLUDE tweets containing certain strings.  
 
-  **Parameters**  
+  **Parameters**
   * `bbox` the geographical boundaries in which the tweets are located (WGS84)  
   * `include` the string to be included  
   * `exclude` the string to be excluded  
