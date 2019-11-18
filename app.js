@@ -22,7 +22,7 @@ app.set('view engine', 'pug');
 
 
 // mongoose setup
-mongoose.connect('mongodb://localhost:27017/local', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://localhost:27017/twitter', {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -50,7 +50,7 @@ var Tweet = require("./models/tweet");
 // const kitty = new Tweet({ json: '{"test": "1"}' });
 // kitty.save();
 
-app.get("/r", (req, res ) =>{
+app.get("/r/", (req, res ) =>{
   var url = 'http://localhost:8000/data';
   var requestSettings = {
         url: url,
@@ -65,6 +65,74 @@ app.get("/r", (req, res ) =>{
 
     });
 });
+
+
+/**
+  * get Tweet in rectangle
+  * @author Dorian
+  * @params rectangular [N, W, S, E]
+  * @return JSOn result
+  */
+function getTweetsInRect(rectangular){
+   return Tweet.find()
+  .where('lat').gte(rectangular[0]).lte(rectangular[2])
+  .where('lat').gte(rectangular[1]).lte(rectangular[3]);
+}
+
+
+/**
+  * get Tweet in Timespan
+  * @author Dorian
+  * @params start start date 'YYYY-MM-DD'
+  * @params end end date 'YYYY-MM-DD'
+  * @return JSON Tweets
+  */
+function getTweetsInTimespan(rectangular){
+  return Tweet.find()
+  .where('date').gte(start).lte(end);
+}
+
+/**
+  * get Tweets which includes expression
+  * @author Dorian
+  * @params word the searched word
+  * @return JSON Tweets
+  */
+function getTweetsIncludeWord(word){
+  return Tweet.find()
+  .where('Text').includes(word);
+}
+
+
+
+
+/**
+  * find Word in tweet by an given input
+  * @author Dorian
+  * @params Text which got searched
+  * @params word to find
+  * @return TweetIDs
+  */
+  function findWord(text, word){
+    text.includes(word);
+  }
+
+  /**
+    * check if point is in rectangle
+    * @author Dorian
+    * @params point[lat, lng]
+    * @params rectangle[[lat,lng],[lat,lng]] --> [N, W, S, E]
+    * @return boolean
+    */
+    function checkPointInRect(point, rectangle){
+      if(point[0] < rectangle[0] && point[2] < rectangle[0] && point[1] < rectangle[1] && point[1] < rectangle[3]){
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+
 /**
   * sets the default location of a pair of a location
   * e.g. a default Map view postion
