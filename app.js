@@ -88,6 +88,7 @@ app.delete('/tweetAPI', (req, res) => {
 * example http://localhost:3000/tweets?fields=id,text
 * @author Felix
 * TODO: finish each query parameters
+* TODO: make optional parameters optional
 */
 function tweetSearch(req,res){
   let outJSON = {"tweets" : []};
@@ -151,7 +152,7 @@ function tweetSearch(req,res){
   if(fields != undefined){
     fields = fields.split(",");
     //traverse every tweet in the given list
-    for (let entry of Out.tweets){
+    for (let entry of OutJSON.tweets){
       //for every tweet, pick only the fields that are specified
       let tweet = {};
       let fieldtweets = {"tweets" : []};
