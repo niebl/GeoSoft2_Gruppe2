@@ -17,6 +17,24 @@ var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/service
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
+var radarAttribution = L.tileLayer.wms("https://maps.dwd.de/geoserver/dwd/wms/", {
+		layers: 'dwd:FX-Produkt',  
+		format: 'image/png',
+		styles: '',
+		transparent: true,
+		opacity: 0.6,
+	});
+
+var image = new L.ImageOverlay("https://maps.dwd.de/geoserver/dwd/wms?service=WMS&version=1.1.0&request=GetMap&layers=dwd%3AFX-Produkt&bbox=-523.462%2C-4658.645%2C376.538%2C-3758.645&width=767&height=768&srs=EPSG%3A1000001&format=image%2Fpng", {
+			opacity: 0.5,
+			interactive: true
+		});	
+
+var overlayMaps = {
+    "Radar": radarAttribution,
+	"Image": image
+};
+
 var baseMaps = {
 	"Topographic": topo,
 	"Streets": street,
@@ -24,20 +42,19 @@ var baseMaps = {
 };
 
 var map = L.map('map', {
-  layers:  [topo],
-  minZoom: 6,
-  maxBounds: [[42, -20], [60, 40]]
-}).setView([51, 10], 6);
+  layers:  [topo]
+}).setView([52, 8], 5);
 
 
-L.control.layers(baseMaps).addTo(map);
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
 
 /**
   * @example loadDoc()
   * Sets a marker using cookies via ajax request
   * @author Dorian
   */
-/*
+  /*
 function loadDoc() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
