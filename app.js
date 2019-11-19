@@ -111,30 +111,33 @@ function tweetSearch(req,res){
   }
 
   //delete later
-  return({
-    "notes":"these are the parameters that were passed",
-    "bbox":bbox,
-    "include":include,
-    "exclude":exclude,
-    "fields":fields,
-    "latest":latest
-  });
+  // return({
+  //   "notes":"these are the parameters that were passed",
+  //   "bbox":bbox,
+  //   "include":include,
+  //   "exclude":exclude,
+  //   "fields":fields,
+  //   "latest":latest
+  // });
+  outJSON = exampleTweet;
 
   //call to function that will look for tweets on TweetDB within bounding box.
   //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
-  outJSON.tweets = getTweetsInRect();
+  //outJSON.tweets = getTweetsInRect();
+
 
   //QUERY include
   if(include != undefined)
   {
-    include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+//    include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
     let userRegEx = new RegExp(include);
     for(let tweet in outJSON.tweets){
       //if there is a match, push tweet to outJSON
+      console.log(outJSON.tweets[tweet].text)
       if(
-        tweet.text.includes(include) ||
-        (tweet.text.match(userRegEx) !==null )
-      ){newOutJSON.push(tweet);}
+        outJSON.tweets[tweet].text.includes(include)
+        ||(outJSON.tweets[tweet].text.match(userRegEx) !==null)
+      ){newOutJSON.tweets.push(outJSON.tweets[tweet]);}
     }
     //make newOutJSON the new outJSON, reset the former
     outJSON = newOutJSON;
@@ -144,7 +147,7 @@ function tweetSearch(req,res){
   //QUERY exclude
   if(exclude != undefined)
   {
-    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+//    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
     for(let i= outJSON.length-1; i >= 0; i--){
       if(
         outJSON.tweets[i].text.includes(include) ||
@@ -165,19 +168,20 @@ function tweetSearch(req,res){
   //if field params are passed, return requested fields only
   if(fields != undefined){
     fields = fields.split(",");
+    let fieldtweets = {"tweets" : []};
     //traverse every tweet in the given list
-    for (let entry of OutJSON.tweets){
+    for (let entry of outJSON.tweets){
       //for every tweet, pick only the fields that are specified
       let tweet = {};
-      let fieldtweets = {"tweets" : []};
       for (let field of fields){
         tweet[field] = entry[field];
       }
       fieldtweets.tweets.push(tweet);
-      outJSON = fieldtweets;
     }
+    outJSON = fieldtweets;
   }
 
+  return outJSON;
 }
 
 // function tweetAPI(req, res){
