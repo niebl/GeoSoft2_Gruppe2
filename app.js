@@ -69,7 +69,7 @@ var exampleTweet = require('./exampleData/example-tweet.json');
 
 //API-endpoints
 app.get('/tweetAPI/search', (req, res) => {
-  return res.send(tweetSearch(req, res));
+  res.send(tweetSearch(req, res));
 });
 
 app.post('/tweetAPI', (req, res) => {
@@ -96,58 +96,73 @@ function tweetSearch(req,res){
   const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
 
   //access the provided parameters
-  let bbox = req.query.bbox;
-  let include = req.query.include;
-  let exclude = req.query.exclude;
-  let fields = req.query.fields;
-  let latest = req.query.latest;
+  var bbox = req.query.bbox;
+  var include = req.query.include;
+  var exclude = req.query.exclude;
+  var fields = req.query.fields;
+  var latest = req.query.latest;
 
   //QUERY BoundingBox
   //create boundingBox geojson from given parameters
+  console.log("I AM ALIVE")
   bbox = bbox.split(",");
-  let boundingBox = geoJSONtemplate;
-  boundingBox.features[0].geometry.type = "polygon";
-  boundingBox.features[0].geometry.coordinates.push([bbox[1],bbox[0]]); //NW
-  boundingBox.features[0].geometry.coordinates.push([bbox[2],bbox[0]]); //NE
-  boundingBox.features[0].geometry.coordinates.push([bbox[2],bbox[3]]); //SE
-  boundingBox.features[0].geometry.coordinates.push([bbox[1],bbox[3]]); //SW
-  boundingBox.features[0].geometry.coordinates.push([bbox[0],bbox[1]]); //NW
+  //numberify the strings
+  for(let i = 0; i < bbox.length; i++){
+    bbox[i] = parseFloat(bbox[i]);
+  }
 
   //call to function that will look for tweets on TweetDB within bounding box.
   //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
-  outJSON.tweets = SearchWithin(bbox);
+  //outJSON.tweets = getTweetsInRect();
 
   //delete later
-  console.log(boundingBox.features[0].geometry.coordinates);
+  return({
+    "notes":"these are the parameters that were passed",
+    "bbox":bbox,
+    "include":include,
+    "exclude":exclude,
+    "fields":fields,
+    "latest":latest
+  });
 
   //QUERY include
-  include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
-  let userRegEx = new RegExp(include);
-  for(let tweet in outJSON.tweets){
-    //if there is a match, push tweet to outJSON
-    if(
-      tweet.text.includes(include) ||
-      tweet.text.match(userRegEx)
-    ){newOutJSON.push(tweet);}
+  if(include != undefined)
+  {
+    include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+    let userRegEx = new RegExp(include);
+    for(let tweet in outJSON.tweets){
+      //if there is a match, push tweet to outJSON
+      if(
+        tweet.text.includes(include) ||
+        (tweet.text.match(userRegEx) !==null )
+      ){newOutJSON.push(tweet);}
+    }
+    //make newOutJSON the new outJSON, reset the former
+    outJSON = newOutJSON;
+    newOutJSON = {"tweets":[]};
   }
-  //make newOutJSON the new outJSON, reset the former
-  outJSON = newOutJSON;
-  newOutJSON = {"tweets":[]};
 
   //QUERY exclude
-  exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
-  for(var i= outJSON.length-1; i >= 0; i--){
-    if(
-      outJSON.tweets[i].text.includes(include) ||
-      outJSON.tweets[i].text.match(userRegEx)
-      //NOTE: UNSURE IF FOLLOWING WORKS CORRECTLY
-    ){
-      outJSON.splice(i,1)
+  if(exclude != undefined)
+  {
+    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+    for(let i= outJSON.length-1; i >= 0; i--){
+      if(
+        outJSON.tweets[i].text.includes(include) ||
+        (outJSON.tweets[i].text.match(userRegEx) !==null )
+        //NOTE: UNSURE IF FOLLOWING WORKS CORRECTLY
+      ){outJSON.splice(i,1);}
     }
   }
 
-  //QUERY FIELDS
-  //TODO: an funktion anpassen, WIP
+  //QUERY latest
+  if(latest != undefined){
+    if(latest.toUpperCase() === TRUE){
+      //function to find latest tweet
+    }
+  }
+
+  //QUERY fields
   //if field params are passed, return requested fields only
   if(fields != undefined){
     fields = fields.split(",");
@@ -163,6 +178,8 @@ function tweetSearch(req,res){
       outJSON = fieldtweets;
     }
   }
+  console.log("HELLOOO")
+
 
 }
 
