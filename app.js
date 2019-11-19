@@ -110,10 +110,6 @@ function tweetSearch(req,res){
     bbox[i] = parseFloat(bbox[i]);
   }
 
-  //call to function that will look for tweets on TweetDB within bounding box.
-  //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
-  //outJSON.tweets = getTweetsInRect();
-
   //delete later
   return({
     "notes":"these are the parameters that were passed",
@@ -123,6 +119,10 @@ function tweetSearch(req,res){
     "fields":fields,
     "latest":latest
   });
+
+  //call to function that will look for tweets on TweetDB within bounding box.
+  //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
+  outJSON.tweets = getTweetsInRect();
 
   //QUERY include
   if(include != undefined)
