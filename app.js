@@ -104,7 +104,6 @@ function tweetSearch(req,res){
 
   //QUERY BoundingBox
   //create boundingBox geojson from given parameters
-  console.log("I AM ALIVE")
   bbox = bbox.split(",");
   //numberify the strings
   for(let i = 0; i < bbox.length; i++){
@@ -178,8 +177,6 @@ function tweetSearch(req,res){
       outJSON = fieldtweets;
     }
   }
-  console.log("HELLOOO")
-
 
 }
 
