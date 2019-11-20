@@ -87,8 +87,7 @@ app.delete('/tweetAPI', (req, res) => {
 * @desc callback function that looks at the arguments passed in the tweet API request and returns the according response
 * example http://localhost:3000/tweets?fields=id,text
 * @author Felix
-* TODO: finish each query parameters
-* TODO: make optional parameters optional
+* TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
 function tweetSearch(req,res){
   let outJSON = {"tweets" : []};
@@ -110,6 +109,7 @@ function tweetSearch(req,res){
     bbox[i] = parseFloat(bbox[i]);
   }
 
+  {
   //delete later
   // return({
   //   "notes":"these are the parameters that were passed",
@@ -120,6 +120,7 @@ function tweetSearch(req,res){
   //   "latest":latest
   // });
   outJSON = exampleTweet;
+  }
 
   //call to function that will look for tweets on TweetDB within bounding box.
   //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
@@ -127,13 +128,11 @@ function tweetSearch(req,res){
 
 
   //QUERY include
-  if(include != undefined)
-  {
+  if(include != undefined){
 //    include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
     let userRegEx = new RegExp(include);
     for(let tweet in outJSON.tweets){
       //if there is a match, push tweet to outJSON
-      console.log(outJSON.tweets[tweet].text)
       if(
         outJSON.tweets[tweet].text.includes(include)
         ||(outJSON.tweets[tweet].text.match(userRegEx) !==null)
@@ -145,22 +144,36 @@ function tweetSearch(req,res){
   }
 
   //QUERY exclude
-  if(exclude != undefined)
-  {
+  if(exclude != undefined){
 //    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
-    for(let i= outJSON.length-1; i >= 0; i--){
+    for(let i= outJSON.tweets.length-1; i >= 0; i--){
+      //console.log(outJSON.tweets[i].text)
       if(
-        outJSON.tweets[i].text.includes(include) ||
-        (outJSON.tweets[i].text.match(userRegEx) !==null )
-        //NOTE: UNSURE IF FOLLOWING WORKS CORRECTLY
-      ){outJSON.splice(i,1);}
+        outJSON.tweets[i].text.includes(exclude)
+        //||(outJSON.tweets[i].text.match(userRegEx) !==null )
+      ){outJSON.tweets.splice(i,1);}
     }
   }
 
   //QUERY latest
+  //if latest is requested, return only latest tweet meeting given parameters
   if(latest != undefined){
-    if(latest.toUpperCase() === TRUE){
-      //function to find latest tweet
+    if(latest.toUpperCase() === "TRUE"){
+      //in the beginning was Jan 01 1970
+      let latestTime = new Date("Thu Jan 01 00:00:00 +0000 1970");
+
+
+      for(let tweet of outJSON.tweets){
+        //if there is a younger one than the previous, make that the new latest
+        if(new Date(tweet.created_at) > latestTime){
+          latestTime = tweet.created_at;
+          newOutJSON.tweets = [];
+          newOutJSON.tweets.push(tweet);
+        }
+      }
+      //make newOutJSON the new outJSON, reset the former
+      outJSON = newOutJSON;
+      newOutJSON = {"tweets":[]};
     }
   }
 
@@ -183,54 +196,6 @@ function tweetSearch(req,res){
 
   return outJSON;
 }
-
-// function tweetAPI(req, res){
-//   var outJSON = {"tweets" : []};
-//
-//   //access the provided parameters
-//   let fields = req.query.fields;
-//   let contains = req.query.contains;
-//
-//
-//   //if no query params passed, return all tweets
-//   if(req.query == undefined){
-//     outJSON = exampleTweet;
-//   } else {
-//
-//     //QUERY CONTAINS
-//     //if contains params are passed, return tweets containing requested substrings only
-//     if(contains != undefined){
-//       //regex match all in quotes
-//       contains = contains.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
-//
-//       //traverse every tweet text for the given substrings
-//       for (let entry of exampleTweet.tweets){
-//         for (let string in contains){
-//           //TODO: support for AND OR
-//         }
-//       }
-//     }
-//
-//     //QUERY FIELDS
-//     //if field params are passed, return requested fields only
-//     if(fields != undefined){
-//       fields = fields.split(",");
-//       //traverse every tweet in the given list
-//       for (let entry of exampleTweet.tweets){
-//         //for every tweet, pick only the fields that are specified
-//         let tweet = {};
-//         let fieldtweets = {"tweets" : []};
-//         for (let field of fields){
-//           tweet[field] = entry[field];
-//         }
-//         fieldtweets.tweets.push(tweet);
-//         outJSON = fieldtweets;
-//       }
-//     }
-//   }
-//   //return JSON of tweets
-//   return outJSON;
-// }
 
 /**
 * @function searchTweets
