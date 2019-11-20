@@ -41,15 +41,6 @@
 
   <hr>
 
-* #### DELETE `/TweetAPI`  
-  Add a Tweet to the database  
-  To be used by the server to add tweet data it downloaded  
-
-  **Parameters**  
-  * `TweetID` the ID of the tweet to be deleted  
-
-
-
 ## Parameters
 ### Tweet-Search
 #### Request
