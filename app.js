@@ -84,8 +84,14 @@ app.delete('/tweetAPI', (req, res) => {
 
 /**
 * @function tweetSearch callback function
-* @desc callback function that looks at the arguments passed in the tweet API request and returns the according response
+* @desc callback function that looks at the arguments passed in the tweet API request and returns the according response.
 * example http://localhost:3000/tweets?fields=id,text
+* params: bbox: The bounding Box of the geographical area to fetch tweets from
+*         include: The strings that are to be included in the returned tweets
+*         exclude: The strings that aren't to be included in the returned tweets
+*         fields: The fields of the tweets that are to be returned
+*         latest: whether or not to only show the latest tweet
+* @param req the request that was submitted in the REST QUERY
 * @author Felix
 * TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
@@ -196,10 +202,6 @@ function tweetSearch(req,res){
 
   return outJSON;
 }
-
-/**
-* @function searchTweets
-*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
