@@ -130,7 +130,7 @@ function tweetSearch(req,res){
 
   //call to function that will look for tweets on TweetDB within bounding box.
   //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
-  //outJSON.tweets = getTweetsInRect();
+  //outJSON.tweets = getTweetsInRect(bbox);
 
 
   //QUERY include
