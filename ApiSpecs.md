@@ -95,9 +95,9 @@
 
 ### GET `/tweetAPI/search`
 #### request example
-```
+`
 localhost:3000/tweetAPI/search?bbox=-180,85,180,-85
-```
+`
 
 ### response example
 ```JS
@@ -440,10 +440,9 @@ localhost:3000/tweetAPI/search?bbox=-180,85,180,-85
 }
 ```
 
-### GET `/tweetAPI/search`
 #### request example
-```
-localhost:3000/tweetAPI/search?bbox=-180,85,180,-85&fields=text,id,created_at&include=is```
+`
+localhost:3000/tweetAPI/search?bbox=-180,85,180,-85&fields=text,id,created_at&include=is`
 
 ### response example
 ```JS
