@@ -5,7 +5,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
@@ -17,10 +17,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
 
+// parse application/json
+app.use(bodyParser.json());
 
 // mongoose setup
-mongoose.connect('mongodb://localhost:27017/twitter', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -41,14 +45,15 @@ app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist')
 app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.css'));
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
 
-
+app.use('/gemeinden', express.static(__dirname + '/landkreise.json'));
 
 // mongoDB models:
 var Tweet = require("./models/tweet");
+var Kreis = require("./models/kreis");
 // const kitty = new Tweet({ json: '{"test": "1"}' });
 // kitty.save();
 
-app.get("/r/", (req, res ) =>{
+app.get("/r", (req, res ) =>{
   var url = 'http://localhost:8000/data';
   var requestSettings = {
         url: url,
@@ -64,6 +69,56 @@ app.get("/r/", (req, res ) =>{
     });
 });
 
+
+/** Adding German "kreisgrenzen" into db
+  * @author Dorian
+  *
+  */
+app.get("/kreise", (req, res ) =>{
+  var requestSettings = {
+        url: "http://localhost:3000/gemeinden",
+        method: 'GET'
+    };
+  request(requestSettings, function(error, response, body) {
+    if(error){
+      console.log(error);
+    }
+    var kreisListe = JSON.parse(body).features;
+    for(var i= 0; i <= kreisListe.length -1; i++){
+      // const kitty = new Tweet({ json: '{"test": "1"}' });
+      // kitty.save();
+        var addKreis = new Kreis({
+          Name: kreisListe[i].properties.GEN,
+          type: kreisListe[i].geometry.type,
+          Border: kreisListe[i].geometry.coordinates[0]
+        });
+        addKreis.save();
+        if(i == kreisListe.length -1 ){
+          res.send('Regions of germany added into db');
+        }
+    }
+
+  });
+});
+
+/** requesting GEJSOn of deutsche Kreise
+  * @author Dorian
+  *
+  */
+app.get('/getBorders', (req, res) => {
+  var regions ={type:"FeatureCollection", features:[]};
+  Kreis.find({}, function(err, result){
+    if(err){
+      console.log(err);
+    }
+    for(var i= 0; i < result.length; i++){
+
+        var objKreis ={type: "Feature", properties:{name: result[i].Name}, geometry: {type: result[i].type, coordinates: [result[i].Border]}};
+        regions.features.push(objKreis);
+    }
+    res.send(regions);
+  });
+});
 
 /**
   * get Tweet in rectangle
