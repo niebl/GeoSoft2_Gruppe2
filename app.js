@@ -22,21 +22,17 @@ app.set('view engine', 'pug');
 
 
 app.get('/', function(req, res) {
-  res.render('index');});
+  res.render('index');
+});
 
 // mongoose setup
-mongoose.connect('mongodb://localhost:27017/test', {useNewUrlParser: true, useUnifiedTopology: true});
-
-
-// twitter data in mongoose
-var twitter = mongoose.model('Tweet', {url: String, location: String, author: String, date: String, text: String});
+mongoose.connect('mongodb://localhost:27017/local', {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 
 app.use('/index', indexRouter);
 app.use('/users', usersRouter);
@@ -50,24 +46,35 @@ app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist')
 app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.css'));
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
 
-
+/**
+  * sets the default location of a pair of a location
+  * e.g. a default Map view postion
+  *
+  * @author Dorian
+  * @problems what happens if cookie is empty??
+  */
 app.get('/getdefaultlocation', function(req, res) {
     var location = req.cookies.coords;
     res.send(location);
 });
-app.get("/", (req, res)=>{res.send("hello world");});
-app.get('/setdefaultlocation1/:lat/:lng', function(req, res){
+
+/**
+  * sets the default location of a pair of a location
+  * e.g. a default Map view postion
+  *
+  * @author Dorian
+  * @problems  function has to be changed to post???? --> UI
+  */
+app.get('/setdefaultlocation/:lat/:lng', function(req, res){
   //res.clearCookie("coords");
   var position = [];
-  postion.push(req.params.lat);
-  postion.push(req.params.lng);
-  res.cookie('coords', postion, {httpOnly: true, secure: true, path:'/'});
-  res.send(req.params.lat);
+  position.push(req.params.lat);
+  position.push(req.params.lng);
+  res.cookie('coords', position, {});
+  res.redirect('/getdefaultlocation');
 });
 
 //Tweet api
-
-
 //API-endpoints
 app.get('/tweetAPI/search', (req, res) => {
   res.send(api.tweetSearch(req, res));
