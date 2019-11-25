@@ -120,7 +120,11 @@ var exampleTweet = require('./exampleData/example-tweet.json');
 * @author Felix
 * TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
+<<<<<<< HEAD
 function tweetSearch(req,res){
+=======
+tweetSearch: function(req,res){
+>>>>>>> 8390af75ba9374a564806b5ffe8771d399562da0
   let outJSON = {"tweets" : []};
   let newOutJSON = {"tweets":[]};
   const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
