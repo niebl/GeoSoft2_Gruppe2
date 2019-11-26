@@ -70,10 +70,12 @@ function loadDoc() {
     if (this.readyState == 4 && this.status == 200) {
       //L.marker(JSON.parse(this.response)).addTo(map).bindPopup("I am an orange leaf.");
       console.log(JSON.parse(this.response));
-      L.geoJSON(JSON.parse(this.response), {style:{'color': 'red'}}).addTo(map).bindPopup("I am an orange leaf.");
+      L.geoJSON(JSON.parse(this.response), {style:{'color': 'red'}}).addTo(map);
+
+
     }
   };
-  xhttp.open("GET", "/getBorders", true);
+  xhttp.open("GET", "/getEvent", true);
   xhttp.send();
 }
 loadDoc();

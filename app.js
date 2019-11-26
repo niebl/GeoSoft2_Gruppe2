@@ -50,6 +50,7 @@ app.use('/gemeinden', express.static(__dirname + '/landkreise.json'));
 // mongoDB models:
 var Tweet = require("./models/tweet");
 var Kreis = require("./models/kreis");
+var UnwetterKreis = require("./models/unwetterkreis");
 // const kitty = new Tweet({ json: '{"test": "1"}' });
 // kitty.save();
 
@@ -89,7 +90,7 @@ app.get("/kreise", (req, res ) =>{
       // kitty.save();
         var addKreis = new Kreis({
           Name: kreisListe[i].properties.GEN,
-          type: kreisListe[i].geometry.type,
+          Type: kreisListe[i].geometry.type,
           Border: kreisListe[i].geometry.coordinates[0]
         });
         addKreis.save();
@@ -100,6 +101,62 @@ app.get("/kreise", (req, res ) =>{
 
   });
 });
+
+app.get('/loadUnwetter', (req, res) => {
+  var requestSettings = {
+        url: "http://localhost:3000/gemeinden",
+        method: 'GET'
+    };
+  request('https://www.dwd.de/DWD/warnungen/warnapp/json/warnings.json', function(error, response, body) {
+    if(error){
+      console.log(error);
+    }
+
+    var toJson = body.slice(24, body.length - 2);
+    var warnings =  JSON.parse(toJson);
+    var dangerzone  = [];
+    for(var key in warnings.warnings){
+      dangerzone.push([warnings.warnings[key][0].regionName, warnings.warnings[key][0].event]);
+    }
+    Kreis.find({}, function(err, result){
+      if(err){
+        console.log(err);
+      }
+      var zet = [];
+      dangerzone.forEach((item, index) =>{
+
+        for(var i= 0; i< result.length; i++){
+          if(item[0].includes(result[i].Name)){
+            var addUnwetterKreis = new UnwetterKreis({
+              Name: result[i].Name,
+              Type: result[i].Type,
+              Border:result[i].Border,
+              Event: item[1]
+            });
+            addUnwetterKreis.save();
+          }
+        }
+      });
+      res.send("Unwetter sind an mongo gesendet");
+    });
+});
+});
+
+app.get("/getEvent", (req, res)=>{
+  UnwetterKreis.find({}, (err, result)=>{
+    var json = {type: "FeatureCollection", features:[]};
+    result.forEach((item, index) =>{
+      var props = {properties: {name: item.Name, event: item.Event}};
+      var geo = {geometry: {type: item.Type, coordinates: [item.Border]}};
+      var endRes = {type: "Feature", properties: {name: item.Name, event: item.Event},geometry: {type: item.Type, coordinates: [item.Border]} };
+      json.features.push(endRes);
+    });
+
+    res.send(json);
+  });
+});
+
+
 
 /** requesting GEJSOn of deutsche Kreise
   * @author Dorian
@@ -113,7 +170,7 @@ app.get('/getBorders', (req, res) => {
     }
     for(var i= 0; i < result.length; i++){
 
-        var objKreis ={type: "Feature", properties:{name: result[i].Name}, geometry: {type: result[i].type, coordinates: [result[i].Border]}};
+        var objKreis ={type: "Feature", properties:{name: result[i].Name}, geometry: {type: result[i].Type, coordinates: [result[i].Border]}};
         regions.features.push(objKreis);
     }
     res.send(regions);

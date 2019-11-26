@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 // Article Schema
 var kreisSchema = mongoose.Schema({
   Name: String,
-  type: String,
+  Type: String,
   Border: Array}
 );
 
