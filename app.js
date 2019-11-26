@@ -1,19 +1,15 @@
 /*jshint esversion: 6 */
 
-const api = require('./apis')
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-//TODO change request to include turf
-var turf = require('@turf/turf');
-
+var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
-
+var request = require('request');
 var app = express();
 
 // view engine setup
@@ -21,12 +17,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 
-app.get('/', function(req, res) {
-  res.render('index');
-});
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 // mongoose setup
-mongoose.connect('mongodb://localhost:27017/local', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -34,7 +32,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/index', indexRouter);
+// sets paths to routers
+app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 
@@ -46,6 +45,11 @@ app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist')
 app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.css'));
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
 
+// mongoDB models:
+var Tweet = require("./models/tweet");
+
+//tweet query functions
+{
 /**
   * sets the default location of a pair of a location
   * e.g. a default Map view postion
@@ -74,10 +78,73 @@ app.get('/setdefaultlocation/:lat/:lng', function(req, res){
   res.redirect('/getdefaultlocation');
 });
 
+/**
+  * get Tweet in rectangle
+  * @author Dorian
+  * @params rectangular [N, W, S, E]
+  * @return JSOn result
+  */
+function getTweetsInRect(rectangular){
+   return Tweet.find()
+  .where('lat').gte(rectangular[0]).lte(rectangular[2])
+  .where('lat').gte(rectangular[1]).lte(rectangular[3]);
+}
+
+/**
+  * get Tweet in Timespan
+  * @author Dorian
+  * @params start start date 'YYYY-MM-DD'
+  * @params end end date 'YYYY-MM-DD'
+  * @return JSON Tweets
+  */
+function getTweetsInTimespan(rectangular){
+  return Tweet.find()
+  .where('date').gte(start).lte(end);
+}
+
+/**
+  * get Tweets which includes expression
+  * @author Dorian
+  * @params word the searched word
+  * @return JSON Tweets
+  */
+function getTweetsIncludeWord(word){
+  return Tweet.find()
+  .where('Text').includes(word);
+}
+
+/**
+* find Word in tweet by an given input
+* @author Dorian
+* @params Text which got searched
+* @params word to find
+* @return TweetIDs
+*/
+function findWord(text, word){
+  text.includes(word);
+}
+
+/**
+* check if point is in rectangle
+* @author Dorian
+* @params point[lat, lng]
+* @params rectangle[[lat,lng],[lat,lng]] --> [N, W, S, E]
+* @return boolean
+*/
+function checkPointInRect(point, rectangle){
+  if(point[0] < rectangle[0] && point[2] < rectangle[0] && point[1] < rectangle[1] && point[1] < rectangle[3]){
+    return true;
+  } else {
+    return false;
+  }
+}
+}
+
 //Tweet api
+{
 //API-endpoints
 app.get('/tweetAPI/search', (req, res) => {
-  res.send(api.tweetSearch(req, res));
+  res.send(tweetSearch(req, res));
 });
 
 app.post('/tweetAPI', (req, res) => {
@@ -90,23 +157,6 @@ app.delete('/tweetAPI', (req, res) => {
   res.send('DELETE request to the homepage');
 });
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-var exampleTweet = require('./exampleData/example-tweet.json');
 /**
 * @function tweetSearch callback function
 * @desc callback function that looks at the arguments passed in the tweet API request and returns the according response.
@@ -120,11 +170,7 @@ var exampleTweet = require('./exampleData/example-tweet.json');
 * @author Felix
 * TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
-<<<<<<< HEAD
 function tweetSearch(req,res){
-=======
-tweetSearch: function(req,res){
->>>>>>> 8390af75ba9374a564806b5ffe8771d399562da0
   let outJSON = {"tweets" : []};
   let newOutJSON = {"tweets":[]};
   const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
@@ -223,5 +269,25 @@ tweetSearch: function(req,res){
 
   return outJSON;
 }
+}
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+var exampleTweet = require('./exampleData/example-tweet.json');
+
 
 module.exports = app;
