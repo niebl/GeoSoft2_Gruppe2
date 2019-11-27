@@ -22,11 +22,13 @@ var params2 = {
 * @param params an object that contains the parameters for a twitter-search query. more info on https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
 * @param interval the interval in milliseconds
 * @see searchTweetExt
+* //TODO: log of output still returns undefined. possibly because return function call searchTweetExt is not waited on 
 */
 function periodicTweetSearchExt(interval, params){
   setInterval(
-    function(interval, params){
-      console.log(searchTweetExt(params));
+    function(){
+      let output = searchTweetExt(params)
+      console.log(output);
     }, interval
   );
 }
@@ -61,8 +63,9 @@ function filterGeotagged(response){
       response.statuses.splice(i, 1);
     }
   }
+  console.log(response)
   return response;
 }
 
-//periodicTweetSearchExt(5000, params2)
-searchTweetExt(params2)
+periodicTweetSearchExt(5000, params2)
+//searchTweetExt(params2)
