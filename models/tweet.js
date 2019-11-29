@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 // Article Schema
 var TweetSchema = mongoose.Schema(
-  {date: Date},
+  {date: Number},
   {lat: Number},
   {lng: Number},
   {Text: String},

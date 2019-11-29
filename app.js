@@ -332,15 +332,13 @@ function postTweetToMongo(tweet){
     Text : tweet.text,
     lat : tweet.coordinates.coordinates[0],
     lng : tweet.coordinates.coordinates[1],
-    Date : 0 //find way to turn twitter date into mongo date
+    Date : Date.parse(tweet.created_at)
   },
   function(err, tweet){
     if(err){    console.log("error in saving tweet to DB");
         console.log(err);}
   }
   );
-
   //newTweet.save(function(err){
-
   //})
 }
