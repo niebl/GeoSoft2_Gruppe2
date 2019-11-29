@@ -1,6 +1,8 @@
 /*jshint esversion: 6 */
+const token = require('./tokens.js');
 
-var twitterApiExt = require('./twitterApiExt.js');
+
+var twitterApiExt = require('./twitApiExt.js');
 
 var createError = require('http-errors');
 var express = require('express');
@@ -26,7 +28,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // mongoose setup
-mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true, useUnifiedTopology: true}, function(err){
+  if (err) {
+    console.log("mongoDB connect failed")
+    console.log(err);
+  }
+  console.log("mongoDB connect succeeded")
+  console.log(mongoose.connection.host)
+  console.log(mongoose.connection.port)
+});
+const TweetSchema = require('./models/tweet.js')
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -48,7 +59,7 @@ app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
 
 // mongoDB models:
-var Tweet = require("./models/tweet");
+var MongoTweet = require("./models/tweet");
 
 //tweet query functions
 {
@@ -293,3 +304,43 @@ var exampleTweet = require('./exampleData/example-tweet.json');
 
 
 module.exports = app;
+
+console.log(twitterApiExt.tweetStreamExt())
+
+console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
+  if(tweet.coordinates != null){
+    console.log(tweet.text);
+    console.log(tweet.coordinates);
+    console.log(tweet.id_str);
+    console.log(tweet.created_at);
+    postTweetToMongo(tweet);
+    console.log("_______________________________");
+
+  }
+}))
+
+/**
+* @function postTweetToMongo
+* @param tweet the tweet object
+* @param includes array containing strings that have to be contained in tweets
+* @param excludes array containing strings that mustn't be in tweets
+* @author Felix
+*/
+function postTweetToMongo(tweet){
+  TweetSchema.create({
+    TweetID : tweet.id_str,
+    Text : tweet.text,
+    lat : tweet.coordinates.coordinates[0],
+    lng : tweet.coordinates.coordinates[1],
+    Date : 0 //find way to turn twitter date into mongo date
+  },
+  function(err, tweet){
+    if(err){    console.log("error in saving tweet to DB");
+        console.log(err);}
+  }
+  );
+
+  //newTweet.save(function(err){
+
+  //})
+}

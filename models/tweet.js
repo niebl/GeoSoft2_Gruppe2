@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 // Article Schema
-var tweetSchema = mongoose.Schema(
+var TweetSchema = mongoose.Schema(
   {date: Date},
   {lat: Number},
   {lng: Number},
@@ -9,4 +9,4 @@ var tweetSchema = mongoose.Schema(
   {TweetID: String}
 );
 
-var Tweet = module.exports = mongoose.model('Tweet', tweetSchema);
+var Tweet = module.exports = mongoose.model('Tweet', TweetSchema);
