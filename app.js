@@ -37,7 +37,7 @@ mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true
   console.log(mongoose.connection.host)
   console.log(mongoose.connection.port)
 });
-const TweetSchema = require('./models/tweet.js')
+const Tweet = require('./models/tweet.js')
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -62,7 +62,7 @@ app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leafle
 var MongoTweet = require("./models/tweet");
 
 //tweet query functions
-{
+
 /**
   * sets the default location of a pair of a location
   * e.g. a default Map view postion
@@ -92,15 +92,24 @@ app.get('/setdefaultlocation/:lat/:lng', function(req, res){
 });
 
 /**
-  * get Tweet in rectangle
-  * @author Dorian
-  * @params rectangular [N, W, S, E]
-  * @return JSOn result
-  */
-function getTweetsInRect(rectangular){
-   return Tweet.find()
+* get Tweet in rectangle
+* @author Dorian
+* @params rectangular [N, W, S, E]
+* @return JSOn result
+*/
+async function getTweetsInRect(rectangular){
+  let output = await Tweet.find()
   .where('lat').gte(rectangular[0]).lte(rectangular[2])
-  .where('lat').gte(rectangular[1]).lte(rectangular[3]);
+  .where('lng').gte(rectangular[1]).lte(rectangular[3])
+  .exec(function(err, docs){
+    if(err){
+      console.log("error in mongo query")
+      console.log(error)
+    }
+
+    console.log(output)
+    return output;
+  });
 }
 
 /**
@@ -151,7 +160,7 @@ function checkPointInRect(point, rectangle){
     return false;
   }
 }
-}
+
 
 //Tweet api
 {
@@ -205,12 +214,13 @@ function tweetSearch(req,res){
 
   {
     //delete later
-    outJSON = exampleTweet;
+    //outJSON = exampleTweet;
   }
 
   //call to function that will look for tweets on TweetDB within bounding box.
   //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
-  //outJSON.tweets = getTweetsInRect(bbox);
+  console.log(bbox)
+  outJSON.tweets = getTweetsInRect(bbox);
 
 
   //QUERY include
@@ -309,12 +319,12 @@ console.log(twitterApiExt.tweetStreamExt())
 
 console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
   if(tweet.coordinates != null){
-    console.log(tweet.text);
-    console.log(tweet.coordinates);
-    console.log(tweet.id_str);
-    console.log(tweet.created_at);
+    // console.log(tweet.text);
+    // console.log(tweet.coordinates);
+    // console.log(tweet.id_str);
+    // console.log(tweet.created_at);
     postTweetToMongo(tweet);
-    console.log("_______________________________");
+    // console.log("_______________________________");
 
   }
 }))
@@ -327,18 +337,32 @@ console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, funct
 * @author Felix
 */
 function postTweetToMongo(tweet){
-  TweetSchema.create({
-    TweetID : tweet.id_str,
-    Text : tweet.text,
+  Tweet.create({
+    tweetID : tweet.id_str,
+    text : tweet.text,
     lat : tweet.coordinates.coordinates[0],
     lng : tweet.coordinates.coordinates[1],
-    Date : Date.parse(tweet.created_at)
+    date : Date.parse(tweet.created_at)
   },
   function(err, tweet){
-    if(err){    console.log("error in saving tweet to DB");
-        console.log(err);}
-  }
-  );
-  //newTweet.save(function(err){
-  //})
+    if(err){
+      console.log("error in saving tweet to DB");
+      console.log(err);
+      return
+    }
+  });
+
+  // let newTweet = new Tweet({
+  //   tweetID : tweet.id_str,
+  //   text : tweet.text,
+  //   lat : tweet.coordinates.coordinates[0],
+  //   lng : tweet.coordinates.coordinates[1],
+  //   date : Date.parse(tweet.created_at)
+  // });
+  // newTweet.save(function(err){
+  //   if(err){
+  //     console.log("error in saving tweet to DB");
+  //     console.log(err);
+  //   }
+  // });
 }
