@@ -86,13 +86,20 @@ app.get("/kreise", (req, res ) =>{
     }
     var kreisListe = JSON.parse(body).features;
     for(var i= 0; i <= kreisListe.length -1; i++){
-      // const kitty = new Tweet({ json: '{"test": "1"}' });
-      // kitty.save();
+        console.log( kreisListe[i].geometry.type);
         var addKreis = new Kreis({
-          Name: kreisListe[i].properties.GEN,
-          Type: kreisListe[i].geometry.type,
-          Border: kreisListe[i].geometry.coordinates[0]
+          geojson: {
+            type: "Feature",
+            properties: {
+              name: kreisListe[i].properties.GEN,
+            },
+            geometry: {
+              type: kreisListe[i].geometry.type,
+              coordinates: kreisListe[i].geometry.coordinates
+           }
+         }
         });
+        //addKreis.properties.name = kreisListe[i].properties.GEN;
         addKreis.save();
         if(i == kreisListe.length -1 ){
           res.send('Regions of germany added into db');
@@ -124,20 +131,27 @@ app.get('/loadUnwetter', (req, res) => {
       }
       var zet = [];
       dangerzone.forEach((item, index) =>{
-
-        for(var i= 0; i< result.length; i++){
-          if(item[0].includes(result[i].Name)){
+        for(var i= 0; i < result.length; i++){
+          if(item[0].includes(result[i].geojson.properties.name)){
+            console.log(item[0] + "   " + result[i].geojson.properties.name);
             var addUnwetterKreis = new UnwetterKreis({
-              Name: result[i].Name,
-              Type: result[i].Type,
-              Border:result[i].Border,
-              Event: item[1]
+              geojson: {
+                type: "Feature",
+                properties: {
+                  name: result[i].geojson.properties.name,
+                  event: item[1]
+                },
+                geometry: {
+                  type: result[i].geojson.geometry.type,
+                  coordinates: result[i].geojson.geometry.coordinates
+               }
+             }
             });
             addUnwetterKreis.save();
           }
         }
       });
-      res.send("Unwetter sind an mongo gesendet");
+      res.send(dangerzone);
     });
 });
 });
@@ -146,13 +160,10 @@ app.get("/getEvent", (req, res)=>{
   UnwetterKreis.find({}, (err, result)=>{
     var json = {type: "FeatureCollection", features:[]};
     result.forEach((item, index) =>{
-      var props = {properties: {name: item.Name, event: item.Event}};
-      var geo = {geometry: {type: item.Type, coordinates: [item.Border]}};
-      var endRes = {type: "Feature", properties: {name: item.Name, event: item.Event},geometry: {type: item.Type, coordinates: [item.Border]} };
-      json.features.push(endRes);
+      json.features.push(item.geojson);
     });
 
-    res.send(json);
+    res.json(json);
   });
 });
 
@@ -163,17 +174,20 @@ app.get("/getEvent", (req, res)=>{
   *
   */
 app.get('/getBorders', (req, res) => {
+
+  let qname =  req.query.name;
+  let qlat =  req.query.lat;
+  let qlng = req.query.lng;
   var regions ={type:"FeatureCollection", features:[]};
   Kreis.find({}, function(err, result){
     if(err){
       console.log(err);
     }
-    for(var i= 0; i < result.length; i++){
 
-        var objKreis ={type: "Feature", properties:{name: result[i].Name}, geometry: {type: result[i].Type, coordinates: [result[i].Border]}};
-        regions.features.push(objKreis);
+    for(var i= 0; i < result.length; i++){
+        regions.features.push(result[i].geojson);
     }
-    res.send(regions);
+    res.json(regions);
   });
 });
 
