@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 const token = require('./tokens.js');
 
 
@@ -92,24 +92,34 @@ app.get('/setdefaultlocation/:lat/:lng', function(req, res){
 });
 
 /**
-* get Tweet in rectangle
-* @author Dorian
+* get Tweets in rectangle
+* @author Dorian, heavily modified by Felix
 * @params rectangular [N, W, S, E]
 * @return JSOn result
 */
 async function getTweetsInRect(rectangular){
-  let output = await Tweet.find()
-  .where('lat').gte(rectangular[0]).lte(rectangular[2])
-  .where('lng').gte(rectangular[1]).lte(rectangular[3])
-  .exec(function(err, docs){
-    if(err){
-      console.log("error in mongo query")
-      console.log(error)
-    }
+  // await Tweet.find()
+  // .where('lat').gte(rectangular[0]).lte(rectangular[2])
+  // .where('lng').gte(rectangular[1]).lte(rectangular[3])
+  // .exec(function(err, docs){
+  //   if(err){
+  //     console.log("error in mongo query")
+  //     console.log(error)
+  //   }
+  //
+  //   console.log(docs)
+  //   return docs;
+  // });
 
-    console.log(output)
-    return output;
-  });
+  let output;
+
+  await Tweet.find(
+    {"text":{"$regex": "klima", "$options":"i"}},
+    function(err,docs){
+      output = docs;
+    }
+  )
+  return output
 }
 
 /**
@@ -192,7 +202,7 @@ app.delete('/tweetAPI', (req, res) => {
 * @author Felix
 * TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
-function tweetSearch(req,res){
+async function tweetSearch(req,res){
   let outJSON = {"tweets" : []};
   let newOutJSON = {"tweets":[]};
   const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
@@ -220,8 +230,9 @@ function tweetSearch(req,res){
   //call to function that will look for tweets on TweetDB within bounding box.
   //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
   console.log(bbox)
-  outJSON.tweets = getTweetsInRect(bbox);
+  outJSON.tweets = await getTweetsInRect(bbox);
 
+  console.log(outJSON)
 
   //QUERY include
   if(include != undefined){
@@ -340,8 +351,8 @@ function postTweetToMongo(tweet){
   Tweet.create({
     tweetID : tweet.id_str,
     text : tweet.text,
-    lat : tweet.coordinates.coordinates[0],
-    lng : tweet.coordinates.coordinates[1],
+    lng : tweet.coordinates.coordinates[0],
+    lat : tweet.coordinates.coordinates[1],
     date : Date.parse(tweet.created_at)
   },
   function(err, tweet){
