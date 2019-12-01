@@ -2,11 +2,11 @@ var mongoose = require('mongoose');
 
 // Article Schema
 var Tweet = mongoose.Schema({
-  date: {type: Number},
-  lat: {type: Number},
-  lng: {type: Number},
+  created_at: {type: Number},
+  //lon-lat-coordinates
+  coordinates: {type: [Number]},
   text: {type: String},
-  tweetID: {type: String, unique: true}
+  id_str: {type: String, unique: true}
 });
 
 var Tweet = module.exports = mongoose.model('Tweet', Tweet);

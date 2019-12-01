@@ -98,28 +98,39 @@ app.get('/setdefaultlocation/:lat/:lng', function(req, res){
 * @return JSOn result
 */
 async function getTweetsInRect(rectangular){
-  // await Tweet.find()
-  // .where('lat').gte(rectangular[0]).lte(rectangular[2])
-  // .where('lng').gte(rectangular[1]).lte(rectangular[3])
-  // .exec(function(err, docs){
-  //   if(err){
-  //     console.log("error in mongo query")
-  //     console.log(error)
-  //   }
-  //
-  //   console.log(docs)
-  //   return docs;
-  // });
-
-  let output;
-
-  await Tweet.find(
-    {"text":{"$regex": "klima", "$options":"i"}},
-    function(err,docs){
-      output = docs;
+  let output
+  await Tweet.find({
+    coordinates: {
+      $geoWithin: {
+        $box : [
+          [rectangular[1],rectangular[3]],
+          [rectangular[2],rectangular[0]]
+        ]
+      }
     }
-  )
+    },
+    function(err, docs){
+      if(err){
+        console.log("~~~~~! error in mongoDB query !~~~~~")
+        console.log(error)
+      }
+
+      console.log(docs)
+      output = docs;
+    });
+    //.where('lat').gte(rectangular[0]).lte(rectangular[2])
+    //.where('lng').gte(rectangular[1]).lte(rectangular[3])
   return output
+  //
+  // let output;
+  //
+  // await Tweet.find(
+  //   {"text":{"$regex": "(regen|wetter|nass|klima)", "$options":"i"}},
+  //   function(err,docs){
+  //     output = docs;
+  //   }
+  // )
+  // return output
 }
 
 /**
@@ -175,8 +186,8 @@ function checkPointInRect(point, rectangle){
 //Tweet api
 {
 //API-endpoints
-app.get('/tweetAPI/search', (req, res) => {
-  res.send(tweetSearch(req, res));
+app.get('/tweetAPI/search', async (req, res) => {
+  res.send(await tweetSearch(req, res));
 });
 
 app.post('/tweetAPI', (req, res) => {
@@ -203,8 +214,8 @@ app.delete('/tweetAPI', (req, res) => {
 * TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
 async function tweetSearch(req,res){
-  let outJSON = {"tweets" : []};
-  let newOutJSON = {"tweets":[]};
+  let outJSON = {tweets : []};
+  let newOutJSON = {tweets : []};
   const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
 
   //access the provided parameters
@@ -222,17 +233,8 @@ async function tweetSearch(req,res){
     bbox[i] = parseFloat(bbox[i]);
   }
 
-  {
-    //delete later
-    //outJSON = exampleTweet;
-  }
-
   //call to function that will look for tweets on TweetDB within bounding box.
-  //IMPORTANT: FUNCTION NAME AND PARAMETERS WILL LIKELY CHANGE.
-  console.log(bbox)
-  outJSON.tweets = await getTweetsInRect(bbox);
-
-  console.log(outJSON)
+  outJSON.tweets = await getTweetsInRect(bbox)
 
   //QUERY include
   if(include != undefined){
@@ -349,11 +351,13 @@ console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, funct
 */
 function postTweetToMongo(tweet){
   Tweet.create({
-    tweetID : tweet.id_str,
+    id_str : tweet.id_str,
     text : tweet.text,
-    lng : tweet.coordinates.coordinates[0],
-    lat : tweet.coordinates.coordinates[1],
-    date : Date.parse(tweet.created_at)
+
+    coordinates : [tweet.coordinates.coordinates[0], tweet.coordinates.coordinates[1]],
+    //lng : tweet.coordinates.coordinates[0],
+    //lat : tweet.coordinates.coordinates[1],
+    created_at : Date.parse(tweet.created_at)
   },
   function(err, tweet){
     if(err){
