@@ -114,8 +114,6 @@ async function getTweetsInRect(rectangular){
         console.log("~~~~~! error in mongoDB query !~~~~~")
         console.log(error)
       }
-
-      console.log(docs)
       output = docs;
     });
     //.where('lat').gte(rectangular[0]).lte(rectangular[2])
@@ -328,17 +326,10 @@ var exampleTweet = require('./exampleData/example-tweet.json');
 
 module.exports = app;
 
-console.log(twitterApiExt.tweetStreamExt())
-
+//TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
 console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
   if(tweet.coordinates != null){
-    // console.log(tweet.text);
-    // console.log(tweet.coordinates);
-    // console.log(tweet.id_str);
-    // console.log(tweet.created_at);
     postTweetToMongo(tweet);
-    // console.log("_______________________________");
-
   }
 }))
 
