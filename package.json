@@ -6,16 +6,19 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "@turf/turf": "^5.1.6",
     "body-parser": "^1.19.0",
-    "express": "~4.16.1",
-    "jquery": "^3.4.1",
-    "pug": "^2.0.4",
     "bootstrap": "^4.3.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "jquery": "^3.4.1",
     "leaflet": "^1.5.1",
     "mongoose": "^5.7.8",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "pug": "^2.0.4",
+    "request": "^2.88.0",
+    "twitter": "^1.7.1"
   }
 }
