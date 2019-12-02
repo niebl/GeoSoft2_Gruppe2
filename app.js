@@ -116,19 +116,7 @@ async function getTweetsInRect(rectangular){
       }
       output = docs;
     });
-    //.where('lat').gte(rectangular[0]).lte(rectangular[2])
-    //.where('lng').gte(rectangular[1]).lte(rectangular[3])
   return output
-  //
-  // let output;
-  //
-  // await Tweet.find(
-  //   {"text":{"$regex": "(regen|wetter|nass|klima)", "$options":"i"}},
-  //   function(err,docs){
-  //     output = docs;
-  //   }
-  // )
-  // return output
 }
 
 /**
@@ -344,10 +332,7 @@ function postTweetToMongo(tweet){
   Tweet.create({
     id_str : tweet.id_str,
     text : tweet.text,
-
     coordinates : [tweet.coordinates.coordinates[0], tweet.coordinates.coordinates[1]],
-    //lng : tweet.coordinates.coordinates[0],
-    //lat : tweet.coordinates.coordinates[1],
     created_at : Date.parse(tweet.created_at)
   },
   function(err, tweet){
