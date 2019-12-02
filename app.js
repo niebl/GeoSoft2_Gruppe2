@@ -30,14 +30,14 @@ app.use(bodyParser.json());
 // mongoose setup
 mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true, useUnifiedTopology: true}, function(err){
   if (err) {
-    console.log("mongoDB connect failed")
+    console.log("mongoDB connect failed");
     console.log(err);
   }
-  console.log("mongoDB connect succeeded")
-  console.log(mongoose.connection.host)
-  console.log(mongoose.connection.port)
+  console.log("mongoDB connect succeeded");
+  console.log(mongoose.connection.host);
+  console.log(mongoose.connection.port);
 });
-const Tweet = require('./models/tweet.js')
+const Tweet = require('./models/tweet.js');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -57,9 +57,6 @@ app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist')
 // use scripts, styles in webserver
 app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.css'));
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
-
-// mongoDB models:
-var MongoTweet = require("./models/tweet");
 
 //tweet query functions
 
@@ -95,28 +92,29 @@ app.get('/setdefaultlocation/:lat/:lng', function(req, res){
 * get Tweets in rectangle
 * @author Dorian, heavily modified by Felix
 * @params rectangular [N, W, S, E]
-* @return JSOn result
+* @return Array
 */
 async function getTweetsInRect(rectangular){
   let output
   await Tweet.find({
-    coordinates: {
+    'geojson.geometry.coordinates': {
       $geoWithin: {
         $box : [
-          [rectangular[1],rectangular[2]], //South-west
-          [rectangular[3],rectangular[0]] //North-east
+          [rectangular[1],rectangular[2]], //West-Sount
+          [rectangular[3],rectangular[0]] //East-North
         ]
       }
     }
-    },
-    function(err, docs){
-      if(err){
-        console.log("~~~~~! error in mongoDB query !~~~~~")
-        console.log(error)
-      }
-      output = docs;
-    });
-  return output
+  },
+  function(err, docs){
+    if(err){
+      console.log("~~~~~! error in mongoDB query !~~~~~")
+      console.log(error)
+    }
+    console.log(docs)
+    output = docs;
+  });
+  return output;
 }
 
 /**
@@ -329,11 +327,24 @@ console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, funct
 * @author Felix
 */
 function postTweetToMongo(tweet){
+  console.log(tweet)
   Tweet.create({
     id_str : tweet.id_str,
     text : tweet.text,
-    coordinates : [tweet.coordinates.coordinates[0], tweet.coordinates.coordinates[1]],
-    created_at : Date.parse(tweet.created_at)
+    created_at : Date.parse(tweet.created_at),
+    //coordinates : [tweet.coordinates.coordinates[0], tweet.coordinates.coordinates[1]],
+    geojson: {
+      type: "Feature",
+      properties: {
+        text: tweet.text,
+        id_str : tweet.id_str,
+        created_at : Date.parse(tweet.created_at)
+      },
+      geometry: {
+        type : "Point",
+        coordinates : [tweet.coordinates.coordinates[0], tweet.coordinates.coordinates[1]]
+      }
+    }
   },
   function(err, tweet){
     if(err){

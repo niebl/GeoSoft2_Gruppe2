@@ -4,7 +4,17 @@ var mongoose = require('mongoose');
 var Tweet = mongoose.Schema({
   created_at: {type: Number},
   //lon-lat-coordinates
-  coordinates: {type: [Number]},
+  coordinates1: {type: [Number]},
+  geojson:{
+      type: { type: String },
+      properties: {
+        text: { type: String }
+      },
+      geometry: {
+        type: { type: String },
+        coordinates: {type: [Number]}
+      }
+    },
   text: {type: String},
   id_str: {type: String, unique: true}
 });
