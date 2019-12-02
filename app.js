@@ -342,18 +342,4 @@ function postTweetToMongo(tweet){
       return
     }
   });
-
-  // let newTweet = new Tweet({
-  //   tweetID : tweet.id_str,
-  //   text : tweet.text,
-  //   lat : tweet.coordinates.coordinates[0],
-  //   lng : tweet.coordinates.coordinates[1],
-  //   date : Date.parse(tweet.created_at)
-  // });
-  // newTweet.save(function(err){
-  //   if(err){
-  //     console.log("error in saving tweet to DB");
-  //     console.log(err);
-  //   }
-  // });
 }
