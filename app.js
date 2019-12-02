@@ -103,9 +103,8 @@ async function getTweetsInRect(rectangular){
     coordinates: {
       $geoWithin: {
         $box : [
-          //UNSURE IF CORRECT PARAMS https://docs.mongodb.com/manual/reference/operator/query/box/
-          [rectangular[1],rectangular[3]],
-          [rectangular[2],rectangular[0]]
+          [rectangular[1],rectangular[2]], //South-west
+          [rectangular[3],rectangular[0]] //North-east
         ]
       }
     }
