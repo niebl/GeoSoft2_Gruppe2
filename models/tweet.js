@@ -3,15 +3,15 @@ var mongoose = require('mongoose');
 // Article Schema
 var Tweet = mongoose.Schema({
   created_at: {type: Number},
-  //lon-lat-coordinates
   coordinates1: {type: [Number]},
   geojson:{
       type: { type: String },
       properties: {
-        text: { type: String }
+        
       },
       geometry: {
         type: { type: String },
+        //lon-lat-coordinates
         coordinates: {type: [Number]}
       }
     },

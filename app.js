@@ -327,18 +327,13 @@ console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, funct
 * @author Felix
 */
 function postTweetToMongo(tweet){
-  console.log(tweet)
   Tweet.create({
     id_str : tweet.id_str,
     text : tweet.text,
     created_at : Date.parse(tweet.created_at),
-    //coordinates : [tweet.coordinates.coordinates[0], tweet.coordinates.coordinates[1]],
     geojson: {
       type: "Feature",
       properties: {
-        text: tweet.text,
-        id_str : tweet.id_str,
-        created_at : Date.parse(tweet.created_at)
       },
       geometry: {
         type : "Point",
@@ -350,7 +345,7 @@ function postTweetToMongo(tweet){
     if(err){
       console.log("error in saving tweet to DB");
       console.log(err);
-      return
+      return false;
     }
   });
 }
