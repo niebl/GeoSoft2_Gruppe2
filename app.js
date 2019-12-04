@@ -157,6 +157,7 @@ app.get('/loadUnwetter', (req, res) => {
 });
 
 app.get("/getEvent", (req, res)=>{
+  //var qname = req.query.name;
   UnwetterKreis.find({}, (err, result)=>{
     var json = {type: "FeatureCollection", features:[]};
     result.forEach((item, index) =>{
@@ -174,21 +175,34 @@ app.get("/getEvent", (req, res)=>{
   *
   */
 app.get('/getBorders', (req, res) => {
-
+  // ?name=Example
   let qname =  req.query.name;
-  let qlat =  req.query.lat;
-  let qlng = req.query.lng;
-  var regions ={type:"FeatureCollection", features:[]};
-  Kreis.find({}, function(err, result){
-    if(err){
-      console.log(err);
-    }
 
-    for(var i= 0; i < result.length; i++){
-        regions.features.push(result[i].geojson);
-    }
-    res.json(regions);
-  });
+  var regions ={type:"FeatureCollection", features:[]};
+  if(qname != undefined){
+    //find featrues by name
+    Kreis.find({geojson: {properties: {name: qname}}}, function(err, result){
+      if(err){
+        console.log(err);
+      }
+
+      for(var i= 0; i < result.length; i++){
+          regions.features.push(result[i].geojson);
+      }
+    });
+  }else{
+    //find features by no query
+    Kreis.find({}, function(err, result){
+      if(err){
+        console.log(err);
+      }
+
+      for(var i= 0; i < result.length; i++){
+          regions.features.push(result[i].geojson);
+      }
+    });
+  }
+  res.json(regions);
 });
 
 /**
