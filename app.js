@@ -53,10 +53,12 @@ app.use('/users', usersRouter);
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
+app.use('/popper.js', express.static(__dirname + '/node_modules/popper.js/dist'))
 
 // use scripts, styles in webserver
 app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.css'));
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
+app.use("/siteScripts", express.static(__dirname+'/public/javascripts/siteScripts.js'))
 
 //tweet query functions
 

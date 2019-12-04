@@ -8,8 +8,19 @@ html
     link(rel='stylesheet', href='/leaflet/leaflet.css')
     script(src="/jquery/jquery.js")
     script(src="/bootstrap/js/bootstrap.js")
+    //script(src="/popper.js/popper.js")
     script(src="/leaflet/leaflet.js")
   body
+    block navbar
+      //.container-fluid
+      nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(style="background-color: #e3f2fd;")
+        a.navbar-brand(href='/') GEOmergency
+        ul.navbar-nav.mr-auto
+          li.nav-item.active
+            a.nav-link(href='/') Home
+        button#update-map.btn.btn-outline-success.my-2.my-sm-0 Update Map
+                  
     div#map
     script(src="/leafletscript")
+    script(src="/siteScripts")
     block content

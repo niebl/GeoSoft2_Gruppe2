@@ -1,4 +1,4 @@
-
+/*jshint esversion: 8 */
 
 var street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     id: 'map',
@@ -36,11 +36,46 @@ var baseMaps = {
 };
 
 var map = L.map('map', {
-  layers:  [topo]
-}).setView([52, 8], 5);
+  layers:  [street]
+}).setView([51.16, 10.45], 6);
 
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+/**
+* @object shapesOnMap.
+* @desc the object containing info of all shapes on the map
+* @author Felix
+*/
+var shapesOnMap = {
+  tweets: []
+}
+
+/**
+* @function addTweetToMap
+* @desc adds a given shape, in this case likely a tweet, to the map.
+* leaning on https://stackoverflow.com/questions/45931963/leaflet-remove-specific-marker
+* BE SURE TO HAVE A GLOBAL VARIABLE shapes DECLARED AS AN ARRAY
+* @param mapdiv the map id of the map
+* @param input the GeoJSON of the shape to be added to the map
+* @Author Felix
+*/
+function addTweetToMap(mapdiv, input){
+  var id;
+
+  //choose a fitting id for the current shape
+  if (shapesOnMap.tweets.length < 1) id = 0;
+  else id = shapes.length;
+
+  //create a leaflet object from the given coordinates and colors
+  var newShape = new L.GeoJSON(input);
+  newShape._id = id;
+  newShape.bindPopup(/*THE TWEET IS EMBEDDED HERE*/)
+  map.addLayer(newShape);
+  shapes.push(newShape);
+}
+
+
 
 
 /**
