@@ -12,3 +12,6 @@ $("#update-map").click(function(){
 * @param bbox array of [lat-Northwest, lon-Northwest, lat-Southeast, lon-Southeast]
 * @returns Object containing array of information about Tweets
 */
+function getTweets(bbox){
+  
+}

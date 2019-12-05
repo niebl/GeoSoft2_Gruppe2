@@ -60,7 +60,7 @@ var shapesOnMap = {
 * @param input the GeoJSON of the shape to be added to the map
 * @Author Felix
 */
-function addTweetToMap(mapdiv, input){
+async function addTweetToMap(mapdiv, input){
   var id;
 
   //choose a fitting id for the current shape
@@ -70,11 +70,38 @@ function addTweetToMap(mapdiv, input){
   //create a leaflet object from the given coordinates and colors
   var newShape = new L.GeoJSON(input);
   newShape._id = id;
-  newShape.bindPopup(/*THE TWEET IS EMBEDDED HERE*/)
+  await newShape.bindPopup(/*THE TWEET IS EMBEDDED HERE*/)
   map.addLayer(newShape);
   shapes.push(newShape);
 }
 
+/**
+* @function getEmbeddedTweet
+* @desc sends a rewuest to the twitter Oembed API to get an embedded tweet https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
+* @param id_str the id of the tweet that is to be embedded
+* @returns html of the embedded tweet
+* @Author Felix
+*/
+async function getEmbeddedTweet(id_str){
+  let output;
+  let requestURL = "https://publish.twitter.com/oembed?url=https://twitter.com/t/status/"
+  requestURL = requestURL.concat(id_str)
+
+  await $.ajax({
+    url: requestURL,
+    dataType: "jsonp",
+    success: function(data){
+      console.log(data)
+      console.log(data.html)
+      output = data.html;
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log(output)
+      output = thrownError;
+    }
+  });
+  return output;
+}
 
 
 
