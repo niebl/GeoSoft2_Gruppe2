@@ -8,7 +8,7 @@ var kreisSchema = mongoose.Schema({
       name: String
     },
     geometry: {
-       type: { type: String },
+      type: { type: String },
       coordinates: Array}
     }
   }

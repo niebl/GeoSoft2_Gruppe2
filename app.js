@@ -109,7 +109,17 @@ app.get("/kreise", (req, res ) =>{
   });
 });
 
-app.get('/loadUnwetter', (req, res) => {
+app.get('/deleteUnwetter', (req, res) => {
+    UnwetterKreis.deleteMany({}, (err, result) => {
+      next();
+    });
+});
+
+app.get('/loadUnwetter', (req, res, next) => {
+    UnwetterKreis.deleteMany({}, (err, result) => {
+      next();
+    });
+}, (req, res) => {
   var requestSettings = {
         url: "http://localhost:3000/gemeinden",
         method: 'GET'
@@ -125,6 +135,7 @@ app.get('/loadUnwetter', (req, res) => {
     for(var key in warnings.warnings){
       dangerzone.push([warnings.warnings[key][0].regionName, warnings.warnings[key][0].event]);
     }
+
     Kreis.find({}, function(err, result){
       if(err){
         console.log(err);
@@ -133,7 +144,6 @@ app.get('/loadUnwetter', (req, res) => {
       dangerzone.forEach((item, index) =>{
         for(var i= 0; i < result.length; i++){
           if(item[0].includes(result[i].geojson.properties.name)){
-            console.log(item[0] + "   " + result[i].geojson.properties.name);
             var addUnwetterKreis = new UnwetterKreis({
               geojson: {
                 type: "Feature",
@@ -156,14 +166,33 @@ app.get('/loadUnwetter', (req, res) => {
 });
 });
 
-app.get("/getEvent", (req, res)=>{
+// coordinates are points=lng, lat
+// url?name=<placeholder>&coordinates=<[lat, lng]>
+app.get("/getUnwetter", (req, res)=>{
   //var qname = req.query.name;
-  UnwetterKreis.find({}, (err, result)=>{
+  var query = {};
+  if(req.query.event){
+    query['geojson.properties.event'] = req.query.event;
+  }
+  if(req.query.name){
+    // query = {'geojson.properties.name' : req.query.name};
+    query['geojson.properties.name'] = req.query.name;
+  }
+  if(req.query.coordinates){
+    var coords = req.query.coordinates.split(",");
+    query['geojson.geometry']=
+     {$geoIntersects: {$geometry: {
+      type: "Point",
+      coordinates: coords}}};
+  }
+  UnwetterKreis.find(query, (err, result)=>{
+  if(err){
+      console.log(err);
+    }
     var json = {type: "FeatureCollection", features:[]};
     result.forEach((item, index) =>{
       json.features.push(item.geojson);
     });
-
     res.json(json);
   });
 });
@@ -176,33 +205,31 @@ app.get("/getEvent", (req, res)=>{
   */
 app.get('/getBorders', (req, res) => {
   // ?name=Example
-  let qname =  req.query.name;
 
   var regions ={type:"FeatureCollection", features:[]};
-  if(qname != undefined){
-    //find featrues by name
-    Kreis.find({geojson: {properties: {name: qname}}}, function(err, result){
-      if(err){
-        console.log(err);
-      }
-
-      for(var i= 0; i < result.length; i++){
-          regions.features.push(result[i].geojson);
-      }
-    });
-  }else{
-    //find features by no query
-    Kreis.find({}, function(err, result){
-      if(err){
-        console.log(err);
-      }
-
-      for(var i= 0; i < result.length; i++){
-          regions.features.push(result[i].geojson);
-      }
-    });
+  var query = {};
+  if(req.query.name){
+    // query = {'geojson.properties.name' : req.query.name};
+    query['geojson.properties.name'] = req.query.name;
   }
-  res.json(regions);
+  if(req.query.coordinates){
+    var coords = req.query.coordinates.split(",");
+    query['geojson.geometry']=
+     {$geoIntersects: {$geometry: {
+      type: "Point",
+      coordinates: coords}}};
+  }
+    //find featrues by name
+    Kreis.find(query, function(err, result){
+      if(err){
+        console.log(err);
+      }
+
+      for(var i= 0; i < result.length; i++){
+          regions.features.push(result[i].geojson);
+      }
+        res.json(regions);
+    });
 });
 
 /**

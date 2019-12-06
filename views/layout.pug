@@ -10,6 +10,14 @@ html
     script(src="/bootstrap/js/bootstrap.js")
     script(src="/leaflet/leaflet.js")
   body
-    div#map
-    script(src="/leafletscript")
-    block content
+    div.row
+      div#sidebar.col-3
+        div.container-fluid
+          div.row
+            div#nav.col-sm.btn.btn-warning(onclick='loadDoc') Warnings
+            div#nav.col-sm.btn.btn-warning Weather Events
+            div#nav.col-sm.btn.btn-warning Preciption
+          block navig
+      div#map.col-9
+      script(src="/leafletscript")
+      block content

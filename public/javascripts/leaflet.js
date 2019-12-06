@@ -30,34 +30,6 @@ var map = L.map('map', {
 
 L.control.layers(baseMaps).addTo(map);
 
-var states = [{
-    "type": "Feature",
-    "properties": {"party": "Republican"},
-    "geometry": {
-        "type": "Polygon",
-        "coordinates": [[
-            [-104.05, 48.99],
-            [-97.22,  48.98],
-            [-96.58,  45.94],
-            [-104.03, 45.94],
-            [-104.05, 48.99]
-        ]]
-    }
-}, {
-    "type": "Feature",
-    "properties": {"party": "Democrat"},
-    "geometry": {
-        "type": "Polygon",
-        "coordinates": [[
-            [-109.05, 41.00],
-            [-102.06, 40.99],
-            [-102.03, 36.99],
-            [-109.04, 36.99],
-            [-109.05, 41.00]
-        ]]
-    }
-}];
-
 /**
   * @example loadDoc()
   * Sets a marker using cookies via ajax request
@@ -71,11 +43,9 @@ function loadDoc() {
       //L.marker(JSON.parse(this.response)).addTo(map).bindPopup("I am an orange leaf.");
       console.log(JSON.parse(this.response));
       L.geoJSON(JSON.parse(this.response), {style:{'color': 'red'}}).addTo(map);
-
-
     }
   };
-  xhttp.open("GET", "/getEvent", true);
+  xhttp.open("GET", "/getUnwetter?coordinates=9,52", true);
   xhttp.send();
 }
 loadDoc();
