@@ -166,10 +166,14 @@ app.get('/loadUnwetter', (req, res, next) => {
 });
 });
 
-// coordinates are points=lng, lat
-// url?name=<placeholder>&coordinates=<[lat, lng]>
-app.get("/getUnwetter", (req, res)=>{
-  //var qname = req.query.name;
+
+/** requesting GEJSOn of bad Weather events
+  * @author Dorian
+  * @url?name=<placeholder>&coordinates=<lng,lat>&event=<EVENT>
+  * @example http://localhost:3000/getUnwetter?event=GLATTEIS&name=Münster
+  */
+
+  app.get("/getUnwetter", (req, res)=>{
   var query = {};
   if(req.query.event){
     query['geojson.properties.event'] = req.query.event;
@@ -201,15 +205,14 @@ app.get("/getUnwetter", (req, res)=>{
 
 /** requesting GEJSOn of deutsche Kreise
   * @author Dorian
-  *
+  * url?name=<placeholder>&coordinates=<lng,lat>
+  * @example url/getBorders?coordinates=9,53
   */
 app.get('/getBorders', (req, res) => {
-  // ?name=Example
-
   var regions ={type:"FeatureCollection", features:[]};
   var query = {};
   if(req.query.name){
-    // query = {'geojson.properties.name' : req.query.name};
+
     query['geojson.properties.name'] = req.query.name;
   }
   if(req.query.coordinates){
