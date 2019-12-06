@@ -14,7 +14,9 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
+const https = require('https');
 var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -171,20 +173,17 @@ function checkPointInRect(point, rectangle){
 
 //Tweet api
 {
-//API-endpoints
+//~~~~~~~API-endpoints~~~~~~~
+//public DB search API
 app.get('/tweetAPI/search', async (req, res) => {
   res.send(await tweetSearch(req, res));
 });
 
-app.post('/tweetAPI', (req, res) => {
-  //post here
-  res.send('POST request to the homepage');
+//private tweet embed api
+app.get('/embedTweet', async (req, res) => {
+  await embedTweet(req,res);
 });
 
-app.delete('/tweetAPI', (req, res) => {
-  //delete here https://dustinpfister.github.io/2018/06/21/express-app-delete/
-  res.send('DELETE request to the homepage');
-});
 
 /**
 * @function tweetSearch callback function
@@ -195,7 +194,8 @@ app.delete('/tweetAPI', (req, res) => {
 *         exclude: The strings that aren't to be included in the returned tweets
 *         fields: The fields of the tweets that are to be returned
 *         latest: whether or not to only show the latest tweet
-* @param req the request that was submitted in the REST QUERY
+* @param req
+* @param res
 * @author Felix
 * TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
@@ -291,6 +291,30 @@ async function tweetSearch(req,res){
 
   return outJSON;
 }
+}
+
+/**
+* @function embedTweet
+* @desc callback function of the tweet embed api
+* acts as a bridge between the twitter oembed api and the client side.
+* because CORS was headache inducing.
+* @param req
+* @param res
+* @Author Felix
+*/
+async function embedTweet(req, response){
+  let output;
+  var requestURL = "http://publish.twitter.com/oembed?url=https://twitter.com/t/status/";
+  let id_str = req.query.id;
+
+  requestURL = requestURL.concat(id_str);
+
+  await request(requestURL , {json:true}, (err,res,body) => {
+    if (err){return console.log(err);}
+
+    output = body;
+    response.send(body)
+  });
 }
 
 // catch 404 and forward to error handler

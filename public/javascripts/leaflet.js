@@ -84,25 +84,28 @@ async function addTweetToMap(mapdiv, input){
 */
 async function getEmbeddedTweet(id_str){
   let output;
-  let requestURL = "https://publish.twitter.com/oembed?url=https://twitter.com/t/status/"
-  requestURL = requestURL.concat(id_str)
+  var requestURL = "http://publish.twitter.com/oembed?url=https://twitter.com/t/status/";
+  //let requestURL = "https://localhost:3000/embedTweet?id="
+  requestURL = requestURL.concat(id_str)+"&callback=embeddedCallback";
+
+  var embeddedCallback = function(data){
+    console.log(data);
+  }
 
   await $.ajax({
     url: requestURL,
-    dataType: "jsonp",
+    dataType: 'jsonp',
+    //contentType: 'application/json',
     success: function(data){
       console.log(data)
-      console.log(data.html)
-      output = data.html;
     },
     error: function(xhr, ajaxOptions, thrownError){
       console.log(output)
       output = thrownError;
     }
   });
-  return output;
+  //return output;
 }
-
 
 
 /**
