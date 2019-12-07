@@ -57,7 +57,7 @@ var shapesOnMap = {
 * leaning on https://stackoverflow.com/questions/45931963/leaflet-remove-specific-marker
 * BE SURE TO HAVE A GLOBAL VARIABLE shapes DECLARED AS AN ARRAY
 * @param mapdiv the map id of the map
-* @param input the GeoJSON of the shape to be added to the map
+* @param input the object of the tweet to be added to the map
 * @Author Felix
 */
 async function addTweetToMap(mapdiv, input){
@@ -68,16 +68,22 @@ async function addTweetToMap(mapdiv, input){
   else id = shapes.length;
 
   //create a leaflet object from the given coordinates and colors
-  var newShape = new L.GeoJSON(input);
+  var newShape = new L.GeoJSON(input.geojson);
   newShape._id = id;
-  await newShape.bindPopup(/*THE TWEET IS EMBEDDED HERE*/)
+  newShape.bindPopup(await getEmbeddedTweet(input.id_str))
   map.addLayer(newShape);
   shapes.push(newShape);
 }
 
+var embeddedCallback = function(data){
+  if(data != undefined){
+    return data;
+  } else {return "nonexistant";}
+}
+
 /**
 * @function getEmbeddedTweet
-* @desc sends a rewuest to the twitter Oembed API to get an embedded tweet https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
+* @desc sends a request to the twitter Oembed API to get an embedded tweet https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
 * @param id_str the id of the tweet that is to be embedded
 * @returns html of the embedded tweet
 * @Author Felix
@@ -86,25 +92,23 @@ async function getEmbeddedTweet(id_str){
   let output;
   var requestURL = "http://publish.twitter.com/oembed?url=https://twitter.com/t/status/";
   //let requestURL = "https://localhost:3000/embedTweet?id="
-  requestURL = requestURL.concat(id_str)+"&callback=embeddedCallback";
-
-  var embeddedCallback = function(data){
-    console.log(data);
-  }
+  requestURL = requestURL.concat(id_str);
 
   await $.ajax({
     url: requestURL,
     dataType: 'jsonp',
-    contentType: 'application/json',
+    //contentType: 'application/json',
+    //success: embeddedCallback,
+    jsonpCallback: 'embeddedCallback',
     success: function(data){
-      console.log(data)
+      output = data;
     },
     error: function(xhr, ajaxOptions, thrownError){
-      console.log(output)
-      output = thrownError;
+      console.log(xhr.status);
+      console.log(thrownError)
     }
   });
-  //return output;
+  return output.html;
 }
 
 

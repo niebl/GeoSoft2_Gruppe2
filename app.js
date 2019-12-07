@@ -115,7 +115,6 @@ async function getTweetsInRect(rectangular){
       console.log("~~~~~! error in mongoDB query !~~~~~")
       console.log(error)
     }
-    console.log(docs)
     output = docs;
   });
   return output;
@@ -172,16 +171,11 @@ function checkPointInRect(point, rectangle){
 
 
 //Tweet api
-{
+
 //~~~~~~~API-endpoints~~~~~~~
 //public DB search API
 app.get('/tweetAPI/search', async (req, res) => {
   res.send(await tweetSearch(req, res));
-});
-
-//private tweet embed api
-app.get('/embedTweet', async (req, res) => {
-  await embedTweet(req,res);
 });
 
 
@@ -291,47 +285,7 @@ async function tweetSearch(req,res){
 
   return outJSON;
 }
-}
 
-/**
-* @function embedTweet
-* @desc callback function of the tweet embed api
-* acts as a bridge between the twitter oembed api and the client side.
-* because CORS was headache inducing.
-* @param req
-* @param res
-* @Author Felix
-*/
-async function embedTweet(req, response){
-  let output;
-  var requestURL = "http://publish.twitter.com/oembed?url=https://twitter.com/t/status/";
-  let id_str = req.query.id;
-
-  requestURL = requestURL.concat(id_str);
-
-  await request(requestURL , {json:true}, (err,res,body) => {
-    if (err){return console.log(err);}
-
-    output = body;
-    response.send(body)
-  });
-}
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
 
 var exampleTweet = require('./exampleData/example-tweet.json');
 

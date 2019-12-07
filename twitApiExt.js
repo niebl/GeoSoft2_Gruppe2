@@ -79,7 +79,6 @@ module.exports = {
     });
 
     tweetPromise.then(function(tweets){
-      console.log(tweets);
       return(tweets);
     });
 
