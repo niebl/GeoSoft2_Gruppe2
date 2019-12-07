@@ -95,7 +95,7 @@ async function getEmbeddedTweet(id_str){
   await $.ajax({
     url: requestURL,
     dataType: 'jsonp',
-    //contentType: 'application/json',
+    contentType: 'application/json',
     success: function(data){
       console.log(data)
     },
