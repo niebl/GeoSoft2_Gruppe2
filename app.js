@@ -95,7 +95,7 @@ app.get('/setdefaultlocation/:lat/:lng', function(req, res){
 /**
 * get Tweets in rectangle
 * @author Dorian, heavily modified by Felix
-* @params rectangular [N, W, S, E]
+* @param rectangular [N, W, S, E], WGS84
 * @return Array
 */
 async function getTweetsInRect(rectangular){
@@ -117,6 +117,28 @@ async function getTweetsInRect(rectangular){
     }
     output = docs;
   });
+  return output;
+}
+
+/**
+* @function queryTweets
+* @author Felix
+* @param queries, Object of mongoose queries
+* @return mongoose docs
+*/
+async function queryTweets(queries){
+  let output;
+  await Tweet.find(
+    queries,
+    function(err,docs){
+      if(err){
+        console.log("~~~~~! error in mongoDB query !~~~~~");
+        console.log(error);
+      } else {
+      output = docs;
+      }
+    }
+  );
   return output;
 }
 
@@ -199,6 +221,7 @@ async function tweetSearch(req,res){
   const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
 
   //access the provided parameters
+  var older_than = req.query.older_than
   var bbox = req.query.bbox;
   var include = req.query.include;
   var exclude = req.query.exclude;
@@ -213,8 +236,26 @@ async function tweetSearch(req,res){
     bbox[i] = parseFloat(bbox[i]);
   }
 
+  //QUERY older_than
+  //if no or incorrect time data is given, set to unix timestamp 0
+  if (older_than == undefined || isNaN(older_than)){
+    older_than = 0;
+  }
+
   //call to function that will look for tweets on TweetDB within bounding box.
-  outJSON.tweets = await getTweetsInRect(bbox)
+  //outJSON.tweets = await getTweetsInRect(bbox)
+  outJSON.tweets = await queryTweets({
+    'geojson.geometry.coordinates': {
+      $geoWithin: {
+        $box : [
+          [bbox[1],bbox[2]], //West-Sount
+          [bbox[3],bbox[0]] //East-North
+        ]
+      }
+    },
+    created_at: {$gt: older_than}
+  })
+
 
   //QUERY include
   if(include != undefined){

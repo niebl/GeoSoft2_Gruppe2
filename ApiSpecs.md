@@ -33,7 +33,8 @@
   Allows to EXCLUDE tweets containing certain strings.  
 
   **Parameters**
-  * `bbox` the geographical boundaries in which the tweets are located (WGS84)  
+  * `bbox` the geographical boundaries in which the tweets are located (WGS84)
+  * `older_than` the minimum age of the tweets
   * `include` the string to be included  
   * `exclude` the string to be excluded  
   * `fields` specify which fields to return in the response JSON  
@@ -54,6 +55,7 @@
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
 |bbox|number array|required|bounding box of 2 coordinates in the WGS84 format, represented as an array of four numbers: `bbox={lat northwest corner},{lon northwest corner},{lat southeast corner},{lon southeast corner}`|
+|older_than|number|optional|timestamp (in milliseconds) of the time the tweet's created_at is not allowed to fall below|
 |include|string|optional|a string that is to be included in the returned tweets' texts.|
 |exclude|string|optional|a string that is not to be contained within the returned tweets' texts.|
 |fields|string array|optional|The fields that are to be included in the returned tweets' JSON. formatted as an array of strings: `fields=field1,field2,...,fieldN`|
