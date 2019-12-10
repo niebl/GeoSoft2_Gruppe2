@@ -15,7 +15,7 @@ var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
 const https = require('https');
-const turfjs = require('@turf/turf')
+const turf = require('@turf/turf')
 var app = express();
 
 
@@ -57,7 +57,7 @@ app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use('/popper.js', express.static(__dirname + '/node_modules/popper.js/dist'))
-app.use('/turfjs', express.static(__dirname + '/node_modules/@turf/turf'))
+app.use('/turf', express.static(__dirname + '/node_modules/@turf/turf'))
 
 // use scripts, styles in webserver
 app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.css'));

@@ -66,14 +66,20 @@ async function addTweetToMap(mapdiv, input){
   //use _leaflet_id
 
   //check if there is already a tweet within 20 meters on that map
-  for (tweet of shapesOnMap.tweets){
+  for (var tweet of shapesOnMap.tweets){
+    console.log(tweet)
+    console.log(turf.distance(
+      turf.point(input.geojson.geometry.coordinates),
+      turf.point([tweet._layers._latlng.lng, tweet._layers._latlng.lat]),
+      {units: 'meters'}
+    ))
+
     if (turf.distance(
-      (input.geojson.geometry.coordinates),
-      (tweet.geojson.geometry.coordinates),
-      {units: meters}
+      turf.point(input.geojson.geometry.coordinates),
+      turf.point(tweet.geojson.geometry.coordinates),
+      {units: 'meters'}
     ) <= 20){
       //append embedded tweet to existing pin
-
       break;
     }
   }
@@ -102,7 +108,7 @@ async function getEmbeddedTweet(id_str){
     if(data != undefined){
       output = data
       return data;
-    } else {return {html: "<b>something went wrong</b>"};}
+    } else {return {html: "<b>Tweet not Available</b>"};}
   }
 
   await $.ajax({
