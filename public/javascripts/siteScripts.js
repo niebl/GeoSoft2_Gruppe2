@@ -1,11 +1,15 @@
 /*jshint esversion: 8 */
 
 var bbox = "47.15,5.00,55.22,15.20";
+var older_than;
+
+//initialise with the current timestamp, -5 minutes
+older_than = Date.now() - 300000
 
 //site-events
 //click of UPDATE MAP button
 $("#update-map").click(function(){
-  showAllTweets();
+  updateMapTweets();
 });
 
 /**
@@ -14,29 +18,48 @@ $("#update-map").click(function(){
 async function showAllTweets(){
   //make a promise to ensure the tweets are there before executing the rest of the function
   var tweetPromise = new Promise(async function(resolve, reject){
-    var tweets = await getTweets(bbox);
+    var tweets = await getTweets("bbox="+bbox+"&older_than="+older_than);
     resolve(tweets.tweets);
   });
 
   tweetPromise.then(function(tweets){
     for (let tweet of tweets){
+      console.log("chirp")
       console.log(tweet)
       addTweetToMap("map", tweet);
     }
   });
+}
 
+/**
+* @function updatgeMapTweets
+* @desc updates the map with the tweets that have
+*/
+async function updateMapTweets(){
+  var tweetPromise = new Promise(async function(resolve, reject){
+    var tweets = await getTweets("bbox="+bbox+"&older_than="+older_than);
+    resolve(tweets.tweets);
+  });
+  //update the timestamp to where tweets were last fetched
+  older_than = Date.now()
+  tweetPromise.then(function(tweets){
+    for (let tweet of tweets){
+      addTweetToMap("map", tweet);
+    }
+  });
 }
 
 /**
 * @function getTweets
 * @desc queries internal API for tweets within given bounding box
-* @param bbox string of "lat-Northwest, lon-Northwest, lat-Southeast, lon-Southeast" (WGS84)
+* @param params string of parameters for the API query.
+* @see ApiSpecs
 * @returns Object containing array of information about Tweets
 */
-async function getTweets(bbox){
+async function getTweets(params){
   let output;
   var requestURL = "http://localhost:3000/tweetAPI/search?";
-  requestURL = requestURL + "bbox=" + bbox;
+  requestURL = requestURL + params;
 
   console.log(requestURL)
   await $.ajax({

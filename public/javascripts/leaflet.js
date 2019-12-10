@@ -55,7 +55,7 @@ var shapesOnMap = {
 * @function addTweetToMap
 * @desc adds a given shape, in this case likely a tweet, to the map.
 * leaning on https://stackoverflow.com/questions/45931963/leaflet-remove-specific-marker
-* BE SURE TO HAVE A GLOBAL VARIABLE shapes DECLARED AS AN ARRAY
+* BE SURE TO HAVE A GLOBAL VARIABLE Object shapesOnMap, containing array "tweets"
 * @param mapdiv the map id of the map
 * @param input the object of the tweet to be added to the map
 * @Author Felix
@@ -63,22 +63,13 @@ var shapesOnMap = {
 async function addTweetToMap(mapdiv, input){
   var id;
 
-  //choose a fitting id for the current shape
-  if (shapesOnMap.tweets.length < 1) id = 0;
-  else id = shapes.length;
+  //use _leaflet_id
 
   //create a leaflet object from the given coordinates and colors
   var newShape = new L.GeoJSON(input.geojson);
-  newShape._id = id;
   newShape.bindPopup(await getEmbeddedTweet(input.id_str))
   map.addLayer(newShape);
-  shapes.push(newShape);
-}
-
-var embeddedCallback = function(data){
-  if(data != undefined){
-    return data;
-  } else {return "nonexistant";}
+  shapesOnMap.tweets.push(newShape);
 }
 
 /**
@@ -89,23 +80,32 @@ var embeddedCallback = function(data){
 * @Author Felix
 */
 async function getEmbeddedTweet(id_str){
-  let output;
+  var output;
   var requestURL = "http://publish.twitter.com/oembed?url=https://twitter.com/t/status/";
   //let requestURL = "https://localhost:3000/embedTweet?id="
   requestURL = requestURL.concat(id_str);
+
+  var embeddedCallback = function(data){
+    if(data != undefined){
+      output = data
+      return data;
+    } else {return {html: "<b>something went wrong</b>"};}
+  }
 
   await $.ajax({
     url: requestURL,
     dataType: 'jsonp',
     //contentType: 'application/json',
     //success: embeddedCallback,
-    jsonpCallback: 'embeddedCallback',
+    callback: 'embeddedCallback',
     success: function(data){
       output = data;
     },
     error: function(xhr, ajaxOptions, thrownError){
       console.log(xhr.status);
+      console.log(id_str)
       console.log(thrownError)
+      output = {html: thrownError}
     }
   });
   return output.html;
