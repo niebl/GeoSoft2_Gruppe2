@@ -65,6 +65,19 @@ async function addTweetToMap(mapdiv, input){
 
   //use _leaflet_id
 
+  //check if there is already a tweet within 20 meters on that map
+  for (tweet of shapesOnMap.tweets){
+    if (turf.distance(
+      (input.geojson.geometry.coordinates),
+      (tweet.geojson.geometry.coordinates),
+      {units: meters}
+    ) <= 20){
+      //append embedded tweet to existing pin
+
+      break;
+    }
+  }
+
   //create a leaflet object from the given coordinates and colors
   var newShape = new L.GeoJSON(input.geojson);
   newShape.bindPopup(await getEmbeddedTweet(input.id_str))
