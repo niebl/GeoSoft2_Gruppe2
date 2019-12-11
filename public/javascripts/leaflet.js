@@ -61,34 +61,45 @@ var shapesOnMap = {
 * @Author Felix
 */
 async function addTweetToMap(mapdiv, input){
-  var id;
+  let id;
+  let popupContent;
+  let neighbourFound = false;
+  const minDistance = 40000000;
 
   //use _leaflet_id
 
-  //check if there is already a tweet within 20 meters on that map
-  for (var tweet of shapesOnMap.tweets){
-    console.log(tweet)
-    console.log(turf.distance(
-      turf.point(input.geojson.geometry.coordinates),
-      turf.point([tweet._layers._latlng.lng, tweet._layers._latlng.lat]),
-      {units: 'meters'}
-    ))
-
-    if (turf.distance(
-      turf.point(input.geojson.geometry.coordinates),
-      turf.point(tweet.geojson.geometry.coordinates),
-      {units: 'meters'}
-    ) <= 20){
-      //append embedded tweet to existing pin
-      break;
-    }
+  //check if there is already a tweet within min distance on that map
+  // for (var tweet of shapesOnMap.tweets){
+  //   //console.log(tweet)
+  //   let neighbourDistance = turf.distance(
+  //     turf.point(input.geojson.geometry.coordinates),
+  //     turf.point([tweet._map._lastCenter.lng, tweet._map._lastCenter.lat]),
+  //     {units: 'meters'}
+  //   )
+  //   console.log(neighbourDistance <= minDistance)
+  //   if (neighbourDistance <= minDistance){
+  //     //append embedded tweet to existing pin
+  //     console.log("nearest neighbour found")
+  //     popupContent = tweet._popup._content;
+  //     popupContent = popupContent + "<hr>";
+  //     popupContent = popupContent + await getEmbeddedTweet(input.id_str);
+  //     neighbourFound = true;
+  //
+  //     tweet._popup._content = popupContent
+  //     //FIX THIS: UPDATE IS NOT A FUNCTION
+  //     tweet.update()
+  //
+  //     break;
+  //   }
+  // }
+  //if there was no neighbour within min distance
+  if (!neighbourFound){
+    //create a leaflet object from the given coordinates and colors
+    var newShape = new L.GeoJSON(input.geojson);
+    newShape.bindPopup(await getEmbeddedTweet(input.id_str))
+    map.addLayer(newShape);
+    shapesOnMap.tweets.push(newShape);
   }
-
-  //create a leaflet object from the given coordinates and colors
-  var newShape = new L.GeoJSON(input.geojson);
-  newShape.bindPopup(await getEmbeddedTweet(input.id_str))
-  map.addLayer(newShape);
-  shapesOnMap.tweets.push(newShape);
 }
 
 /**

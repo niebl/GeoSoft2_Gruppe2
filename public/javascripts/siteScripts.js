@@ -4,7 +4,7 @@ var bbox = "47.15,5.00,55.22,15.20";
 var older_than;
 
 //initialise with the current timestamp, -5 minutes
-older_than = Date.now() - 3000000
+older_than = Date.now() - 300000
 
 //site-events
 //click of UPDATE MAP button
