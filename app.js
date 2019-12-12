@@ -230,13 +230,52 @@ async function tweetSearch(req,res){
   var fields = req.query.fields;
   var latest = req.query.latest;
 
+  //check validity of parameters
+  if (bbox == undefined){
+    res.status(400),
+    res.send("bbox is not defined")
+  }
+
   //QUERY BoundingBox
   //create boundingBox geojson from given parameters
-  bbox = bbox.split(",");
+  try {
+    bbox = bbox.split(",");
+  }catch(err){
+    //check
+    res.status(400)
+    res.send("error in bbox parameter<hr>"+err)
+  }
+
   //numberify the strings
   for(let i = 0; i < bbox.length; i++){
     bbox[i] = parseFloat(bbox[i]);
+
+    //return error when bbox coord was not given a number
+    if(isNaN(bbox[i])){
+      res.status(400);
+      res.send("bbox parameter "+i+" is not a number <hr>");
+    }
   }
+
+  //check validity of bbox
+  if(bbox.length != 4){
+    res.status(400)
+    res.send("invalid parameter for bbox")
+  }
+  //check validity of bbox coordinates
+  if(!(
+    (bbox[0]>bbox[2])&& //north to be more north than south
+    (bbox[1]<bbox[3])&& //west to be less east than east
+
+    bbox[0]<=85 && bbox[0]>=-85&& //north and south in range of 85 to -85 degrees
+    bbox[2]<=85 && bbox[2]>=-85&&
+
+    bbox[1]<=180 && bbox[1]>=-180&& //east and west in range of 180 to -180 degrees
+    bbox[3]<=180 && bbox[3]>=-180
+  )){
+    res.status(400)
+    res.send("bbox coordinates are not geographically valid")
+  };
 
   //QUERY older_than
   //if no or incorrect time data is given, set to unix timestamp 0
@@ -313,6 +352,21 @@ async function tweetSearch(req,res){
   //if field params are passed, return requested fields only
   if(fields != undefined){
     fields = fields.split(",");
+
+    //check if requested fields exist
+    for (let field of fields){
+      if(!(
+      field == "geojson" ||
+      field == "_id" ||
+      field == "id_str" ||
+      field == "text" ||
+      field == "create_at"
+      )){
+        res.status(400)
+        res.send("requested field "+field+" does not exist")
+      }
+    }
+
     let fieldtweets = {"tweets" : []};
     //traverse every tweet in the given list
     for (let entry of outJSON.tweets){

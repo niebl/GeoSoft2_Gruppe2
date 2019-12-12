@@ -1,6 +1,6 @@
 /*jshint esversion: 8 */
 
-var bbox = "47.15,5.00,55.22,15.20";
+var bbox = "55.22,5.00,47.15,15.20";
 var older_than;
 
 //initialise with the current timestamp, -5 minutes
