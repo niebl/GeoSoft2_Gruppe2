@@ -144,56 +144,6 @@ async function queryTweets(queries){
   return output;
 }
 
-/**
-  * get Tweet in Timespan
-  * @author Dorian
-  * @params start start date 'YYYY-MM-DD'
-  * @params end end date 'YYYY-MM-DD'
-  * @return JSON Tweets
-  */
-function getTweetsInTimespan(rectangular){
-  return Tweet.find()
-  .where('date').gte(start).lte(end);
-}
-
-/**
-  * get Tweets which includes expression
-  * @author Dorian
-  * @params word the searched word
-  * @return JSON Tweets
-  */
-function getTweetsIncludeWord(word){
-  return Tweet.find()
-  .where('Text').includes(word);
-}
-
-/**
-* find Word in tweet by an given input
-* @author Dorian
-* @params Text which got searched
-* @params word to find
-* @return TweetIDs
-*/
-function findWord(text, word){
-  text.includes(word);
-}
-
-/**
-* check if point is in rectangle
-* @author Dorian
-* @params point[lat, lng]
-* @params rectangle[[lat,lng],[lat,lng]] --> [N, W, S, E]
-* @return boolean
-*/
-function checkPointInRect(point, rectangle){
-  if(point[0] < rectangle[0] && point[2] < rectangle[0] && point[1] < rectangle[1] && point[1] < rectangle[3]){
-    return true;
-  } else {
-    return false;
-  }
-}
-
-
 //Tweet api
 
 //~~~~~~~API-endpoints~~~~~~~
@@ -215,7 +165,6 @@ app.get('/tweetAPI/search', async (req, res) => {
 * @param req
 * @param res
 * @author Felix
-* TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
 async function tweetSearch(req,res){
   let outJSON = {tweets : []};
@@ -382,10 +331,6 @@ async function tweetSearch(req,res){
 
   return outJSON;
 }
-
-
-var exampleTweet = require('./exampleData/example-tweet.json');
-
 
 module.exports = app;
 

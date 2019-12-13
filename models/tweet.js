@@ -3,11 +3,10 @@ var mongoose = require('mongoose');
 // Article Schema
 var Tweet = mongoose.Schema({
   created_at: {type: Number},
-  coordinates1: {type: [Number]},
   geojson:{
       type: { type: String },
       properties: {
-        
+
       },
       geometry: {
         type: { type: String },
