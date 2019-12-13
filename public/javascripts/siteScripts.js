@@ -32,21 +32,25 @@ async function showAllTweets(){
 }
 
 /**
-* @function updatgeMapTweets
-* @desc updates the map with the tweets that have
+* @function updateMapTweets
+* @desc updates the map with the tweets that have been fetched from getTweets() function
+* @see getTweets
 */
 async function updateMapTweets(){
   var tweetPromise = new Promise(async function(resolve, reject){
     var tweets = await getTweets("bbox="+bbox+"&older_than="+older_than);
     resolve(tweets.tweets);
   });
-  //update the timestamp to where tweets were last fetched
+
+  //update the timestamp to when tweets were last fetched
   older_than = Date.now()
+
+  //add the tweets once the API responded
   tweetPromise.then(function(tweets){
     for (let tweet of tweets){
-      addTweetToMap("map", tweet);
+      addTweetToMap(tweet);
     }
-  });
+  })
 }
 
 /**
