@@ -43,63 +43,106 @@ var map = L.map('map', {
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 /**
-* @object shapesOnMap.
-* @desc the object containing info of all shapes on the map
-* @author Felix
+* create an empty layer
+* leaning on https://stackoverflow.com/a/33221018
+* @see onEachDot
+* @author Felix, nathansnider(inspiration)
 */
-var shapesOnMap = {
-  tweets: []
+var tweetLayer = L.geoJson(false,{
+  pointToLayer: function(feature, latlng){
+    return L.marker(latlng, {
+      opacity: 0.7
+    });
+  },
+  onEachFeature: onEachDot
+}).addTo(map)
+
+/**
+* @function onEachDot
+* @desc gets called whenever a new marker is added to the map.
+* binds the embedded tweet into the popup.
+* devnote: potential for more functionality
+* @author Felix, nathansnider(inspiration)
+*/
+function onEachDot(feature, layer){
+  layer.bindPopup(feature.properties.embeddedTweet)
+}
+
+/**
+* @function makeTweet
+* creates a tweet object to be appended to the tweetLayer on the map.
+* also calls oembed api to get an embedded version of the tweet.
+* devnote: currently unused, but possibly still needed in future
+* @param tweet the tweet object that was fetched from the API
+* @return geojson object of the tweet on the map, incuding html for embedded tweet
+*/
+async function makeTweet(tweet){
+  let id;
+  let popupContent;
+
+  var newTweet = {
+    type: "FeatureCollection",
+    features: []
+  };
+
+  var embedPromise = new Promise(async function(resolve,reject){
+    var embedded = await getEmbeddedTweet(tweet.id_str)
+    resolve(embedded)
+  })
+
+  return embedPromise.then(function(embedded){
+    var properties = {
+      id_str: tweet.id_str,
+      _id: tweet._id,
+      text: tweet.text,
+      created_at: tweet.created_at,
+      embeddedTweet: embedded
+    };
+    newTweet.features.push({
+      "geometry": tweet.geojson.geometry,
+      "properties": properties,
+      "type": "Feature"
+    });
+    return newTweet;
+  });
 }
 
 /**
 * @function addTweetToMap
-* @desc adds a given shape, in this case likely a tweet, to the map.
-* leaning on https://stackoverflow.com/questions/45931963/leaflet-remove-specific-marker
-* BE SURE TO HAVE A GLOBAL VARIABLE Object shapesOnMap, containing array "tweets"
-* @param mapdiv the map id of the map
-* @param input the object of the tweet to be added to the map
-* @Author Felix
+* creates a tweet object and appends it to the tweetLayer on the map.
+* also calls oembed api to get an embedded version of the tweet.
+* also adds the tweets to the map after the fact because that allows the function to be called parallel.
+* @param tweet the tweet object that was fetched from the API
 */
-async function addTweetToMap(mapdiv, input){
+async function addTweetToMap(tweet){
   let id;
   let popupContent;
-  let neighbourFound = false;
-  const minDistance = 40000000;
 
-  //use _leaflet_id
+  var newTweet = {
+    type: "FeatureCollection",
+    features: []
+  };
 
-  //check if there is already a tweet within min distance on that map
-  // for (var tweet of shapesOnMap.tweets){
-  //   //console.log(tweet)
-  //   let neighbourDistance = turf.distance(
-  //     turf.point(input.geojson.geometry.coordinates),
-  //     turf.point([tweet._map._lastCenter.lng, tweet._map._lastCenter.lat]),
-  //     {units: 'meters'}
-  //   )
-  //   console.log(neighbourDistance <= minDistance)
-  //   if (neighbourDistance <= minDistance){
-  //     //append embedded tweet to existing pin
-  //     console.log("nearest neighbour found")
-  //     popupContent = tweet._popup._content;
-  //     popupContent = popupContent + "<hr>";
-  //     popupContent = popupContent + await getEmbeddedTweet(input.id_str);
-  //     neighbourFound = true;
-  //
-  //     tweet._popup._content = popupContent
-  //     //FIX THIS: UPDATE IS NOT A FUNCTION
-  //     tweet.update()
-  //
-  //     break;
-  //   }
-  // }
-  //if there was no neighbour within min distance
-  if (!neighbourFound){
-    //create a leaflet object from the given coordinates and colors
-    var newShape = new L.GeoJSON(input.geojson);
-    newShape.bindPopup(await getEmbeddedTweet(input.id_str))
-    map.addLayer(newShape);
-    shapesOnMap.tweets.push(newShape);
-  }
+  var embedPromise = new Promise(async function(resolve,reject){
+    var embedded = await getEmbeddedTweet(tweet.id_str)
+    resolve(embedded)
+  })
+
+  return embedPromise.then(function(embedded){
+    var properties = {
+      id_str: tweet.id_str,
+      _id: tweet._id,
+      text: tweet.text,
+      created_at: tweet.created_at,
+      embeddedTweet: embedded
+    };
+    newTweet.features.push({
+      "geometry": tweet.geojson.geometry,
+      "properties": properties,
+      "type": "Feature"
+    });
+    tweetLayer.addData(newTweet)
+  });
 }
 
 /**
