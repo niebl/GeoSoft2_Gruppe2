@@ -143,7 +143,57 @@ async function addTweetToMap(tweet){
     });
     tweetLayer.addData(newTweet)
   });
+<<<<<<< HEAD
+=======
 }
+
+/**
+* @function updateMapTweets
+*
+*/
+
+
+
+
+
+
+
+
+
+/**
+* @object shapesOnMap.
+* @desc the object containing info of all shapes on the map
+* @author Felix
+*/
+var shapesOnMap = {
+  tweets: []
+>>>>>>> 9f94c0d06252fa0d72e05a4448a58d4bd75ac043
+}
+
+// /**
+// * @function addTweetToMap
+// * @desc adds a given shape, in this case likely a tweet, to the map.
+// * leaning on https://stackoverflow.com/questions/45931963/leaflet-remove-specific-marker
+// * BE SURE TO HAVE A GLOBAL VARIABLE Object shapesOnMap, containing array "tweets"
+// * @param mapdiv the map id of the map
+// * @param input the object of the tweet to be added to the map
+// * @Author Felix
+// */
+// async function addTweetToMap(mapdiv, input){
+//   let id;
+//   let popupContent;
+//   let neighbourFound = false;
+//   const minDistance = 40000000;
+//
+//   //if there was no neighbour within min distance
+//   if (!neighbourFound){
+//     //create a leaflet object from the given coordinates and colors
+//     var newShape = new L.GeoJSON(input.geojson);
+//     newShape.bindPopup(await getEmbeddedTweet(input.id_str))
+//     map.addLayer(newShape);
+//     shapesOnMap.tweets.push(newShape);
+//   }
+// }
 
 /**
 * @function getEmbeddedTweet
