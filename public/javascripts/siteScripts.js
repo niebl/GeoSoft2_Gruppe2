@@ -2,15 +2,11 @@
 
 var bbox = "55.22,5.00,47.15,15.20";
 var older_than;
-<<<<<<< HEAD
 /**
 * @var nearestTweetRadius.
 * the minimal distance a tweet is allowed to have to another in meters.
 */
 const nearestTweetRadius = 50;
-=======
-const nearestTweetRadius = 50
->>>>>>> 12b7c05678e78e26e9a5334022fbac2a864626e6
 
 //initialise with the current timestamp, -5 minutes
 older_than = Date.now() - 300000;
