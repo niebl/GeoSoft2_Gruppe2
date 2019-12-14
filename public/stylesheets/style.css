@@ -1,4 +1,9 @@
+.navbar {
+  min-height: 4em;
+  max-height: 4em
+}
 #map{
-  width:100vw;
-  height: 100vh;
+  /*16px: scrollbar-width. replace with something better later*/
+  height: calc( 100vh - 4em - 16px);
+  max-height: 100%;
 }

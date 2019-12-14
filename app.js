@@ -14,7 +14,10 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
+const https = require('https');
+const turf = require('@turf/turf')
 var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -53,10 +56,13 @@ app.use('/users', usersRouter);
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
+app.use('/popper.js', express.static(__dirname + '/node_modules/popper.js/dist'))
+app.use('/turf', express.static(__dirname + '/node_modules/@turf/turf'))
 
 // use scripts, styles in webserver
 app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.css'));
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
+app.use("/siteScripts", express.static(__dirname+'/public/javascripts/siteScripts.js'))
 
 //tweet query functions
 
@@ -91,7 +97,7 @@ app.get('/setdefaultlocation/:lat/:lng', function(req, res){
 /**
 * get Tweets in rectangle
 * @author Dorian, heavily modified by Felix
-* @params rectangular [N, W, S, E]
+* @param rectangular [N, W, S, E], WGS84
 * @return Array
 */
 async function getTweetsInRect(rectangular){
@@ -111,78 +117,41 @@ async function getTweetsInRect(rectangular){
       console.log("~~~~~! error in mongoDB query !~~~~~")
       console.log(error)
     }
-    console.log(docs)
     output = docs;
   });
   return output;
 }
 
 /**
-  * get Tweet in Timespan
-  * @author Dorian
-  * @params start start date 'YYYY-MM-DD'
-  * @params end end date 'YYYY-MM-DD'
-  * @return JSON Tweets
-  */
-function getTweetsInTimespan(rectangular){
-  return Tweet.find()
-  .where('date').gte(start).lte(end);
-}
-
-/**
-  * get Tweets which includes expression
-  * @author Dorian
-  * @params word the searched word
-  * @return JSON Tweets
-  */
-function getTweetsIncludeWord(word){
-  return Tweet.find()
-  .where('Text').includes(word);
-}
-
-/**
-* find Word in tweet by an given input
-* @author Dorian
-* @params Text which got searched
-* @params word to find
-* @return TweetIDs
+* @function queryTweets
+* @author Felix
+* @param queries, Object of mongoose queries
+* @return mongoose docs
 */
-function findWord(text, word){
-  text.includes(word);
+async function queryTweets(queries){
+  let output;
+  await Tweet.find(
+    queries,
+    function(err,docs){
+      if(err){
+        console.log("~~~~~! error in mongoDB query !~~~~~");
+        console.log(error);
+      } else {
+      output = docs;
+      }
+    }
+  );
+  return output;
 }
-
-/**
-* check if point is in rectangle
-* @author Dorian
-* @params point[lat, lng]
-* @params rectangle[[lat,lng],[lat,lng]] --> [N, W, S, E]
-* @return boolean
-*/
-function checkPointInRect(point, rectangle){
-  if(point[0] < rectangle[0] && point[2] < rectangle[0] && point[1] < rectangle[1] && point[1] < rectangle[3]){
-    return true;
-  } else {
-    return false;
-  }
-}
-
 
 //Tweet api
-{
-//API-endpoints
+
+//~~~~~~~API-endpoints~~~~~~~
+//public DB search API
 app.get('/tweetAPI/search', async (req, res) => {
   res.send(await tweetSearch(req, res));
 });
 
-app.post('/tweetAPI', (req, res) => {
-  //post here
-  res.send('POST request to the homepage');
-});
-
-app.delete('/tweetAPI', (req, res) => {
-  //delete here https://dustinpfister.github.io/2018/06/21/express-app-delete/
-  res.send('DELETE request to the homepage');
-});
 
 /**
 * @function tweetSearch callback function
@@ -193,9 +162,9 @@ app.delete('/tweetAPI', (req, res) => {
 *         exclude: The strings that aren't to be included in the returned tweets
 *         fields: The fields of the tweets that are to be returned
 *         latest: whether or not to only show the latest tweet
-* @param req the request that was submitted in the REST QUERY
+* @param req
+* @param res
 * @author Felix
-* TODO: Add error handling and response codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.2/com.ibm.qradar.doc/c_rest_api_errors.html
 */
 async function tweetSearch(req,res){
   let outJSON = {tweets : []};
@@ -203,22 +172,80 @@ async function tweetSearch(req,res){
   const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
 
   //access the provided parameters
+  var older_than = req.query.older_than
   var bbox = req.query.bbox;
   var include = req.query.include;
   var exclude = req.query.exclude;
   var fields = req.query.fields;
   var latest = req.query.latest;
 
+  //check validity of parameters
+  if (bbox == undefined){
+    res.status(400),
+    res.send("bbox is not defined")
+  }
+
   //QUERY BoundingBox
   //create boundingBox geojson from given parameters
-  bbox = bbox.split(",");
+  try {
+    bbox = bbox.split(",");
+  }catch(err){
+    //check
+    res.status(400)
+    res.send("error in bbox parameter<hr>"+err)
+  }
+
   //numberify the strings
   for(let i = 0; i < bbox.length; i++){
     bbox[i] = parseFloat(bbox[i]);
+
+    //return error when bbox coord was not given a number
+    if(isNaN(bbox[i])){
+      res.status(400);
+      res.send("bbox parameter "+i+" is not a number <hr>");
+    }
+  }
+
+  //check validity of bbox
+  if(bbox.length != 4){
+    res.status(400)
+    res.send("invalid parameter for bbox")
+  }
+  //check validity of bbox coordinates
+  if(!(
+    (bbox[0]>bbox[2])&& //north to be more north than south
+    (bbox[1]<bbox[3])&& //west to be less east than east
+
+    bbox[0]<=85 && bbox[0]>=-85&& //north and south in range of 85 to -85 degrees
+    bbox[2]<=85 && bbox[2]>=-85&&
+
+    bbox[1]<=180 && bbox[1]>=-180&& //east and west in range of 180 to -180 degrees
+    bbox[3]<=180 && bbox[3]>=-180
+  )){
+    res.status(400)
+    res.send("bbox coordinates are not geographically valid")
+  };
+
+  //QUERY older_than
+  //if no or incorrect time data is given, set to unix timestamp 0
+  if (older_than == undefined || isNaN(older_than)){
+    older_than = 0;
   }
 
   //call to function that will look for tweets on TweetDB within bounding box.
-  outJSON.tweets = await getTweetsInRect(bbox)
+  //outJSON.tweets = await getTweetsInRect(bbox)
+  outJSON.tweets = await queryTweets({
+    'geojson.geometry.coordinates': {
+      $geoWithin: {
+        $box : [
+          [bbox[1],bbox[2]], //West-Sount
+          [bbox[3],bbox[0]] //East-North
+        ]
+      }
+    },
+    created_at: {$gt: older_than}
+  })
+
 
   //QUERY include
   if(include != undefined){
@@ -274,6 +301,21 @@ async function tweetSearch(req,res){
   //if field params are passed, return requested fields only
   if(fields != undefined){
     fields = fields.split(",");
+
+    //check if requested fields exist
+    for (let field of fields){
+      if(!(
+      field == "geojson" ||
+      field == "_id" ||
+      field == "id_str" ||
+      field == "text" ||
+      field == "create_at"
+      )){
+        res.status(400)
+        res.send("requested field "+field+" does not exist")
+      }
+    }
+
     let fieldtweets = {"tweets" : []};
     //traverse every tweet in the given list
     for (let entry of outJSON.tweets){
@@ -289,26 +331,6 @@ async function tweetSearch(req,res){
 
   return outJSON;
 }
-}
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-var exampleTweet = require('./exampleData/example-tweet.json');
-
 
 module.exports = app;
 
