@@ -1,46 +1,29 @@
 /*jshint esversion: 8 */
 
 var street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    id: 'map',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 13
+  id: 'map',
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  maxZoom: 13
 });
 
 var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
   id: 'map',
   maxZoom: 17,
-	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+  attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 });
 
 var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
   id: 'map',
-	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
 var leafletRadarAttribution = L.tileLayer.wms("https://maps.dwd.de/geoserver/dwd/wms/", {
-		layers: 'dwd:FX-Produkt',
-		format: 'image/png',
-		styles: '',
-		transparent: true,
-		opacity: 0.6,
-	});
-
-var overlayMaps = {
-    "Radar": leafletRadarAttribution
-};
-
-var baseMaps = {
-	"Topographic": topo,
-	"Streets": street,
-  "Satellite": satellite
-};
-
-var map = L.map('map', {
-  layers:  [street]
-}).setView([51.16, 10.45], 6);
-
-
-L.control.layers(baseMaps, overlayMaps).addTo(map);
+  layers: 'dwd:FX-Produkt',
+  format: 'image/png',
+  styles: '',
+  transparent: true,
+  opacity: 0.6,
+});
 
 /**
 * create an empty layer
@@ -55,7 +38,29 @@ var tweetLayer = L.geoJson(false,{
     });
   },
   onEachFeature: onEachDot
-}).addTo(map)
+})
+
+var overlayMaps = {
+  "Radar": leafletRadarAttribution,
+  "Tweets": tweetLayer
+};
+
+var baseMaps = {
+  "Topographic": topo,
+  "Streets": street,
+  "Satellite": satellite
+};
+
+var map = L.map('map', {
+  layers:  [street,tweetLayer]
+}).setView([51.16, 10.45], 6);
+
+
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+////////////////////////////////////////////////////////////////////////////////
+// functions
+////////////////////////////////////////////////////////////////////////////////
 
 /**
 * @function onEachDot
@@ -143,31 +148,6 @@ async function addTweetToMap(tweet){
     });
     tweetLayer.addData(newTweet)
   });
-<<<<<<< HEAD
-=======
-}
-
-/**
-* @function updateMapTweets
-*
-*/
-
-
-
-
-
-
-
-
-
-/**
-* @object shapesOnMap.
-* @desc the object containing info of all shapes on the map
-* @author Felix
-*/
-var shapesOnMap = {
-  tweets: []
->>>>>>> 9f94c0d06252fa0d72e05a4448a58d4bd75ac043
 }
 
 // /**
@@ -236,20 +216,20 @@ async function getEmbeddedTweet(id_str){
 
 
 /**
-  * @example loadDoc()
-  * Sets a marker using cookies via ajax request
-  * @author Dorian
-  */
-  /*
+* @example loadDoc()
+* Sets a marker using cookies via ajax request
+* @author Dorian
+*/
+/*
 function loadDoc() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      L.marker(JSON.parse(this.response)).addTo(map).bindPopup("I am an orange leaf.");
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+if (this.readyState == 4 && this.status == 200) {
+L.marker(JSON.parse(this.response)).addTo(map).bindPopup("I am an orange leaf.");
 
-    }
-  };
-  xhttp.open("GET", "/getdefaultlocation", true);
-  xhttp.send();
+}
+};
+xhttp.open("GET", "/getdefaultlocation", true);
+xhttp.send();
 }
 */
