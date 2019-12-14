@@ -2,6 +2,7 @@
 
 var bbox = "55.22,5.00,47.15,15.20";
 var older_than;
+const nearestTweetRadius = 50
 
 //initialise with the current timestamp, -5 minutes
 older_than = Date.now() - 300000
