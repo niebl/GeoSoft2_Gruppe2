@@ -2,34 +2,20 @@
 
 var bbox = "55.22,5.00,47.15,15.20";
 var older_than;
+/**
+* @var nearestTweetRadius.
+* the minimal distance a tweet is allowed to have to another in meters.
+*/
+const nearestTweetRadius = 50;
 
 //initialise with the current timestamp, -5 minutes
-older_than = Date.now() - 300000
+older_than = Date.now() - 300000;
 
 //site-events
 //click of UPDATE MAP button
 $("#update-map").click(function(){
   updateMapTweets();
 });
-
-/**
-* @function showAllTweets a test function to see if tweets show up on map
-*/
-async function showAllTweets(){
-  //make a promise to ensure the tweets are there before executing the rest of the function
-  var tweetPromise = new Promise(async function(resolve, reject){
-    var tweets = await getTweets("bbox="+bbox+"&older_than="+older_than);
-    resolve(tweets.tweets);
-  });
-
-  tweetPromise.then(function(tweets){
-    for (let tweet of tweets){
-      console.log("chirp")
-      console.log(tweet)
-      addTweetToMap("map", tweet);
-    }
-  });
-}
 
 /**
 * @function updateMapTweets
@@ -43,14 +29,14 @@ async function updateMapTweets(){
   });
 
   //update the timestamp to when tweets were last fetched
-  older_than = Date.now()
+  older_than = Date.now();
 
   //add the tweets once the API responded
   tweetPromise.then(function(tweets){
     for (let tweet of tweets){
       addTweetToMap(tweet);
     }
-  })
+  });
 }
 
 /**

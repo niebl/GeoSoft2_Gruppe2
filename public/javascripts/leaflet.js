@@ -32,13 +32,9 @@ var leafletRadarAttribution = L.tileLayer.wms("https://maps.dwd.de/geoserver/dwd
 * @author Felix, nathansnider(inspiration)
 */
 var tweetLayer = L.geoJson(false,{
-  pointToLayer: function(feature, latlng){
-    return L.marker(latlng, {
-      opacity: 0.7
-    });
-  },
+  pointToLayer: tweetToLayer,
   onEachFeature: onEachDot
-})
+});
 
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
@@ -63,6 +59,58 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+* @function tweetToLayer
+* @desc gets called whenever a new marker is added to the map.
+* checks whether the location of the tweet is currently occupied.
+* then decides on whether to add to the map or to append to a popup
+* devnote: potential for more functionality
+* @param feature the tweet that is being added
+* @param latlng the coordinates of the tweet
+* @see nearestTweetRadius
+* @author Felix, nathansnider(inspiration)
+*/
+function tweetToLayer(feature, latlng){
+  var markersOnMap = tweetLayer._layers
+
+  //if there are no tweets on the map, just add it. don't check for others
+  if(Object.entries(markersOnMap).length === 0){
+    return L.marker(latlng, {
+      opacity: 0.7
+    });
+  }
+
+  //otherwise, compare the locations of the new tweets to existing ones to check for overlapping pins
+  else {
+    var nearNeighbourFound = false;
+    var nearNeighbour = {};
+
+    for(var marker in markersOnMap){
+      existingCoords = [markersOnMap[marker]._latlng.lng,markersOnMap[marker]._latlng.lat];
+      newCoords = [latlng.lng,latlng.lat];
+
+      //if the distance between the two points is smaller than the smallest allowed radius mark the nearNeighbour as found
+      if(turf.distance(existingCoords,newCoords,{units:'meters'}) <= nearestTweetRadius){
+        nearNeighbourFound = true;
+        nearNeighbour = marker;
+        break;
+      }
+    }
+
+    if(nearNeighbourFound){ //if the tweet is within the smallest allowed radius to another tweet, append it to the popup
+      var newPopupContent = markersOnMap[nearNeighbour]._popup._content;
+      newPopupContent = feature.properties.embeddedTweet+"<hr>"+newPopupContent;
+      //change the content of the marker on the map
+      markersOnMap[nearNeighbour]._popup._content = newPopupContent;
+
+    } else { //otherwise, just append it to the existing one within the radius
+      return L.marker(latlng, {
+        opacity: 0.7
+      });
+    }
+  }
+}
+
+/**
 * @function onEachDot
 * @desc gets called whenever a new marker is added to the map.
 * binds the embedded tweet into the popup.
@@ -70,7 +118,10 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 * @author Felix, nathansnider(inspiration)
 */
 function onEachDot(feature, layer){
-  layer.bindPopup(feature.properties.embeddedTweet)
+  var popup = L.popup(
+      {maxHeight:140}
+    ).setContent(feature.properties.embeddedTweet)
+  layer.bindPopup(popup)
 }
 
 /**
