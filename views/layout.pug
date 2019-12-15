@@ -8,7 +8,8 @@ html
     link(rel='stylesheet', href='/leaflet/leaflet.css')
     script(src="/jquery/jquery.js")
     script(src="/bootstrap/js/bootstrap.js")
-    //script(src="/popper.js/popper.js")
+    //dist/umd/popper.js fixes the "export declarations may only appear at top level of a module"
+    script(src="/popper.js/umd/popper.js")
     script(src="/leaflet/leaflet.js")
     script(src="/turf/turf.min.js")
   body
@@ -19,7 +20,8 @@ html
         ul.navbar-nav.mr-auto
           li.nav-item.active
             a.nav-link(href='/') Home
-        button#update-map.btn.btn-outline-success.my-2.my-sm-0 Update Map
+        button#update-map.btn.btn-outline-success.my-2.my-sm-0 Update Map 
+          span#update-badge.badge.badge-warning.invisible 0
     block content
       script(src="/leafletscript")
       script(src="/siteScripts")
