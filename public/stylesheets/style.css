@@ -1,9 +1,22 @@
 .navbar {
   min-height: 4em;
-  max-height: 4em
+  max-height: 4em;
+  width:100%
+}
+
+.nav-item{
+  margin-right: 10px
+}
+
+#sidebar{
+  float:left;
+  height:100%;
+  max-width:100%;
+  width: 256px;
 }
 #map{
-  /*16px: scrollbar-width. replace with something better later*/
+  /*16px: scrollbar-width. replace with something better if found*/
   height: calc( 100vh - 4em - 16px);
   max-height: 100%;
+  width: auto;
 }
