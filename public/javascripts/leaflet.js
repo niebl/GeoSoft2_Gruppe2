@@ -45,7 +45,7 @@ function loadDoc() {
       L.geoJSON(JSON.parse(this.response), {style:{'color': 'red'}}).addTo(map);
     }
   };
-  xhttp.open("GET", "/getUnwetter?coordinates=9,52", true);
+  xhttp.open("GET", "/rad", true);
   xhttp.send();
 }
 loadDoc();
