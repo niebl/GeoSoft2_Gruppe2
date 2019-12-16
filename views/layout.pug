@@ -7,25 +7,31 @@ html
     link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
     link(rel='stylesheet', href='/leaflet/leaflet.css')
     script(src="/jquery/jquery.js")
-    script(src="/popper.js/popper.min.js")
+    //script(src="/popper.js/popper.min.js")
     script(src="/bootstrap/js/bootstrap.js")
     //dist/umd/popper.js fixes the "export declarations may only appear at top level of a module"
     script(src="/popper.js/umd/popper.js")
     script(src="/leaflet/leaflet.js")
     script(src="/turf/turf.min.js")
-  body    
-    block navbar
-      //.container-fluid
-      nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(style="background-color: #e3f2fd;")
-        a.navbar-brand(href='/') GEOmergency
-        ul.navbar-nav.mr-auto
-          button(type="button").nav-item.btn.btn-success#sidebarCollapse
-            i.fas.fa-align-left
-            span expand sidebar 
-          li.nav-item.active
-            a.nav-link(href='/') Home
-        button#update-map.btn.btn-outline-success.my-2.my-sm-0 Update Map 
-          span#update-badge.badge.badge-warning.invisible 0
-    block content
-      script(src="/leafletscript")
-      script(src="/siteScripts")
+  body
+    
+    div#wrapper  
+      block navbar
+        //.container-fluid
+        nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(style="background-color: #e3f2fd;")
+          a.navbar-brand(href='/') GEOmergency
+          ul.navbar-nav.mr-auto
+            button(type="button").nav-item.btn.btn-success#sidebarCollapse
+              i.fas.fa-align-left
+              span expand sidebar 
+            li.nav-item.active
+              a.nav-link(href='/') Home
+          button#update-map.btn.btn-outline-success.my-2.my-sm-0 Update Map 
+            span#update-badge.badge.badge-warning.invisible 0
+              
+      block sidebar
+        
+      div#page-content-wrapper  
+        block content
+script(src="/leafletscript")
+script(src="/siteScripts")

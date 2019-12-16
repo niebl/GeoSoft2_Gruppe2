@@ -1,17 +1,14 @@
 extends layout
 
 block sidebar
-  nav#sidebar
-    div.sidebar-wrapper
-      div#features.panel.panel-default
-        div.panel-heading
-          h3.panel-title sidebar header
-          div#map-controls
-          div#tweet-browser
+  //https://startbootstrap.com/templates/simple-sidebar/
+  //sidebar
+  nav#sidebar-wrapper.bg-light.border-right
+    div.sidebar-heading sidebar
+    div.list-group.list-group-flush
+      a(href="/").list-group-item.list-group-item-action.bg-light home
+        
             
   
 block content
-  div.content-wrapper
-    div#map
-    script(src="/leafletscript")
-    script(src="/siteScripts")
+  div#map

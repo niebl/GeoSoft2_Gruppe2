@@ -22,6 +22,10 @@ checkTweetUpdates(10000);
 $("#update-map").click(function(){
   updateMapTweets();
 });
+$("#sidebarCollapse").click(function(e){
+  e.preventDefault();
+  $("#wrapper").toggleClass("toggled");
+});
 
 /**
 * @function updateMapTweets
