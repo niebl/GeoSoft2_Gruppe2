@@ -309,7 +309,7 @@ async function tweetSearch(req,res){
       field == "_id" ||
       field == "id_str" ||
       field == "text" ||
-      field == "create_at"
+      field == "created_at"
       )){
         res.status(400)
         res.send("requested field "+field+" does not exist")
