@@ -1,7 +1,7 @@
 /*jshint esversion: 8 */
 
 var bbox = "55.22,5.00,47.15,15.20";
-//the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates 
+//the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
 /**
@@ -15,7 +15,7 @@ older_than = Date.now() - 300000;
 older_thanCheck = older_than;
 
 //begin the periodic update check. interval of 10 seconds
-checkTweetUpdates(10000)
+checkTweetUpdates(10000);
 
 //site-events
 //click of UPDATE MAP button
