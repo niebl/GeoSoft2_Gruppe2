@@ -203,6 +203,10 @@ async function addTweetToMap(tweet){
       "type": "Feature"
     });
     tweetLayer.addData(newTweet)
+
+    //add the tweet to the tweet-browser
+    //provisional. TODO: add support to remove tweets when new bbox specified
+    $("#tweet-browser").prepend(embedded+"<hr>")
   });
 }
 

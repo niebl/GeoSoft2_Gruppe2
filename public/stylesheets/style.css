@@ -7,11 +7,28 @@
   margin-right: 10px
 }
 #sidebarCollapse{
-  font-size: 30px;
+  font-size: 20px;
   padding-top: 1px;
   padding-right: 12px;
-  padding-bottom: 1px;
+  padding-bottom: 4px;
   padding-left: 12px;
+}
+#tweet-browser{
+  max-height: 512px;
+  height: 512px;
+  overflow-y: scroll;
+
+  -webkit-transition: height .25s ease-out;
+  -moz-transition: height .25s ease-out;
+  -o-transition: height .25s ease-out;
+  transition: height .25s ease-out;
+}
+#impressum{
+  font-size: 10px;
+
+  position:fixed;
+  bottom: 0;
+  width: 400px;
 }
 
 /*based on https://startbootstrap.com/templates/simple-sidebar/ */
