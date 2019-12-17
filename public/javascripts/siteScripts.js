@@ -9,13 +9,14 @@ var older_thanCheck;
 * the minimal distance a tweet is allowed to have to another in meters.
 */
 const nearestTweetRadius = 50;
+const updateCheckInterval=10000;
 
 //initialise with the current timestamp, -5 minutes
 older_than = Date.now() - 300000;
 older_thanCheck = older_than;
 
 //begin the periodic update check. interval of 10 seconds
-checkTweetUpdates(10000);
+checkTweetUpdates(updateCheckInterval);
 
 //site-events
 //click of UPDATE MAP button

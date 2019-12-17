@@ -71,7 +71,6 @@ app.use("/siteScripts", express.static(__dirname+'/public/javascripts/siteScript
 app.use('/gemeinden', express.static(__dirname + '/public/jsons/landkreise.json'));
 
 // mongoDB models:
-var Tweet = require("./models/tweet");
 var Kreis = require("./models/kreis");
 var UnwetterKreis = require("./models/unwetterkreis");
 // const kitty = new Tweet({ json: '{"test": "1"}' });
