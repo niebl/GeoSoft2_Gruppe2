@@ -63,7 +63,7 @@ async function updateMapTweets(){
 */
 async function getTweets(params){
   let output;
-  var requestURL = "http://localhost:3000/tweetAPI/search?";
+  var requestURL = "/tweetAPI/search?";
   requestURL = requestURL + params;
 
   //console.log(requestURL)

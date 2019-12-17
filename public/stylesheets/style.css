@@ -15,13 +15,12 @@
 }
 #tweet-browser{
   max-height: 512px;
-  height: 512px;
   overflow-y: scroll;
 
-  -webkit-transition: height .25s ease-out;
-  -moz-transition: height .25s ease-out;
-  -o-transition: height .25s ease-out;
-  transition: height .25s ease-out;
+  -webkit-transition: height .5s ease-out;
+  -moz-transition: height .5s ease-out;
+  -o-transition: height .5s ease-out;
+  transition: height .5s ease-out;
 }
 #impressum{
   font-size: 10px;
