@@ -14,8 +14,10 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
+
 const https = require('https');
 const turf = require('@turf/turf')
+
 var app = express();
 
 
@@ -31,6 +33,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // mongoose setup
+
 mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true, useUnifiedTopology: true}, function(err){
   if (err) {
     console.log("mongoDB connect failed");
@@ -64,7 +67,22 @@ app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.
 app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leaflet.js'));
 app.use("/siteScripts", express.static(__dirname+'/public/javascripts/siteScripts.js'))
 
-//tweet query functions
+
+app.use('/gemeinden', express.static(__dirname + '/public/jsons/landkreise.json'));
+
+// mongoDB models:
+var Tweet = require("./models/tweet");
+var Kreis = require("./models/kreis");
+var UnwetterKreis = require("./models/unwetterkreis");
+// const kitty = new Tweet({ json: '{"test": "1"}' });
+// kitty.save();
+
+var weatherRouter = require("./routes/badweather");
+app.use('/weather', weatherRouter);
+
+var rRouter = require("./routes/r");
+app.use('/r', rRouter);
+
 
 /**
   * sets the default location of a pair of a location

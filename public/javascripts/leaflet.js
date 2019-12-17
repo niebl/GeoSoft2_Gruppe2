@@ -1,6 +1,7 @@
 /*jshint esversion: 8 */
 
 var street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
   id: 'map',
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   maxZoom: 17
@@ -48,6 +49,7 @@ var baseMaps = {
 };
 
 var map = L.map('map', {
+
   layers:  [street,tweetLayer],
   zoomControl: false
 }).setView([51.16, 10.45], 6);
@@ -99,6 +101,7 @@ function tweetToLayer(feature, latlng){
         nearNeighbour = marker;
         break;
       }
+
     }
 
     if(nearNeighbourFound){ //if the tweet is within the smallest allowed radius to another tweet, append it to the popup
@@ -275,21 +278,3 @@ async function getEmbeddedTweet(id_str){
 }
 
 
-/**
-* @example loadDoc()
-* Sets a marker using cookies via ajax request
-* @author Dorian
-*/
-/*
-function loadDoc() {
-var xhttp = new XMLHttpRequest();
-xhttp.onreadystatechange = function() {
-if (this.readyState == 4 && this.status == 200) {
-L.marker(JSON.parse(this.response)).addTo(map).bindPopup("I am an orange leaf.");
-
-}
-};
-xhttp.open("GET", "/getdefaultlocation", true);
-xhttp.send();
-}
-*/

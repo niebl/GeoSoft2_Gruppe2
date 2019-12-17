@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 // Article Schema
+
 var Tweet = mongoose.Schema({
   created_at: {type: Number},
   geojson:{
@@ -19,3 +20,4 @@ var Tweet = mongoose.Schema({
 });
 
 var Tweet = module.exports = mongoose.model('Tweet', Tweet);
+
