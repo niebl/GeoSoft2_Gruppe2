@@ -1,1 +1,20 @@
 extends layout
+
+block sidebar
+  //https://startbootstrap.com/templates/simple-sidebar/
+  //sidebar
+  nav#sidebar-wrapper.bg-light.border-right
+    div.list-group.list-group-flush
+      div#sidebarOptions.list-group-item.list-group-item-action.bg-light
+        p some buttons
+      div#browser-controls.list-group-item.list-group-item-action.bg-light
+        p browser controls. forms and such here
+      div#tweet-browser.list-group-item.list-group-item-action.bg-light
+        //this is where a scrollable list of tweets on the map appears
+      div#impressum.list-group-item.list-group-item-action.bg-light
+        p Geomergency 2019
+        
+            
+  
+block content
+  div#map

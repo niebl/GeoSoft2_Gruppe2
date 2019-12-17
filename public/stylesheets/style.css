@@ -1,11 +1,107 @@
+.navbar {
+  min-height: 4em;
+  max-height: 4em;
+  width:100%
+}
+.nav-item{
+  margin-right: 10px
+}
+#sidebarCollapse{
+  font-size: 20px;
+  padding-top: 1px;
+  padding-right: 12px;
+  padding-bottom: 4px;
+  padding-left: 12px;
+}
+#tweet-browser{
+  max-height: 512px;
+  height: 512px;
+  overflow-y: scroll;
+
+  -webkit-transition: height .25s ease-out;
+  -moz-transition: height .25s ease-out;
+  -o-transition: height .25s ease-out;
+  transition: height .25s ease-out;
+}
+#impressum{
+  font-size: 10px;
+
+  position:fixed;
+  bottom: 0;
+  width: 400px;
+}
+
+/*based on https://startbootstrap.com/templates/simple-sidebar/ */
+body {
+  overflow-x: hidden;
+}
+#sidebar-wrapper {
+  max-width: 50%;
+  width: 400px;
+  display:inline;
+  float:left;
+  height: calc( 100vh - 4em);
+
+  /* z-index to layer sidebar over map*/
+  position: absolute;
+  z-index: 0;
+
+  margin-left: -15rem;
+  -webkit-transition: margin .25s ease-out;
+  -moz-transition: margin .25s ease-out;
+  -o-transition: margin .25s ease-out;
+  transition: margin .25s ease-out;
+}
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+  width: 100%;
+}
+
+#page-content-wrapper {
+  float: right;
+  height: calc( 100vh - 4em);
+  display: inline;
+
+  min-width: 80%;
+  /* z-index to layer sidebar over map*/
+  width:100%;
+  position: absolute;
+  z-index: -1;
+
+  -webkit-transition: margin .25s ease-out;
+  -moz-transition: margin .25s ease-out;
+  -o-transition: margin .25s ease-out;
+  transition: margin .25s ease-out;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0;
+}
+#wrapper.toggled #page-content-wrapper {
+  width: 100%
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0;
+  }
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -30rem;
+  }
+}
 #map{
-  position: relative;
-  height:100vh;  /* or as desired */
-  width: 100%;  /* This means "100% of the width of its container", the .col-md-8 */
+  /*16px: scrollbar-width. replace with something better if found*/
+  height: calc( 100vh - 4em - 16px);
+  max-height: 100%;
 }
-#sidebar{
+.visible {
+  visibility: visible;
 }
-#nav{
-  border: 1px;
-  border-color: black;
+.invisible {
+  visibility: hidden;
 }
