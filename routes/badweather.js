@@ -16,7 +16,6 @@ router.get('/getBorders', (req, res) => {
   var regions ={type:"FeatureCollection", features:[]};
   var query = {};
   if(req.query.name){
-
     query['geojson.properties.name'] = req.query.name;
   }
   if(req.query.coordinates){
@@ -146,7 +145,8 @@ router.get('/loadUnwetter', (req, res, next) => {
   router.get("/getUnwetter", (req, res)=>{
   var query = {};
   if(req.query.event){
-    query['geojson.properties.event'] = req.query.event;
+    var event = str.toUpperCase(req.query.event);
+    query['geojson.properties.event'] = event;
   }
   if(req.query.name){
     // query = {'geojson.properties.name' : req.query.name};
