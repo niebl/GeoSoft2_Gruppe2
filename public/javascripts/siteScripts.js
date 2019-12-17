@@ -25,6 +25,7 @@ $("#update-map").click(function(){
 $("#sidebarCollapse").click(function(e){
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
+  setTimeout(function(){ map.invalidateSize()}, 400);
 });
 
 /**

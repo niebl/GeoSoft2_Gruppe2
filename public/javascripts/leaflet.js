@@ -48,9 +48,14 @@ var baseMaps = {
 };
 
 var map = L.map('map', {
-  layers:  [street,tweetLayer]
+  layers:  [street,tweetLayer],
+  zoomControl: false
 }).setView([51.16, 10.45], 6);
 
+//add zoom buttons:
+var zoomControls = L.control.zoom({
+  position:'topright'
+}).addTo(map)
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 

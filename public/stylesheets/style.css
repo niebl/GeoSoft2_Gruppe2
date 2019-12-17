@@ -6,21 +6,28 @@
 .nav-item{
   margin-right: 10px
 }
+#sidebarCollapse{
+  font-size: 30px;
+  padding-top: 1px;
+  padding-right: 12px;
+  padding-bottom: 1px;
+  padding-left: 12px;
+}
 
 /*based on https://startbootstrap.com/templates/simple-sidebar/ */
 body {
   overflow-x: hidden;
 }
 #sidebar-wrapper {
-  max-width: 20%;
-  width: 20%;
+  max-width: 50%;
+  width: 400px;
   display:inline;
   float:left;
   height: calc( 100vh - 4em);
 
-  /* z-index to layer sidebar over map
+  /* z-index to layer sidebar over map*/
   position: absolute;
-  z-index: 0;*/
+  z-index: 0;
 
   margin-left: -15rem;
   -webkit-transition: margin .25s ease-out;
@@ -44,10 +51,10 @@ body {
   display: inline;
 
   min-width: 80%;
-  /* z-index to layer sidebar over map
-  width:100%
+  /* z-index to layer sidebar over map*/
+  width:100%;
   position: absolute;
-  z-index: 0;*/
+  z-index: -1;
 
   -webkit-transition: margin .25s ease-out;
   -moz-transition: margin .25s ease-out;
@@ -67,7 +74,7 @@ body {
     margin-left: 0;
   }
   #wrapper.toggled #sidebar-wrapper {
-    margin-left: -20rem;
+    margin-left: -30rem;
   }
 }
 #map{
