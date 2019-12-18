@@ -27,8 +27,11 @@ html
               span ≡
             li.nav-item.active
               a.nav-link(href='/') Home
-          button#update-map.btn.btn-outline-success.my-2.my-sm-0 Update Map 
+          //TODO: change id of update-map throughout implementation: update-tweets is better
+          button#update-map.btn.btn-outline-success.my-2.my-sm-0 Update tweets 
             span#update-badge.badge.badge-warning.invisible 0
+          |
+          //button#update-radar.btn.btn-outline-success.my-2.my-sm-0 Update radar
               
       block sidebar
         
@@ -36,4 +39,3 @@ html
         block content
 script(src="/leafletscript")
 script(src="/siteScripts")
-

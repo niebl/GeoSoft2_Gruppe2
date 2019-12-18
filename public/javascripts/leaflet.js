@@ -34,12 +34,21 @@ var leafletRadarAttribution = L.tileLayer.wms("https://maps.dwd.de/geoserver/dwd
 */
 var tweetLayer = L.geoJson(false,{
   pointToLayer: tweetToLayer,
-  onEachFeature: onEachDot
+  onEachFeature: onEachTweet
 });
+
+
+
+/**
+* create layer for counties
+*
+*/
+var kreisLayer = L.featureGroup(false)
 
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
-  "Tweets": tweetLayer
+  "Tweets": tweetLayer,
+  "Kreise": kreisLayer
 };
 
 var baseMaps = {
@@ -60,6 +69,47 @@ var zoomControls = L.control.zoom({
 }).addTo(map)
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+kreisPromise = new Promise(async function(resolve, reject){
+  var requestURL = "/weather/kreise";
+  var response = await $.ajax({
+    url: requestURL,
+    dataType: 'text',
+    //contentType: 'application/json',
+    //success: embeddedCallback,
+    success: async function(data){
+      console.log(data)
+      getKreise()
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log(xhr.status);
+      console.log(id_str)
+      console.log(thrownError)
+      output = {html: thrownError}
+    }
+  });
+})
+async function getKreise(){
+  var requestURL = "weather/getBorders"
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      //console.log(data)
+      for(let feature of data.features){
+        kreisLayer.addLayer(L.geoJson(feature,{
+          opacity: 0.5
+        })//.bindPopup(feature.properties.name)
+      )
+      }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in getTweets")
+      console.log(xhr.status);
+      console.log(thrownError)
+    }
+  })
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // functions
@@ -119,13 +169,13 @@ function tweetToLayer(feature, latlng){
 }
 
 /**
-* @function onEachDot
+* @function onEachTweet
 * @desc gets called whenever a new marker is added to the map.
 * binds the embedded tweet into the popup.
 * devnote: potential for more functionality
 * @author Felix, nathansnider(inspiration)
 */
-function onEachDot(feature, layer){
+function onEachTweet(feature, layer){
   var popup = L.popup(
       {maxHeight:140}
     ).setContent(feature.properties.embeddedTweet)
@@ -213,31 +263,6 @@ async function addTweetToMap(tweet){
   });
 }
 
-// /**
-// * @function addTweetToMap
-// * @desc adds a given shape, in this case likely a tweet, to the map.
-// * leaning on https://stackoverflow.com/questions/45931963/leaflet-remove-specific-marker
-// * BE SURE TO HAVE A GLOBAL VARIABLE Object shapesOnMap, containing array "tweets"
-// * @param mapdiv the map id of the map
-// * @param input the object of the tweet to be added to the map
-// * @Author Felix
-// */
-// async function addTweetToMap(mapdiv, input){
-//   let id;
-//   let popupContent;
-//   let neighbourFound = false;
-//   const minDistance = 40000000;
-//
-//   //if there was no neighbour within min distance
-//   if (!neighbourFound){
-//     //create a leaflet object from the given coordinates and colors
-//     var newShape = new L.GeoJSON(input.geojson);
-//     newShape.bindPopup(await getEmbeddedTweet(input.id_str))
-//     map.addLayer(newShape);
-//     shapesOnMap.tweets.push(newShape);
-//   }
-// }
-
 /**
 * @function getEmbeddedTweet
 * @desc sends a request to the twitter Oembed API to get an embedded tweet https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
@@ -276,5 +301,3 @@ async function getEmbeddedTweet(id_str){
   });
   return output.html;
 }
-
-

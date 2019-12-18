@@ -14,6 +14,9 @@ library(sp)
 library(raster)
 library(geojsonsf)
 
+#install.packages("rmapshaper")
+library(rmapshaper)
+
 #* Echo back the input
 #* @param msg The message to echo
 #* @get /echo
@@ -73,12 +76,60 @@ function(req, a, b){
 }
 
 
+#test of simplification algo
+test <- function(simpBool){
+  #gridbase <- "https://opendata.dwd.de/weather/radar/radolan/rw/raa01-rw_10000-latest-dwd---bin"
+  # Link zum ftp-server
+  rasterbase <- paste0(gridbase,"/hourly/radolan/recent")
+  
+  # Alle Dateien aus dem asc-Ordner ausw???hlbar machen
+  ftp.files <- indexFTP("/asc", base=rasterbase, dir=tempdir())
+  # Speicherziel definieren
+  ddir <- localtestdir()
+  tdir <- tempdir()
+  
+  # Eine Datei aus dem asc-Ordner bestimmen
+  link <- paste0("hourly/radolan/recent/", ftp.files[length(ftp.files)-1])
+  # Gew???hlte Datei herunterladen
+  file <- dataDWD(link, base=gridbase, joinbf=TRUE, dir=ddir, quiet=TRUE,
+                  dbin=TRUE, read=FALSE)
+  
+  # Entpacken
+  untar(file, exdir=ddir)
+  
+  # Entpackte Dateien ausw???hlbar machen
+  y <-list.files(ddir)
+  # Link zu Dateien
+  r <- paste0(ddir, "/")
+  # Datei ausw???hlen und an Link hinzuf???gen
+  r <- paste0(r, y[length(y)])
+  # Raster-/Array-Daten lesen
+  star <- read_stars(r)
+  
+  # Projektion definieren
+  crs = "+proj=stere +lat_0=90 +lat_ts=90 +lon_0=10 +k=0.93301270189 +x_0=0 +y_0=0 +a=6370040 +b=6370040 +no_defs"
+  
+  
+  # Projektion ???ndern
+  st_crs(star)= crs
+  
+  x <- st_as_stars(star)
+  sf_data <- st_as_sf(x,as_points=FALSE, merge=TRUE, na.rm = FALSE)
+  
+  #https://www.rdocumentation.org/packages/geojsonsf/versions/1.3.0/topics/sf_geojson
+  #https://fidanalytics.co.uk/blog/simplifying-polygons-r
+  if(simpBool == TRUE){
+    sf_data <- sf_data %>% st_simplify(preserveTopology=FALSE, dTolerance = 1000)
+  }
+  
+  new = st_crs(4326)
+  sf_data2 <- st_transform(sf_data, new)
+  names(sf_data2)[colnames(sf_data2) =="RW_20191216-2350.asc"] <- "prec"
+  geo <- sf_geojson(sf_data2)
+  return(geo)
+  #jsonlite::unbox(geo)
+}
 
-
-
-#* Radar data Output
-#* @serializer unboxedJSON
-#* @get /radio
 function(){
   
   #gridbase <- "https://opendata.dwd.de/weather/radar/radolan/rw/raa01-rw_10000-latest-dwd---bin"
@@ -119,7 +170,9 @@ function(){
   sf_data <- st_as_sf(x,as_points=FALSE, merge=TRUE, na.rm = FALSE)
   new = st_crs(4326)
   sf_data2 <- st_transform(sf_data, new)
+  names(sf_data2)[colnames(sf_data2) =="RW_20191216-2350.asc"] <- "prec"
   geo <- sf_geojson(sf_data2)
+  geo <- geo %>% st_simplify(dTolerance = 1000)
   geo
   #jsonlite::unbox(geo)
 }
