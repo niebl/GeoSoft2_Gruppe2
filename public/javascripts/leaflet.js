@@ -90,15 +90,16 @@ kreisPromise = new Promise(async function(resolve, reject){
   });
 })
 async function getKreise(){
-  var requestURL = "weather/getBorders"
+  var requestURL = "weather/getUnwetter"
   return await $.ajax({
     url: requestURL,
     success: async function(data){
       //console.log(data)
       for(let feature of data.features){
         kreisLayer.addLayer(L.geoJson(feature,{
-          opacity: 0.5
-        })//.bindPopup(feature.properties.name)
+          fillOpacity: 0.3,
+          color: 'purple'
+        }).bindPopup(feature.properties.name+"<br>"+feature.properties.event)
       )
       }
 

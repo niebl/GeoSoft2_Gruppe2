@@ -170,9 +170,9 @@ function(){
   sf_data <- st_as_sf(x,as_points=FALSE, merge=TRUE, na.rm = FALSE)
   new = st_crs(4326)
   sf_data2 <- st_transform(sf_data, new)
-  names(sf_data2)[colnames(sf_data2) =="RW_20191216-2350.asc"] <- "prec"
+  #names(sf_data2)[colnames(sf_data2) =="RW_20191216-2350.asc"] <- "prec"
   geo <- sf_geojson(sf_data2)
-  geo <- geo %>% st_simplify(dTolerance = 1000)
+  #geo <- geo %>% st_simplify(dTolerance = 1000)
   geo
   #jsonlite::unbox(geo)
 }
