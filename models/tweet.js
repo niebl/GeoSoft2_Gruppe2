@@ -15,9 +15,9 @@ var Tweet = mongoose.Schema({
         coordinates: {type: [Number]}
       }
     },
+  embeddedTweet: {type: String},
   text: {type: String},
   id_str: {type: String, unique: true}
 });
 
 var Tweet = module.exports = mongoose.model('Tweet', Tweet);
-

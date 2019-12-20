@@ -354,7 +354,8 @@ module.exports = app;
 //TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
 console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
   if(tweet.coordinates != null){
-    postTweetToMongo(tweet);
+    // call getEmbeddedTweet() -> postTweetToMongo()
+    getEmbeddedTweet(tweet);
   }
 }))
 
@@ -366,10 +367,14 @@ console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, funct
 * @author Felix
 */
 function postTweetToMongo(tweet){
+  //initialise embeddedTweet as false
+  var embeddedTweet = false;
+
   Tweet.create({
     id_str : tweet.id_str,
     text : tweet.text,
     created_at : Date.parse(tweet.created_at),
+    embeddedTweet : tweet.embeddedTweet,
     geojson: {
       type: "Feature",
       properties: {
@@ -387,4 +392,32 @@ function postTweetToMongo(tweet){
       return false;
     }
   });
+}
+
+/**
+* @function getEmbeddedTweet
+* @desc sends a request to the twitter Oembed API to get an embedded tweet https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
+* then calls postTweetToMongo in order to add the tweet to the database
+* @param tweet the tweet-object
+* @Author Felix
+* TODO: handle case where embedded tweet is not found
+*/
+async function getEmbeddedTweet(tweet){
+  var output;
+  var requestURL = "http://publish.twitter.com/oembed?url=https://twitter.com/t/status/";
+  //let requestURL = "https://localhost:3000/embedTweet?id="
+  requestURL = requestURL.concat(tweet.id_str);
+
+  var requestSettings = {
+    uri: requestURL,
+    method: 'GET',
+    encoding: null,
+  }
+  await request(requestSettings, function(error, response, body){
+    if(error){console.log(error)}
+    	else{
+      tweet.embeddedTweet = JSON.parse(body).html;
+      postTweetToMongo(tweet);
+    }
+  })
 }

@@ -27,7 +27,7 @@ var leafletRadarAttribution = L.tileLayer.wms("https://maps.dwd.de/geoserver/dwd
 });
 
 /**
-* create an empty layer
+* create an empty layer for the tweets
 * leaning on https://stackoverflow.com/a/33221018
 * @see onEachDot
 * @author Felix, nathansnider(inspiration)
@@ -70,47 +70,47 @@ var zoomControls = L.control.zoom({
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-kreisPromise = new Promise(async function(resolve, reject){
-  var requestURL = "/weather/kreise";
-  var response = await $.ajax({
-    url: requestURL,
-    dataType: 'text',
-    //contentType: 'application/json',
-    //success: embeddedCallback,
-    success: async function(data){
-      console.log(data)
-      getKreise()
-    },
-    error: function(xhr, ajaxOptions, thrownError){
-      console.log(xhr.status);
-      console.log(id_str)
-      console.log(thrownError)
-      output = {html: thrownError}
-    }
-  });
-})
-async function getKreise(){
-  var requestURL = "weather/getUnwetter"
-  return await $.ajax({
-    url: requestURL,
-    success: async function(data){
-      //console.log(data)
-      for(let feature of data.features){
-        kreisLayer.addLayer(L.geoJson(feature,{
-          fillOpacity: 0.3,
-          color: 'purple'
-        }).bindPopup(feature.properties.name+"<br>"+feature.properties.event)
-      )
-      }
-
-    },
-    error: function(xhr, ajaxOptions, thrownError){
-      console.log("error in getTweets")
-      console.log(xhr.status);
-      console.log(thrownError)
-    }
-  })
-}
+// kreisPromise = new Promise(async function(resolve, reject){
+//   var requestURL = "/weather/kreise";
+//   var response = await $.ajax({
+//     url: requestURL,
+//     dataType: 'text',
+//     //contentType: 'application/json',
+//     //success: embeddedCallback,
+//     success: async function(data){
+//       console.log(data)
+//       getKreise()
+//     },
+//     error: function(xhr, ajaxOptions, thrownError){
+//       console.log(xhr.status);
+//       console.log(id_str)
+//       console.log(thrownError)
+//       output = {html: thrownError}
+//     }
+//   });
+// })
+// async function getKreise(){
+//   var requestURL = "weather/getUnwetter"
+//   return await $.ajax({
+//     url: requestURL,
+//     success: async function(data){
+//       //console.log(data)
+//       for(let feature of data.features){
+//         kreisLayer.addLayer(L.geoJson(feature,{
+//           fillOpacity: 0.3,
+//           color: 'purple'
+//         }).bindPopup(feature.properties.name+"<br>"+feature.properties.event)
+//       )
+//       }
+//
+//     },
+//     error: function(xhr, ajaxOptions, thrownError){
+//       console.log("error in getTweets")
+//       console.log(xhr.status);
+//       console.log(thrownError)
+//     }
+//   })
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 // functions
@@ -238,67 +238,32 @@ async function addTweetToMap(tweet){
     features: []
   };
 
-  var embedPromise = new Promise(async function(resolve,reject){
-    var embedded = await getEmbeddedTweet(tweet.id_str)
-    resolve(embedded)
-  })
 
-  return embedPromise.then(function(embedded){
-    var properties = {
-      id_str: tweet.id_str,
-      _id: tweet._id,
-      text: tweet.text,
-      created_at: tweet.created_at,
-      embeddedTweet: embedded
-    };
-    newTweet.features.push({
-      "geometry": tweet.geojson.geometry,
-      "properties": properties,
-      "type": "Feature"
-    });
-    tweetLayer.addData(newTweet)
-
-    //add the tweet to the tweet-browser
-    //provisional. TODO: add support to remove tweets when new bbox specified
-    $("#tweet-browser").prepend(embedded+"<hr>")
+  var properties = {
+    id_str: tweet.id_str,
+    _id: tweet._id,
+    text: tweet.text,
+    created_at: tweet.created_at,
+    embeddedTweet: tweet.embeddedTweet
+  };
+  newTweet.features.push({
+    "geometry": tweet.geojson.geometry,
+    "properties": properties,
+    "type": "Feature"
   });
-}
+  tweetLayer.addData(newTweet)
 
-/**
-* @function getEmbeddedTweet
-* @desc sends a request to the twitter Oembed API to get an embedded tweet https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
-* @param id_str the id of the tweet that is to be embedded
-* @returns html of the embedded tweet
-* @Author Felix
-*/
-async function getEmbeddedTweet(id_str){
-  var output;
-  var requestURL = "http://publish.twitter.com/oembed?url=https://twitter.com/t/status/";
-  //let requestURL = "https://localhost:3000/embedTweet?id="
-  requestURL = requestURL.concat(id_str);
+  //add the tweet to the tweet-browser
+  //provisional.
+  //TODO: add support to remove tweets when new bbox specified
+  //TODO: link tweets to location on map
 
-  var embeddedCallback = function(data){
-    if(data != undefined){
-      output = data
-      return data;
-    } else {return {html: "<b>Tweet not Available</b>"};}
-  }
-
-  await $.ajax({
-    url: requestURL,
-    dataType: 'jsonp',
-    //contentType: 'application/json',
-    //success: embeddedCallback,
-    callback: 'embeddedCallback',
-    success: function(data){
-      output = data;
-    },
-    error: function(xhr, ajaxOptions, thrownError){
-      console.log(xhr.status);
-      console.log(id_str)
-      console.log(thrownError)
-      output = {html: thrownError}
-    }
-  });
-  return output.html;
+  var tweetdiv = `
+    <div class="tweetDiv" coords="${tweet.geojson.geometry.coordinates[0]},${tweet.geojson.geometry.coordinates[1]}" id_str="${tweet.id_str}">
+      <button type="button" class="btn btn-secondary gotoTweet">go to</button>
+      <!--button type="button" class="btn btn-danger gotoTweet">remove</button-->
+      ${tweet.embeddedTweet}
+    </div><hr>
+  `;
+  $("#tweet-browser").prepend(tweetdiv);
 }

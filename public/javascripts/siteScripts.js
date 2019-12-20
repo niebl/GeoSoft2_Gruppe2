@@ -29,6 +29,27 @@ $("#sidebarCollapse").click(function(e){
   setTimeout(function(){ map.invalidateSize()}, 400);
 });
 
+//go to tweet
+$("#tweet-browser").on('click', '.gotoTweet', function(e){
+  //get the coordinates from the parent element of the button
+  var coordsInput = $(e.target).parent().attr('coords').split(",")
+  //parse the coordinates and swap lat and lon
+  var coords = []
+  coords[0] = parseFloat(coordsInput[1])
+  coords[1] = parseFloat(coordsInput[0])
+
+  //set the view of the map to the tweet and zoom in
+  map.setView(coords, 13, {
+    "animate": true,
+    "pan":{"duration": 0.5},
+  });
+});
+
+//remove tweet
+// $("#tweet-browser").on('click', '.gotoTweet', function(e){
+//
+// });
+
 /**
 * @function updateMapTweets
 * @desc updates the map with the tweets that have been fetched from getTweets() function
