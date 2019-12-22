@@ -128,7 +128,15 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 * @author Felix, nathansnider(inspiration)
 */
 function tweetToLayer(feature, latlng){
-  var markersOnMap = tweetLayer._layers
+  var tweetdiv = `
+    <div id="mapTweet${feature.properties.id_str}" class="tweetDiv" coords="${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}" id_str="${feature.properties.id_str}">
+      <button type="button" class="btn btn-secondary gotoTweet">go to</button>
+      <button type="button" class="btn btn-danger removeTweet">remove</button>
+      ${feature.properties.embeddedTweet}
+    <hr>
+    </div>
+  `;
+  var markersOnMap = tweetLayer._layers;
 
   //if there are no tweets on the map, just add it. don't check for others
   if(Object.entries(markersOnMap).length === 0){
@@ -157,7 +165,7 @@ function tweetToLayer(feature, latlng){
 
     if(nearNeighbourFound){ //if the tweet is within the smallest allowed radius to another tweet, append it to the popup
       var newPopupContent = markersOnMap[nearNeighbour]._popup._content;
-      newPopupContent = feature.properties.embeddedTweet+"<hr>"+newPopupContent;
+      newPopupContent = tweetdiv+newPopupContent;
       //change the content of the marker on the map
       markersOnMap[nearNeighbour]._popup._content = newPopupContent;
 
@@ -177,9 +185,18 @@ function tweetToLayer(feature, latlng){
 * @author Felix, nathansnider(inspiration)
 */
 function onEachTweet(feature, layer){
+  console.log(feature)
+  var tweetdiv = `
+    <div id="mapTweet${feature.properties.id_str}" class="tweetDiv" coords="${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}" id_str="${feature.properties.id_str}">
+      <button type="button" class="btn btn-secondary gotoTweet">go to</button>
+      <button type="button" class="btn btn-danger removeTweet">remove</button>
+      ${feature.properties.embeddedTweet}
+    <hr>
+    </div>
+  `;
   var popup = L.popup(
       {maxHeight:140}
-    ).setContent(feature.properties.embeddedTweet)
+    ).setContent(tweetdiv)
   layer.bindPopup(popup)
 }
 
@@ -259,11 +276,12 @@ async function addTweetToMap(tweet){
   //TODO: link tweets to location on map
 
   var tweetdiv = `
-    <div class="tweetDiv" coords="${tweet.geojson.geometry.coordinates[0]},${tweet.geojson.geometry.coordinates[1]}" id_str="${tweet.id_str}">
+    <div id="tweet${tweet.id_str}" class="tweetDiv" coords="${tweet.geojson.geometry.coordinates[0]},${tweet.geojson.geometry.coordinates[1]}" id_str="${tweet.id_str}">
       <button type="button" class="btn btn-secondary gotoTweet">go to</button>
-      <!--button type="button" class="btn btn-danger gotoTweet">remove</button-->
+      <button type="button" class="btn btn-danger removeTweet">remove</button>
       ${tweet.embeddedTweet}
-    </div><hr>
+    <hr>
+    </div>
   `;
   $("#tweet-browser").prepend(tweetdiv);
 }

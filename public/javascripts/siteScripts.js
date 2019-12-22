@@ -30,7 +30,7 @@ $("#sidebarCollapse").click(function(e){
 });
 
 //go to tweet
-$("#tweet-browser").on('click', '.gotoTweet', function(e){
+$("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
   //get the coordinates from the parent element of the button
   var coordsInput = $(e.target).parent().attr('coords').split(",")
   //parse the coordinates and swap lat and lon
@@ -40,15 +40,59 @@ $("#tweet-browser").on('click', '.gotoTweet', function(e){
 
   //set the view of the map to the tweet and zoom in
   map.setView(coords, 13, {
-    "animate": true,
-    "pan":{"duration": 0.5},
+    "pan":{
+      "animate": true,
+      "duration": 0.5
+    },
+    "zoom":{
+      "animate": true,
+      "duration": 0.5
+    },
   });
+
+  //todo: open the popup
 });
 
-//remove tweet
-// $("#tweet-browser").on('click', '.gotoTweet', function(e){
-//
-// });
+//remove the tweet from map
+$("#tweet-browser, #map").on('click', '.removeTweet', function(e){
+  //get the coordinates from the parent element of the button
+  var coordsInput = $(e.target).parent().attr('coords').split(",")
+  var idInput = $(e.target).parent().attr('id_str').split(",")
+
+  //parse the coordinates and swap lat and lon
+  var coords = []
+  coords[0] = parseFloat(coordsInput[1])
+  coords[1] = parseFloat(coordsInput[0])
+
+  //remove from the browser
+  $("#tweet"+idInput).remove();
+
+  //remove from the map
+  for(marker in tweetLayer._layers){
+    //if the tweets id is found in the popup, remove it's div
+    //based on https://stackoverflow.com/questions/16940274/remove-div-and-its-content-from-html-string/16940353#16940353
+    if(tweetLayer._layers[marker]._popup._content.includes(idInput)){
+      let popupContent = tweetLayer._layers[marker]._popup._content
+      popupContent = $(popupContent);
+      editor = $("<p>").append(popupContent);
+      editor.find("#mapTweet"+idInput).remove();
+      popupContent = editor.html();
+      tweetLayer._layers[marker]._popup._content = popupContent;
+
+
+
+      //remove the layer if there is no popup content
+      if(popupContent == ""){
+        tweetLayer._layers[marker].remove()
+      } else {
+        //update the popup in map view
+        tweetLayer._layers[marker].closePopup();
+        tweetLayer._layers[marker].openPopup();
+      }
+    }
+  }
+})
+
 
 /**
 * @function updateMapTweets
