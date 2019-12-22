@@ -120,15 +120,15 @@ async function updateMapTweets(){
 
   //add the tweets once the API responded
   tweetPromise.then(function(tweets){
-    //update the timestamp to when tweets were last fetched.
-    //also update the timestamp for the var used by updateTweetNotifs
-    older_than = Date.now();
-    older_thanCheck = older_than;
-
     for (let tweet of tweets){
       addTweetToMap(tweet);
     }
     updateTweetNotifs({clear:true});
+
+    //update the timestamp to when tweets were last fetched.
+    //also update the timestamp for the var used by updateTweetNotifs
+    older_than = timeOfClick;
+    older_thanCheck = timeOfClick;
   });
 }
 
