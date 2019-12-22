@@ -9,7 +9,7 @@ var older_thanCheck;
 * the minimal distance a tweet is allowed to have to another in meters.
 */
 const nearestTweetRadius = 50;
-const updateCheckInterval=10000;
+const updateCheckInterval= 10000;
 
 //initialise with the current timestamp, -5 minutes
 older_than = Date.now() - 300000;
@@ -18,11 +18,15 @@ older_thanCheck = older_than;
 //begin the periodic update check. interval of 10 seconds
 checkTweetUpdates(updateCheckInterval);
 
-//site-events
+////////////////////////////////////////////////////////////////////////////////
+// site-events
+////////////////////////////////////////////////////////////////////////////////
+
 //click of UPDATE MAP button
 $("#update-map").click(function(){
   updateMapTweets();
 });
+//toggle sidebar button
 $("#sidebarCollapse").click(function(e){
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
@@ -31,31 +35,34 @@ $("#sidebarCollapse").click(function(e){
 
 //go to tweet
 $("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
-  //get the coordinates from the parent element of the button
+  //get the attributes from the parent element of the button
   var coordsInput = $(e.target).parent().attr('coords').split(",")
+  var idInput = $(e.target).parent().attr('id_str').split(",")
+
   //parse the coordinates and swap lat and lon
   var coords = []
   coords[0] = parseFloat(coordsInput[1])
   coords[1] = parseFloat(coordsInput[0])
 
   //set the view of the map to the tweet and zoom in
-  map.setView(coords, 13, {
-    "pan":{
-      "animate": true,
-      "duration": 0.5
-    },
-    "zoom":{
-      "animate": true,
-      "duration": 0.5
-    },
-  });
-
+  map.setView(coords, 13,
+    // {
+    // "animate": true,
+    // "pan":{
+    //   "duration": 0.5
+    // }
+    // }
+  );
+  for(marker in tweetLayer._layers){
+    if(tweetLayer._layers[marker]._popup._content.includes(idInput)){
+      tweetLayer._layers[marker].openPopup();
+    }
+  }
   //todo: open the popup
 });
-
 //remove the tweet from map
 $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
-  //get the coordinates from the parent element of the button
+  //get the attributes from the parent element of the button
   var coordsInput = $(e.target).parent().attr('coords').split(",")
   var idInput = $(e.target).parent().attr('id_str').split(",")
 
@@ -72,14 +79,14 @@ $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
     //if the tweets id is found in the popup, remove it's div
     //based on https://stackoverflow.com/questions/16940274/remove-div-and-its-content-from-html-string/16940353#16940353
     if(tweetLayer._layers[marker]._popup._content.includes(idInput)){
+      //get the html popup content to work with jquery
       let popupContent = tweetLayer._layers[marker]._popup._content
       popupContent = $(popupContent);
       editor = $("<p>").append(popupContent);
+      //remove the according div and assign the new updated content
       editor.find("#mapTweet"+idInput).remove();
       popupContent = editor.html();
       tweetLayer._layers[marker]._popup._content = popupContent;
-
-
 
       //remove the layer if there is no popup content
       if(popupContent == ""){
@@ -93,6 +100,9 @@ $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
   }
 })
 
+////////////////////////////////////////////////////////////////////////////////
+// functions
+////////////////////////////////////////////////////////////////////////////////
 
 /**
 * @function updateMapTweets
@@ -105,13 +115,16 @@ async function updateMapTweets(){
     resolve(tweets.tweets);
   });
 
-  //update the timestamp to when tweets were last fetched.
-  //also update the timestamp for the var used by updateTweetNotifs
-  older_than = Date.now();
-  older_thanCheck = older_than;
+  //get the time of when the button was clicked
+  var timeOfClick = Date.now();
 
   //add the tweets once the API responded
   tweetPromise.then(function(tweets){
+    //update the timestamp to when tweets were last fetched.
+    //also update the timestamp for the var used by updateTweetNotifs
+    older_than = Date.now();
+    older_thanCheck = older_than;
+
     for (let tweet of tweets){
       addTweetToMap(tweet);
     }

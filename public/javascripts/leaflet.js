@@ -185,7 +185,6 @@ function tweetToLayer(feature, latlng){
 * @author Felix, nathansnider(inspiration)
 */
 function onEachTweet(feature, layer){
-  console.log(feature)
   var tweetdiv = `
     <div id="mapTweet${feature.properties.id_str}" class="tweetDiv" coords="${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}" id_str="${feature.properties.id_str}">
       <button type="button" class="btn btn-secondary gotoTweet">go to</button>
