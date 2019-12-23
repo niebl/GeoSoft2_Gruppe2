@@ -1,6 +1,8 @@
 /*jshint esversion: 8 */
 
 var bbox = "55.22,5.00,47.15,15.20";
+var include = {};
+var exclude = {};
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
@@ -21,6 +23,20 @@ checkTweetUpdates(updateCheckInterval);
 ////////////////////////////////////////////////////////////////////////////////
 // site-events
 ////////////////////////////////////////////////////////////////////////////////
+
+//toggle side-bar elements
+//toggle tweet options
+$("#parameter-toggle").click(function(e){
+  e.preventDefault();
+  $("#browser-controls").toggleClass("toggled");
+  setTimeout(function(){ map.invalidateSize()}, 400);
+})
+//toggle tweet-browser
+$("#browser-toggle").click(function(e){
+  e.preventDefault();
+  $("#tweet-browser").toggleClass("toggled");
+  setTimeout(function(){ map.invalidateSize()}, 400);
+})
 
 //click of UPDATE MAP button
 $("#update-map").click(function(){

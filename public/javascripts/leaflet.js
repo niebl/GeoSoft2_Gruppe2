@@ -37,18 +37,20 @@ var tweetLayer = L.geoJson(false,{
   onEachFeature: onEachTweet
 });
 
-
-
 /**
 * create layer for counties
 *
 */
 var kreisLayer = L.featureGroup(false)
 
+//create layer for selection rectangle
+var drawnRect = new L.FeatureGroup();
+
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
   "Tweets": tweetLayer,
-  "Kreise": kreisLayer
+  "Kreise": kreisLayer,
+  "Selection": drawnRect
 };
 
 var baseMaps = {
@@ -58,15 +60,52 @@ var baseMaps = {
 };
 
 var map = L.map('map', {
-
   layers:  [street,tweetLayer],
-  zoomControl: false
+  zoomControl: false,
+  drawControl: false
 }).setView([51.16, 10.45], 6);
 
 //add zoom buttons:
 var zoomControls = L.control.zoom({
   position:'topright'
 }).addTo(map)
+
+//add drawControl
+var drawControl = new L.Control.Draw({
+  draw: {
+    rectangle: true,
+
+    marker: false,
+    polygon: false,
+    polyline: false,
+    circle: false,
+    circlemarker: false,
+  },
+  edit: {
+    featureGroup: drawnRect
+  },
+  position:'topright'
+})
+map.addControl(drawControl);
+
+map.on('draw:created', function(e){
+  drawnRect.clearLayers()
+  var layer = e.layer;
+
+  //North, west, south, east coords
+  var coords = [layer._bounds._northEast.lat,layer._bounds._southWest.lng,layer._bounds._southWest.lat,layer._bounds._northEast.lng];
+
+  //show coords in side-menu
+  $("input[name='bboxNorth']").val(coords[0]);
+  $("input[name='bboxWest']").val(coords[1]);
+  $("input[name='bboxSouth']").val(coords[2]);
+  $("input[name='bboxEast']").val(coords[3]);
+
+  //set coordinates to bbox
+  bbox = coords;
+
+  drawnRect.addLayer(layer);
+});
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
@@ -130,8 +169,8 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 function tweetToLayer(feature, latlng){
   var tweetdiv = `
     <div id="mapTweet${feature.properties.id_str}" class="tweetDiv" coords="${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}" id_str="${feature.properties.id_str}">
-      <button type="button" class="btn btn-secondary gotoTweet">go to</button>
-      <button type="button" class="btn btn-danger removeTweet">remove</button>
+      <button type="button" class="btn btn-secondary btn-sm gotoTweet">go to</button>
+      <button type="button" class="btn btn-danger btn-sm removeTweet">remove</button>
       ${feature.properties.embeddedTweet}
     <hr>
     </div>
@@ -187,8 +226,8 @@ function tweetToLayer(feature, latlng){
 function onEachTweet(feature, layer){
   var tweetdiv = `
     <div id="mapTweet${feature.properties.id_str}" class="tweetDiv" coords="${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}" id_str="${feature.properties.id_str}">
-      <button type="button" class="btn btn-secondary gotoTweet">go to</button>
-      <button type="button" class="btn btn-danger removeTweet">remove</button>
+      <button type="button" class="btn btn-secondary btn-sm gotoTweet">go to</button>
+      <button type="button" class="btn btn-danger btn-sm removeTweet">remove</button>
       ${feature.properties.embeddedTweet}
     <hr>
     </div>
@@ -276,8 +315,8 @@ async function addTweetToMap(tweet){
 
   var tweetdiv = `
     <div id="tweet${tweet.id_str}" class="tweetDiv" coords="${tweet.geojson.geometry.coordinates[0]},${tweet.geojson.geometry.coordinates[1]}" id_str="${tweet.id_str}">
-      <button type="button" class="btn btn-secondary gotoTweet">go to</button>
-      <button type="button" class="btn btn-danger removeTweet">remove</button>
+      <button type="button" class="btn btn-secondary btn-sm gotoTweet">go to</button>
+      <button type="button" class="btn btn-danger btn-sm removeTweet">remove</button>
       ${tweet.embeddedTweet}
     <hr>
     </div>

@@ -6,24 +6,70 @@
 .nav-item{
   margin-right: 10px
 }
-.tweetDiv{
-
+.sidebarButton{
+  margin-left: 4px;
 }
+
+.bboxForm{
+  margin: 2px;
+}
+#bboxNorth{
+  display: table;
+  margin: 0 auto;
+}
+#bboxSouth{
+  display: table;
+  margin: 0 auto;
+}
+#bboxWest{
+  float: left;
+}
+#bboxEast{
+  float: right;
+}
+
+.toggle-bar{
+  position:absolute;
+  z-index: 1;
+
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+#tweet-browser{
+  max-height: 512px;
+  overflow-y: scroll;
+
+  transition: max-height .5s ease-out;
+}
+#tweet-browser.toggled{
+  margin-top: -24px;
+
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .5s ease-out;
+}
+#browser-controls{
+  max-height: 256px;
+  overflow-y: scroll;
+
+  transition: max-height .5s ease-out;
+}
+#browser-controls.toggled{
+  margin-top: -24px;
+
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .5s ease-out;
+}
+
+
 #sidebarCollapse{
   font-size: 20px;
   padding-top: 1px;
   padding-right: 12px;
   padding-bottom: 4px;
   padding-left: 12px;
-}
-#tweet-browser{
-  max-height: 512px;
-  overflow-y: scroll;
-
-  -webkit-transition: height .5s ease-out;
-  -moz-transition: height .5s ease-out;
-  -o-transition: height .5s ease-out;
-  transition: height .5s ease-out;
 }
 #impressum{
   font-size: 10px;
