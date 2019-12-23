@@ -17,8 +17,8 @@ block sidebar
             input#bboxWest(name='bboxWest',placeholder="West").form-control-sm.bboxForm
             input#bboxEast(name='bboxEast',placeholder="East").form-control-sm.bboxForm
             input#bboxSouth(name='bboxSouth',placeholder="South").form-control-sm.bboxForm
-          button(type="button").btn.btn-secondary.btn-sm.sidebarButton clear selection
-          button(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm selection
+          button#confirmCoords(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm selection
+          button#clearCoords(type="button").btn.btn-secondary.btn-sm.sidebarButton clear selection
           hr
         div#Keywords
           p include keywords:
@@ -32,8 +32,6 @@ block sidebar
         button#browser-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle tweet-browser
       div#tweet-browser.list-group-item.list-group-item-action.bg-light.toggled
         //this is where a scrollable list of tweets on the map appears
-      div#derp.list-group-item.list-group-item-action.bg-light
-          p DERP
       div#impressum.list-group-item.list-group-item-action.bg-light
         p Geomergency 2019
         

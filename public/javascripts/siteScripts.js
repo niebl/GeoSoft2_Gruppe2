@@ -1,5 +1,6 @@
 /*jshint esversion: 8 */
 
+var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var include = {};
 var exclude = {};
@@ -29,14 +30,12 @@ checkTweetUpdates(updateCheckInterval);
 $("#parameter-toggle").click(function(e){
   e.preventDefault();
   $("#browser-controls").toggleClass("toggled");
-  setTimeout(function(){ map.invalidateSize()}, 400);
-})
+});
 //toggle tweet-browser
 $("#browser-toggle").click(function(e){
   e.preventDefault();
   $("#tweet-browser").toggleClass("toggled");
-  setTimeout(function(){ map.invalidateSize()}, 400);
-})
+});
 
 //click of UPDATE MAP button
 $("#update-map").click(function(){
@@ -114,6 +113,26 @@ $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
       }
     }
   }
+})
+
+//confirm Coords
+$('#confirmCoords').on('click', function(e){
+  bbox = [parseFloat($("input[name='bboxNorth']").val()),
+          parseFloat($("input[name='bboxWest']").val()),
+          parseFloat($("input[name='bboxSouth']").val()),
+          parseFloat($("input[name='bboxEast']").val())]
+
+  removeTweetsOutOfArea(bbox);
+
+  drawnRect.clearLayers()
+
+  var rectBounds = [[bbox[0],bbox[1]],[bbox[2],bbox[3]]];
+  L.rectangle(rectBounds).addTo(drawnRect)
+})
+//clear coords
+$('#clearCoords').on('click', function(e){
+  drawnRect.clearLayers();
+  bbox = defaultBbox;
 })
 
 ////////////////////////////////////////////////////////////////////////////////

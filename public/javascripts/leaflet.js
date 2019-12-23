@@ -105,6 +105,9 @@ map.on('draw:created', function(e){
   bbox = coords;
 
   drawnRect.addLayer(layer);
+
+  //remove the tweets that aren'T within the area
+  removeTweetsOutOfArea(bbox);
 });
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -322,4 +325,35 @@ async function addTweetToMap(tweet){
     </div>
   `;
   $("#tweet-browser").prepend(tweetdiv);
+}
+
+/**
+* @function removeTweetsOutOfArea
+* removes all tweets that are not contained within the bounding box
+* @param bbox an array with the length of 4, representing the bounding box containing the tweets
+*/
+function removeTweetsOutOfArea(bbox){
+  bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
+
+  //remove the tweet from the map
+  for(var marker in tweetLayer._layers){
+    var point = turf.point([tweetLayer._layers[marker]._latlng.lng,tweetLayer._layers[marker]._latlng.lat]);
+  	if(!turf.booleanWithin(point, bbox)){
+      tweetLayer._layers[marker].remove();
+    }
+  }
+
+  //remove the tweets from the browser
+  $("#tweet-browser").children("div").each(function(){
+    var coords = $(this).attr("coords").split(",");
+    coords[0] = parseFloat(coords[0]);
+    coords[1] = parseFloat(coords[1]);
+
+    var point = turf.point(coords);
+
+    if(!turf.booleanWithin(point, bbox)){
+      $(this).remove();
+    }
+  });
+
 }
