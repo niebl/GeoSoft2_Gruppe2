@@ -71,9 +71,18 @@
   padding-bottom: 4px;
   padding-left: 12px;
 }
+
+/*devnote: the following dimensions are a hack and don't fit 100%.
+low priority, but fix when solution is found*/
+#sidebar-scroll-wrapper{
+  overflow-y: auto;
+  height: calc( 100vh - 8em);
+}
 #impressum{
   font-size: 10px;
+  height: 7em;
 
+  display:inline;
   position:fixed;
   bottom: 0;
   width: 400px;
@@ -86,7 +95,6 @@ body {
 #sidebar-wrapper {
   max-width: 50%;
   width: 400px;
-  display:inline;
   float:left;
   height: calc( 100vh - 4em);
 
