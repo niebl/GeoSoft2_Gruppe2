@@ -14,9 +14,10 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
+var nodeHTMLParser = require('node-html-parser');
 
 const https = require('https');
-const turf = require('@turf/turf')
+const turf = require('@turf/turf');
 
 var app = express();
 
@@ -371,9 +372,14 @@ function postTweetToMongo(tweet){
   //initialise embeddedTweet as false
   var embeddedTweet = false;
 
+  //get the plain text of the tweet
+  //it needs to be parsed from the html because twitter API doesn't always return full text
+  var plaintext = nodeHTMLParser.parse(tweet.embeddedTweet);
+  plaintext = plaintext.firstChild.text;
+
   Tweet.create({
     id_str : tweet.id_str,
-    text : tweet.text,
+    text : plaintext,
     created_at : Date.parse(tweet.created_at),
     embeddedTweet : tweet.embeddedTweet,
     geojson: {

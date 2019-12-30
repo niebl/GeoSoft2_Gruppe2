@@ -2,8 +2,10 @@
 
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
-var include = {};
-var exclude = {};
+var bboxArray = [55.22,5.00,47.15,15.20]
+var include = [];
+var exclude = [];
+
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
@@ -117,12 +119,12 @@ $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
 
 //confirm Coords
 $('#confirmCoords').on('click', function(e){
-  bbox = [parseFloat($("input[name='bboxNorth']").val()),
+  bboxArray = [parseFloat($("input[name='bboxNorth']").val()),
           parseFloat($("input[name='bboxWest']").val()),
           parseFloat($("input[name='bboxSouth']").val()),
           parseFloat($("input[name='bboxEast']").val())]
 
-  removeTweetsOutOfArea(bbox);
+  removeTweetsOutOfSelection(bboxArray, include, exclude);
 
   drawnRect.clearLayers()
 
@@ -133,6 +135,14 @@ $('#confirmCoords').on('click', function(e){
 $('#clearCoords').on('click', function(e){
   drawnRect.clearLayers();
   bbox = defaultBbox;
+})
+
+//FILTER words
+$('#confirmFilter').on('click', function(e){
+  include = $("input[name='includeKeywords']").val().split(",")
+  exclude = $("input[name='excludeKeywords']").val().split(",")
+
+  removeTweetsOutOfSelection(bboxArray, include, exclude);
 })
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -107,7 +107,7 @@ map.on('draw:created', function(e){
   drawnRect.addLayer(layer);
 
   //remove the tweets that aren'T within the area
-  removeTweetsOutOfArea(bbox);
+  removeTweetsOutOfSelection(bbox, include, exclude);
 });
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -328,32 +328,132 @@ async function addTweetToMap(tweet){
 }
 
 /**
-* @function removeTweetsOutOfArea
+* @function removeTweetsOutOfSelection
 * removes all tweets that are not contained within the bounding box
-* @param bbox an array with the length of 4, representing the bounding box containing the tweets
+* @param bbox an array or string with 4 coordinates, representing the bounding box containing the tweets
+* @param include array of substrings that are to be included in the tweets
+* @param exclude array of substrings that are to be excluded frin the tweets
+* @Author Felix
 */
-function removeTweetsOutOfArea(bbox){
-  bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
+function removeTweetsOutOfSelection(bbox, include, exclude){
+  //remove the tweets from the browser
+  rmTweetsByKeywords(bbox, include, exclude);
 
-  //remove the tweet from the map
-  for(var marker in tweetLayer._layers){
-    var point = turf.point([tweetLayer._layers[marker]._latlng.lng,tweetLayer._layers[marker]._latlng.lat]);
-  	if(!turf.booleanWithin(point, bbox)){
-      tweetLayer._layers[marker].remove();
+  //case differentiation if bbox is string or array
+  if (typeof bbox === 'string' || bbox instanceof String){
+    bbox = bbox.split(",");
+    for(let i = 0; i < bbox.length; i++){
+      bbox[i] = parseFloat(bbox[i]);
     }
   }
+  bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
 
-  //remove the tweets from the browser
-  $("#tweet-browser").children("div").each(function(){
-    var coords = $(this).attr("coords").split(",");
-    coords[0] = parseFloat(coords[0]);
-    coords[1] = parseFloat(coords[1]);
+  //remove out of bounds the tweet from the map
 
-    var point = turf.point(coords);
+}
 
-    if(!turf.booleanWithin(point, bbox)){
-      $(this).remove();
-    }
+/**
+* @function rmTweetsByKeywords
+* helping function that makes a request to the API to remove the tweets from the browser
+* @param bbox an array or string with 4 coordinates, representing the bounding box containing the tweets, N,W,S,E
+* @param include array of substrings that are to be included in the tweets
+* @param exclude array of substrings that are to be excluded frin the tweets
+* @see removeTweetsOutOfSelection
+* @author Felix
+*/
+async function rmTweetsByKeywords(bbox, include, exclude){
+  //build the request string
+  var requestURL = `bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}`;
+  if(!(include.length == 0 || include == undefined)){
+    requestURL = requestURL + `&include=${include.join()}`;
+  }
+  if(!(include.length == 0 || include == undefined)){
+    requestURL = requestURL + `&exclude=${exclude.join()}`;
+  }
+  requestURL = requestURL + "&fields=id_str";
+
+  var tweetPromise = new Promise(async function(resolve, reject){
+    //get the included tweets and resolve
+    var tweets = await getTweets(requestURL);
+    resolve(tweets.tweets);
   });
 
+  tweetPromise.then(function(tweets){
+    bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
+
+    //remove tweets from the browser
+    for(let tweet of tweets){
+      //remove the tweets from the browser
+      $("#tweet-browser").children("div").each(function(){
+        //extrct coordinates of div
+        var point = $(this).attr('coords').split(",");
+        point[0] = parseFloat(point[0])
+        point[1] = parseFloat(point[1])
+        point = turf.point([point[0],point[1]]);
+
+        let included = false;
+        let contained = turf.booleanWithin(point, bbox);
+
+        //if include string is empty, defualt to true
+        if(include.length == 0 || include == undefined){included = true;}
+
+        //check if the id strings were found in the answer
+        if(tweet.id_str == $(this).attr("id_str")){
+          included = true;
+        }
+
+        //remove if any of the conditions are met
+        if(!included || !contained){
+          $(this).remove();
+        }
+      });
+    }
+
+    //remove tweets from the map
+    //ISSUE: TODO: following seems to incorrectly exclude some tweets.
+    for(var marker in tweetLayer._layers){
+      //EXCTRACT COORDINATES
+      var point = turf.point([tweetLayer._layers[marker]._latlng.lng,tweetLayer._layers[marker]._latlng.lat]);
+
+      //TODO: text dependent removal of tweets from map
+      //initialise the var deciding about geographic containment of tweets within bbox
+      var contained = turf.booleanWithin(point, bbox);
+
+      //remove out-of-bounds markers first
+      if(!contained){
+        tweetLayer._layers[marker].remove();
+      }
+      //then check the popups of remaining markers for tweets that should be excluded
+      else {
+        popupHTML = $(tweetLayer._layers[marker]._popup._content);
+        popupHTML.children("div").each(function(){
+          for(let tweet of tweets){
+            //initialise variable deciding over inclusion of tweet
+            var included = false;
+            //when include is empty or undefined, default to true
+            if(include.length == 0 || include == undefined){included = true;}
+
+            //check if the id strings were found in the answer
+            console.log($(this).attr("id_str"))
+            if(tweet.id_str == $(this).attr("id_str")){
+              included = true;
+            }
+
+            if(!included){
+              //remove entire marker if there is only one tweet left
+              if(popupHTML.children("div").length <= 1){
+                tweetLayer._layers[marker].remove();
+              } else {
+                this.remove();
+              }
+            }
+          }
+        });
+        //update the popup if marker still exists
+        try{
+          tweetLayer._layers[marker]._popup._content = popupHTML.html();
+        } catch(error){/*ignore*/}
+      }
+    }
+  });
 }

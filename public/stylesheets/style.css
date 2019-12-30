@@ -12,6 +12,7 @@
 
 .bboxForm{
   margin: 2px;
+  width: 150px;
 }
 #bboxNorth{
   display: table;
