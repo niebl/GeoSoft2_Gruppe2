@@ -411,6 +411,7 @@ async function rmTweetsByKeywords(bbox, include, exclude){
 
     //remove tweets from the map
     //ISSUE: TODO: following seems to incorrectly exclude some tweets.
+    //              ISSUE probably starts at line 428
     for(var marker in tweetLayer._layers){
       //EXCTRACT COORDINATES
       var point = turf.point([tweetLayer._layers[marker]._latlng.lng,tweetLayer._layers[marker]._latlng.lat]);
@@ -426,7 +427,11 @@ async function rmTweetsByKeywords(bbox, include, exclude){
       //then check the popups of remaining markers for tweets that should be excluded
       else {
         popupHTML = $(tweetLayer._layers[marker]._popup._content);
+        console.log("the popup")
+        console.log(popupHTML)
         popupHTML.children("div").each(function(){
+          console.log("the child")
+          console.log(this)
           for(let tweet of tweets){
             //initialise variable deciding over inclusion of tweet
             var included = false;
