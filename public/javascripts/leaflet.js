@@ -313,8 +313,6 @@ async function addTweetToMap(tweet){
 
   //add the tweet to the tweet-browser
   //provisional.
-  //TODO: add support to remove tweets when new bbox specified
-  //TODO: link tweets to location on map
 
   var tweetdiv = `
     <div id="tweet${tweet.id_str}" class="tweetDiv" coords="${tweet.geojson.geometry.coordinates[0]},${tweet.geojson.geometry.coordinates[1]}" id_str="${tweet.id_str}">

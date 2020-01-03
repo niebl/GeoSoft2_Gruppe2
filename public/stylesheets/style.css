@@ -121,7 +121,9 @@ body {
 
 #page-content-wrapper {
   float: right;
-  height: calc( 100vh - 4em);
+  /*height: calc( 100vh - 4em- 16px);*/
+  max-height: calc( 100vh - 4em - 16px);
+
   display: inline;
 
   min-width: 80%;
@@ -153,9 +155,27 @@ body {
 }
 #map{
   /*16px: scrollbar-width. replace with something better if found*/
-  height: calc( 100vh - 4em - 16px);
+  height: calc( 100vh - 11em - 12px);
   max-height: 100%;
 }
+#progressIndicatorBar{
+  height: 5em;
+}
+#progressIndicator{
+  height: 60px;
+  width: 50%;
+  float: right;
+  margin-right: 50px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  padding: 5px;
+  padding-left: 15px;
+
+  overflow: hidden;
+  font-size: 10px;
+  color: white;
+}
+
 .visible {
   visibility: visible;
 }

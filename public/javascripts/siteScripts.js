@@ -150,6 +150,16 @@ $('#confirmFilter').on('click', function(e){
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+* @function updateProgressIndicator
+* function that updates the content of the progress indicator with a given string
+* @param message the string of a message to display.
+*/
+function updateProgressIndicator(message){
+  currentTime = "timestamp: " + Date.now()
+  $("#progressIndicator").prepend(currentTime+"&nbsp;&nbsp;"+message+"<br>")
+}
+
+/**
 * @function updateMapTweets
 * @desc updates the map with the tweets that have been fetched from getTweets() function
 * @see getTweets
@@ -165,6 +175,7 @@ async function updateMapTweets(){
 
   //add the tweets once the API responded
   tweetPromise.then(function(tweets){
+    updateProgressIndicator("displaying new tweets")
     for (let tweet of tweets){
       addTweetToMap(tweet);
     }
@@ -188,17 +199,17 @@ async function getTweets(params){
   let output;
   var requestURL = "/tweetAPI/search?";
   requestURL = requestURL + params;
+  updateProgressIndicator("fetching data from tweet API");
 
   //console.log(requestURL)
   await $.ajax({
     url: requestURL,
     success: function(data){
       output = data;
+      updateProgressIndicator("received data from tweet-API");
     },
     error: function(xhr, ajaxOptions, thrownError){
-      console.log("error in getTweets")
-      console.log(xhr.status);
-      console.log(thrownError)
+      updateProgressIndicator(`<font color="red">connection to tweet-API failed</font>`);
     }
   });
   return output;
@@ -213,6 +224,8 @@ async function getTweets(params){
 async function checkTweetUpdates(interval){
   setInterval(async function(){
     var tweetPromise = new Promise(async function(resolve, reject){
+      //indicate event
+      updateProgressIndicator("checking for new tweets");
       var tweets = await getTweets("bbox="+bbox+"&older_than="+older_thanCheck+"&fields=created_at");
       resolve(tweets.tweets);
     });
@@ -220,6 +233,12 @@ async function checkTweetUpdates(interval){
     tweetPromise.then(function(tweets){
       let numberNewTweets = tweets.length;
       updateTweetNotifs({increment: numberNewTweets});
+
+      //indicate event
+      if(numberNewTweets > 0){
+        updateProgressIndicator("new tweets available");
+      }
+
       //update the timestamp
       older_thanCheck = Date.now();
     });
