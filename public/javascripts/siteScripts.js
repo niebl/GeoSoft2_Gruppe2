@@ -175,7 +175,9 @@ async function updateMapTweets(){
 
   //add the tweets once the API responded
   tweetPromise.then(function(tweets){
-    updateProgressIndicator("displaying new tweets")
+    if(tweets.length > 0){
+      updateProgressIndicator("displaying new tweets");
+    }
     for (let tweet of tweets){
       addTweetToMap(tweet);
     }
