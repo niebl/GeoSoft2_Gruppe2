@@ -334,9 +334,6 @@ async function addTweetToMap(tweet){
 * @Author Felix
 */
 function removeTweetsOutOfSelection(bbox, include, exclude){
-  //remove the tweets from the browser
-  rmTweetsByKeywords(bbox, include, exclude);
-
   //case differentiation if bbox is string or array
   if (typeof bbox === 'string' || bbox instanceof String){
     bbox = bbox.split(",");
@@ -345,6 +342,9 @@ function removeTweetsOutOfSelection(bbox, include, exclude){
     }
   }
   bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
+
+  //remove the tweets from the browser
+  rmTweetsByKeywords(bbox, include, exclude);
 
   //remove out of bounds the tweet from the map
 

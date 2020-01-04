@@ -245,7 +245,7 @@ async function checkTweetUpdates(interval){
 
       //indicate event
       if(numberNewTweets > 0){
-        updateProgressIndicator("new tweets available");
+        updateProgressIndicator(`<font color="yellow">+${numberNewTweets}</font>, new tweets available`);
       }
 
       //update the timestamp
