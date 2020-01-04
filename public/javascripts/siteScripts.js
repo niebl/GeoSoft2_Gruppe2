@@ -5,10 +5,10 @@ var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20]
 var include = [];
 var exclude = [];
-
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
+
 /**
 * @var nearestTweetRadius.
 * the minimal distance a tweet is allowed to have to another in meters.
@@ -87,6 +87,8 @@ $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
   var coords = []
   coords[0] = parseFloat(coordsInput[1])
   coords[1] = parseFloat(coordsInput[0])
+
+  updateProgressIndicator(`removing tweet <font color="yellow">${idInput}</font> from view`)
 
   //remove from the browser
   $("#tweet"+idInput).remove();
@@ -175,18 +177,23 @@ async function updateMapTweets(){
 
   //add the tweets once the API responded
   tweetPromise.then(function(tweets){
-    if(tweets.length > 0){
-      updateProgressIndicator("displaying new tweets");
-    }
-    for (let tweet of tweets){
-      addTweetToMap(tweet);
-    }
-    updateTweetNotifs({clear:true});
+    //check for undefined tweets and display error message (see issue #6)
+    if(tweets == undefined){
+      updateProgressIndicator(`<font color="red">response from TweetAPI undefined. Try again</font>`);
+    } else {
+      if(tweets.length > 0){
+        updateProgressIndicator("displaying new tweets");
+      }
+      for (let tweet of tweets){
+        addTweetToMap(tweet);
+      }
+      updateTweetNotifs({clear:true});
 
-    //update the timestamp to when tweets were last fetched.
-    //also update the timestamp for the var used by updateTweetNotifs
-    older_than = timeOfClick;
-    older_thanCheck = timeOfClick;
+      //update the timestamp to when tweets were last fetched.
+      //also update the timestamp for the var used by updateTweetNotifs
+      older_than = timeOfClick;
+      older_thanCheck = timeOfClick;
+    }
   });
 }
 
