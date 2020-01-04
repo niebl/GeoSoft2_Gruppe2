@@ -313,8 +313,6 @@ async function addTweetToMap(tweet){
 
   //add the tweet to the tweet-browser
   //provisional.
-  //TODO: add support to remove tweets when new bbox specified
-  //TODO: link tweets to location on map
 
   var tweetdiv = `
     <div id="tweet${tweet.id_str}" class="tweetDiv" coords="${tweet.geojson.geometry.coordinates[0]},${tweet.geojson.geometry.coordinates[1]}" id_str="${tweet.id_str}">
@@ -336,9 +334,6 @@ async function addTweetToMap(tweet){
 * @Author Felix
 */
 function removeTweetsOutOfSelection(bbox, include, exclude){
-  //remove the tweets from the browser
-  rmTweetsByKeywords(bbox, include, exclude);
-
   //case differentiation if bbox is string or array
   if (typeof bbox === 'string' || bbox instanceof String){
     bbox = bbox.split(",");
@@ -347,6 +342,9 @@ function removeTweetsOutOfSelection(bbox, include, exclude){
     }
   }
   bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
+
+  //remove the tweets from the browser
+  rmTweetsByKeywords(bbox, include, exclude);
 
   //remove out of bounds the tweet from the map
 
