@@ -4,15 +4,13 @@
 
 ## Resource Descriptions
  ### Available Methods
- * The API to retreive tweets `/TweetAPI`  
-    accesses the tweetdb resource  
+ * The API to retreive tweets `/TweetAPI`:
 
 |**method**|**path**|
   |------|-----|
   |  GET | `/TweetAPI/search` |
 
- * The endpoint to retreive radar data `/Radar`  
-    accesses the geoserver resource   
+ * The endpoint to retreive radar data `/Radar`:
 
 |**method**|**path**|
   |------|-----|
@@ -20,8 +18,12 @@
   |  GET | `/Radar/raster` |
   |  GET | `/Radar/vector` |
 
- * The database containing the tweets `/tweetDB`  
- * The WMS and WFS source `/Geoserver`
+* The API to handle status indicator communication `/status`:
+
+|**method**|**path**|
+  |------|-----|
+  |  GET | `/status/currentprocesses` |
+  |  POST| `/status/newprocess` |
 
 ## Endpoints and Methods
 
@@ -40,7 +42,18 @@
   * `fields` specify which fields to return in the response JSON  
   * `latest` if TRUE, return only the latest tweet
 
-  <hr>
+* #### GET `/status/currentprocesses`
+  Retreive information about current running processes on the server side  
+  **Parameters**
+  * `older_than` string, UNIX-timestamp indicating the maximum age of the processes
+  * `remove` boolean, if false indicated processes won't be cleared after call
+
+* #### POST `/status/newprocess`
+  Allows a server component to tell the API what it is currently doing
+  **Parameters**
+
+
+<hr>
 
 ## Parameters
 ### Tweet-Search
@@ -61,6 +74,31 @@
 |fields|string array|optional|The fields that are to be included in the returned tweets' JSON. formatted as an array of strings: `fields=field1,field2,...,fieldN`|
 |latest|Boolean|optional|If true, only the latest tweet that meets all the queries will be returned|
 
+### status
+#### Request
+| **Name** | **Method** | **Description**|
+|----------|------------|----------------|
+|`statuses/currentprocesses`| GET |Get the list of processes that are currently in progress, according to the status-API|
+
+#### General Search Parameters
+
+| **Name** | **Data Type** |**Required / Optional**| **Description**|
+|----------|---------------|-----------------------|----------------|
+|older_than|number|optional|UNIX-timestamp (in milliseconds) minimum allowed age of the messages|
+|remove|Boolean|optional|Whether or not to remove all statuses from the API after they were called. Defaults to TRUE if not used. |
+
+#### Request
+| **Name** | **Method** | **Description**|
+|----------|------------|----------------|
+|`statuses/newprocess`| POST |Post a status indicator message to the Status API|  
+
+Requires the body to be composed in x-www-form-urlencoded!
+
+| **Name** | **Data Type** |**Required / Optional**| **Description**|
+|----------|---------------|-----------------------|----------------|
+|created_at|number|required|UNIX-timestamp (in milliseconds) of the time the message was posted|
+|message|String|required|The String containing the message part of the message. this will be displayed on site in the progress-indicator|  
+
 <hr>
 
 ## examples
@@ -68,7 +106,7 @@
 ### GET `/tweetAPI/search`
 #### request example
 `
-localhost:3000/tweetAPI/search?bbox=-180,85,180,-85
+localhost:3000/tweetAPI/search?bbox=55.299,3.95,47.076,16.655
 `
 
 ### response example
@@ -76,337 +114,22 @@ localhost:3000/tweetAPI/search?bbox=-180,85,180,-85
 {
     "tweets": [
         {
-            "created_at": "Fri Nov 08 21:21:28 +0000 2019",
-            "id": 1192915062618542000,
-            "id_str": "1192915062618542082",
-            "text": "Wallahiii daga Facebook yakeee https://t.co/hEU596jxnJ",
-            "truncated": false,
-            "entities": {
-                "hashtags": [],
-                "symbols": [],
-                "user_mentions": [],
-                "urls": [
-                    {
-                        "url": "https://t.co/hEU596jxnJ",
-                        "expanded_url": "https://twitter.com/Ahmadmilo1/status/1192914432738897920",
-                        "display_url": "twitter.com/Ahmadmilo1/staxe2x80xa6",
-                        "indices": [
-                            31,
-                            54
-                        ]
-                    }
-                ]
-            },
-            "metadata": {
-                "iso_language_code": "tl",
-                "result_type": "recent"
-            },
-            "source": "<a href='http://twitter.com/download/android' rel='nofollow'>Twitter for Android</a>",
-            "in_reply_to_status_id": null,
-            "in_reply_to_status_id_str": null,
-            "in_reply_to_user_id": null,
-            "in_reply_to_user_id_str": null,
-            "in_reply_to_screen_name": null,
-            "user": {
-                "id": 1338381398,
-                "id_str": "1338381398",
-                "name": "VARxf0x9fx91xa8xf0x9fx8fxbbu200dxf0x9fx8fxabxf0x9fx93xa1xf0x9fx93xb7xf0x9fx93xb8",
-                "screen_name": "Auwerl",
-                "location": "Yobe state",
-                "description": "",
-                "url": "https://t.co/DVA3uWUeHA",
-                "entities": {
-                    "url": {
-                        "urls": [
-                            {
-                                "url": "https://t.co/DVA3uWUeHA",
-                                "expanded_url": "http://www.anayimunajindadi.com",
-                                "display_url": "anayimunajindadi.com",
-                                "indices": [
-                                    0,
-                                    23
-                                ]
-                            }
-                        ]
-                    },
-                    "description": {
-                        "urls": []
-                    }
-                },
-                "protected": false,
-                "followers_count": 418,
-                "friends_count": 686,
-                "listed_count": 0,
-                "created_at": "Tue Apr 09 05:35:30 +0000 2013",
-                "favourites_count": 4946,
-                "utc_offset": null,
-                "time_zone": null,
-                "geo_enabled": true,
-                "verified": false,
-                "statuses_count": 5566,
-                "lang": null,
-                "contributors_enabled": false,
-                "is_translator": false,
-                "is_translation_enabled": false,
-                "profile_background_color": "C0DEED",
-                "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
-                "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
-                "profile_background_tile": false,
-                "profile_image_url": "http://pbs.twimg.com/profile_images/1190548148487442432/gctlavYH_normal.jpg",
-                "profile_image_url_https": "https://pbs.twimg.com/profile_images/1190548148487442432/gctlavYH_normal.jpg",
-                "profile_link_color": "1DA1F2",
-                "profile_sidebar_border_color": "C0DEED",
-                "profile_sidebar_fill_color": "DDEEF6",
-                "profile_text_color": "333333",
-                "profile_use_background_image": true,
-                "has_extended_profile": true,
-                "default_profile": true,
-                "default_profile_image": false,
-                "following": false,
-                "follow_request_sent": false,
-                "notifications": false,
-                "translator_type": "null"
-            },
-            "geo": null,
-            "coordinates": null,
-            "place": {
-                "id": "01cbb7f86211fef3",
-                "url": "https://api.twitter.com/1.1/geo/id/01cbb7f86211fef3.json",
-                "place_type": "city",
-                "name": "Damaturu",
-                "full_name": "Damaturu,  Nigeria",
-                "country_code": "NG",
-                "country": "Nigeria",
-                "contained_within": [],
-                "bounding_box": {
-                    "type": "Polygon",
+            "geojson": {
+                "geometry": {
                     "coordinates": [
-                        [
-                            [
-                                11.930547,
-                                11.7201586
-                            ],
-                            [
-                                12.0167097,
-                                11.7201586
-                            ],
-                            [
-                                12.0167097,
-                                11.7820384
-                            ],
-                            [
-                                11.930547,
-                                11.7820384
-                            ]
-                        ]
-                    ]
+                        13.1199934,
+                        52.381905
+                    ],
+                    "type": "Point"
                 },
-                "attributes": {}
+                "type": "Feature"
             },
-            "contributors": null,
-            "is_quote_status": true,
-            "retweet_count": 0,
-            "favorite_count": 0,
-            "favorited": false,
-            "retweeted": false,
-            "possibly_sensitive": false,
-            "lang": "tl"
-        },
-        {
-            "created_at": "Fri Nov 08 21:21:28 +0000 2019",
-            "id": 1192915062618184700,
-            "id_str": "1192915062618184624",
-            "text": "where is everybody?",
-            "truncated": false,
-            "entities": {
-                "hashtags": [],
-                "symbols": [],
-                "user_mentions": [],
-                "urls": []
-            },
-            "metadata": {
-                "iso_language_code": "en",
-                "result_type": "recent"
-            },
-            "source": "<a href='http://twitter.com/download/android' rel='nofollow'>Twitter for Android</a>",
-            "in_reply_to_status_id": null,
-            "in_reply_to_status_id_str": null,
-            "in_reply_to_user_id": null,
-            "in_reply_to_user_id_str": null,
-            "in_reply_to_screen_name": null,
-            "user": {
-                "id": 1333389876,
-                "id_str": "1333389876",
-                "name": "VARxf0x9fx91xa8xf0x9fx8fxbbu200dxf0x9fx8fxabxf0x9fx93xa1xf0x9fx93xb7xf0x9fx93xb8",
-                "screen_name": "Michael Collins",
-                "location": "behind the moon",
-                "description": "",
-                "url": "https://t.co/nonexistant",
-                "entities": null,
-                "protected": false,
-                "followers_count": 420,
-                "friends_count": 69,
-                "listed_count": 0,
-                "created_at": "Sun Jul 20 05:35:30 +0000 1969",
-                "favourites_count": 4946,
-                "utc_offset": null,
-                "time_zone": null,
-                "geo_enabled": true,
-                "verified": false,
-                "statuses_count": 5566,
-                "lang": null,
-                "contributors_enabled": false,
-                "is_translator": false,
-                "is_translation_enabled": false
-            },
-            "geo": null,
-            "coordinates": {
-                "coordinates": [
-                    51.808615,
-                    8.833008
-                ],
-                "type": "Point"
-            },
-            "place": {
-                "id": "01cbb7f86211fef3",
-                "url": "https://api.twitter.com/1.1/geo/id/01cbb7f86211fef3.json",
-                "place_type": "city",
-                "name": "Damaturu",
-                "full_name": "Damaturu,  Nigeria",
-                "country_code": "NG",
-                "country": "Nigeria",
-                "contained_within": [],
-                "bounding_box": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [
-                                11.930547,
-                                11.7201586
-                            ],
-                            [
-                                12.0167097,
-                                11.7201586
-                            ],
-                            [
-                                12.0167097,
-                                11.7820384
-                            ],
-                            [
-                                11.930547,
-                                11.7820384
-                            ]
-                        ]
-                    ]
-                },
-                "attributes": {}
-            },
-            "contributors": null,
-            "is_quote_status": true,
-            "retweet_count": 69,
-            "favorite_count": 420,
-            "favorited": false,
-            "retweeted": false,
-            "possibly_sensitive": false,
-            "lang": "en"
-        },
-        {
-            "created_at": "Fri Nov 08 21:21:28 +0000 2019",
-            "id": 1192915062846207200,
-            "id_str": "1192915062846207263",
-            "text": "There is no reason for me to be here",
-            "truncated": false,
-            "entities": {
-                "hashtags": [],
-                "symbols": [],
-                "user_mentions": [],
-                "urls": []
-            },
-            "metadata": {
-                "iso_language_code": "en",
-                "result_type": "recent"
-            },
-            "source": "<a href='http://twitter.com/download/android' rel='nofollow'>Twitter for Android</a>",
-            "in_reply_to_status_id": null,
-            "in_reply_to_status_id_str": null,
-            "in_reply_to_user_id": null,
-            "in_reply_to_user_id_str": null,
-            "in_reply_to_screen_name": null,
-            "user": {
-                "id": 1333389876,
-                "id_str": "1333389876",
-                "name": "VARxf0x9fx91xa8xf0x9fx8fxbbu200dxf0x9fx8fxabxf0x9fx93xa1xf0x9fx93xb7xf0x9fx93xb8",
-                "screen_name": "null meridian",
-                "location": "greenwich",
-                "description": "",
-                "url": "https://t.co/nonexistant",
-                "entities": null,
-                "protected": false,
-                "followers_count": 420,
-                "friends_count": 69,
-                "listed_count": 0,
-                "created_at": "Mon Nov 11 15:27:30 +0000 2019",
-                "favourites_count": 4946,
-                "utc_offset": null,
-                "time_zone": null,
-                "geo_enabled": true,
-                "verified": false,
-                "statuses_count": 5566,
-                "lang": null,
-                "contributors_enabled": false,
-                "is_translator": false,
-                "is_translation_enabled": false
-            },
-            "geo": null,
-            "coordinates": {
-                "coordinates": [
-                    51.4934,
-                    0
-                ],
-                "type": "Point"
-            },
-            "place": {
-                "id": "3eb2c704fe8a50cb",
-                "url": "https://api.twitter.com/1.1/geo/id/3eb2c704fe8a50cb.json",
-                "place_type": "city",
-                "name": "City of London",
-                "full_name": "City of London, London",
-                "country_code": "GB",
-                "country": "United Kingdom",
-                "contained_within": [],
-                "bounding_box=BoundingBox": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [
-                                -0.112442,
-                                51.5068
-                            ],
-                            [
-                                -0.0733794,
-                                51.5068
-                            ],
-                            [
-                                -0.0733794,
-                                51.522161
-                            ],
-                            [
-                                -0.112442,
-                                51.522161
-                            ]
-                        ]
-                    ]
-                },
-                "attributes": {}
-            },
-            "contributors": null,
-            "is_quote_status": true,
-            "retweet_count": 69,
-            "favorite_count": 420,
-            "favorited": false,
-            "retweeted": false,
-            "possibly_sensitive": false,
-            "lang": "en"
+            "_id": "5e118e1eb99f07385c341b6d",
+            "id_str": "1213721760446713856",
+            "text": "#nowplaying #Dido ~ Dido | Here With Me ||| BB RADIO - In #Wittenberge #Brandenburg #GER auf 104.3— BB RADIO Playlist (@_BB_RADIO_MUSIC) January 5, 2020",
+            "created_at": 1578208792000,
+            "embeddedTweet": "<blockquote class=\"twitter-tweet\"><p lang=\"en\" dir=\"ltr\"><a href=\"https://twitter.com/hashtag/nowplaying?src=hash&amp;ref_src=twsrc%5Etfw\">#nowplaying</a> <a href=\"https://twitter.com/hashtag/Dido?src=hash&amp;ref_src=twsrc%5Etfw\">#Dido</a> ~ Dido | Here With Me ||| BB RADIO - In <a href=\"https://twitter.com/hashtag/Wittenberge?src=hash&amp;ref_src=twsrc%5Etfw\">#Wittenberge</a> <a href=\"https://twitter.com/hashtag/Brandenburg?src=hash&amp;ref_src=twsrc%5Etfw\">#Brandenburg</a> <a href=\"https://twitter.com/hashtag/GER?src=hash&amp;ref_src=twsrc%5Etfw\">#GER</a> auf 104.3</p>&mdash; BB RADIO Playlist (@_BB_RADIO_MUSIC) <a href=\"https://twitter.com/_BB_RADIO_MUSIC/status/1213721760446713856?ref_src=twsrc%5Etfw\">January 5, 2020</a></blockquote>\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+            "__v": 0
         }
     ]
 }
@@ -432,4 +155,22 @@ localhost:3000/tweetAPI/search?bbox=-180,85,180,-85&fields=text,id,created_at&in
         }
     ]
 }
+```
+
+### GET `/status/currentprocesses`
+#### request example
+`
+localhost:3000/status/currentprocesses?remove=true&older_than=0
+`
+
+### response example
+```JS
+[
+    {
+        "_id": "5e11adf3af423d42300e8519",
+        "created_at": 1578215915,
+        "message": "this is a message",
+        "__v": 0
+    }
+]
 ```

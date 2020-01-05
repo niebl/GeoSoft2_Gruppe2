@@ -8,6 +8,7 @@ var exclude = [];
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
+var older_thanStatusCheck;
 
 /**
 * @var nearestTweetRadius.
@@ -15,13 +16,16 @@ var older_thanCheck;
 */
 const nearestTweetRadius = 50;
 const updateCheckInterval= 10000;
+const statusCheckInterval= 1000;
 
 //initialise with the current timestamp, -5 minutes
 older_than = Date.now() - 300000;
 older_thanCheck = older_than;
+older_thanStatusCheck = Date.now();
 
-//begin the periodic update check. interval of 10 seconds
+//begin the periodic update checks
 checkTweetUpdates(updateCheckInterval);
+checkStatusUpdates(statusCheckInterval);
 
 ////////////////////////////////////////////////////////////////////////////////
 // site-events
@@ -156,9 +160,13 @@ $('#confirmFilter').on('click', function(e){
 * function that updates the content of the progress indicator with a given string
 * @param message the string of a message to display.
 */
-function updateProgressIndicator(message){
-  currentTime = "timestamp: " + Date.now()
-  $("#progressIndicator").prepend(currentTime+"&nbsp;&nbsp;"+message+"<br>")
+function updateProgressIndicator(message, currentTime){
+  if (currentTime==undefined){
+    currentTime = "timestamp: " + Date.now();
+  } else {
+    currentTime = "timestamp: " + currentTime;
+  }
+  $("#progressIndicator").prepend(currentTime+"&nbsp;&nbsp;"+message+"<br>");
 }
 
 /**
@@ -255,6 +263,60 @@ async function checkTweetUpdates(interval){
     interval
   );
 }
+
+/**
+* @function checkStatusUpdates
+* @desc periodically queries internal status API to see what is currently running.
+* Posts new messages to the status indicator.
+* @param interval the amount of time to pass between each check in ms
+*/
+async function checkStatusUpdates(interval){
+  setInterval(async function(){
+    var messagePromise = new Promise(async function(resolve, reject){
+      //progress indicator won't be updated for these checks, since they serve to directly feed the progressIndicator
+      var messages = await getMessages(`older_than=${older_thanStatusCheck}&remove=true`);
+      resolve(messages);
+    });
+
+    messagePromise.then(function(messages){
+      let numberNewMessages = messages.length;
+
+      //if there are new statuses, prepend each to the status indicator
+      if(numberNewMessages > 0){
+        for(let message of messages){
+          updateProgressIndicator(message.message, message.created_at);
+        }
+      }
+    });
+  },
+    interval
+  );
+}
+
+/**
+* @function getMessages
+* @desc queries internal API for tweets within given bounding box
+* @param params string of parameters for the API query.
+* @see ApiSpecs
+* @returns Object containing array of information about Tweets
+*/
+async function getMessages(params){
+  let output;
+  var requestURL = "/status/currentprocesses?";
+  requestURL = requestURL + params;
+
+  await $.ajax({
+    url: requestURL,
+    success: function(data){
+      output = data;
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log(`call to status-API failed`);
+    }
+  });
+  return output;
+}
+
 
 /**
 * @function updateTweetNotifs

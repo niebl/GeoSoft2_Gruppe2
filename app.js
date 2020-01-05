@@ -28,7 +28,8 @@ app.set('view engine', 'pug');
 
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+// devnote: changed from false to true, blame FELIX if it broke anything.
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // parse application/json
 app.use(bodyParser.json());
@@ -44,7 +45,6 @@ mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true
   console.log(mongoose.connection.host);
   console.log(mongoose.connection.port);
 });
-const Tweet = require('./models/tweet.js');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -75,8 +75,8 @@ app.use('/gemeinden', express.static(__dirname + '/public/jsons/landkreise.json'
 // mongoDB models:
 var Kreis = require("./models/kreis");
 var UnwetterKreis = require("./models/unwetterkreis");
-// const kitty = new Tweet({ json: '{"test": "1"}' });
-// kitty.save();
+const Status = require("./models/status.js")
+const Tweet = require('./models/tweet.js');
 
 var weatherRouter = require("./routes/badweather");
 app.use('/weather', weatherRouter);
@@ -163,7 +163,9 @@ async function queryTweets(queries){
   return output;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 //Tweet api
+////////////////////////////////////////////////////////////////////////////////
 
 //~~~~~~~API-endpoints~~~~~~~
 //public DB search API
@@ -171,9 +173,8 @@ app.get('/tweetAPI/search', async (req, res) => {
   res.send(await tweetSearch(req, res));
 });
 
-
 /**
-* @function tweetSearch callback function
+* @function tweetSearch middleware function
 * @desc callback function that looks at the arguments passed in the tweet API request and returns the according response.
 * example http://localhost:3000/tweets?fields=id,text
 * params: bbox: The bounding Box of the geographical area to fetch tweets from
@@ -191,7 +192,7 @@ async function tweetSearch(req,res){
   const geoJSONtemplate = {"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"type": "","coordinates": [[]]}}]};
 
   //access the provided parameters
-  var older_than = req.query.older_than
+  var older_than = req.query.older_than;
   var bbox = req.query.bbox;
   var include = req.query.include;
   var exclude = req.query.exclude;
@@ -427,4 +428,146 @@ async function getEmbeddedTweet(tweet){
       postTweetToMongo(tweet);
     }
   })
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//status-indication api
+////////////////////////////////////////////////////////////////////////////////
+//endpoints
+app.get('/status/currentprocesses', async (req,res)=> {
+  res.send(await getProcesses(req, res));
+});
+app.post('/status/newprocess', async (req,res)=> {
+  res.send(await postProcesses(req, res));
+});
+
+//functions
+/**
+* @function getProcesses middleware function for getting Processes
+* @desc middleware function that looks for running processes
+* @param req
+* @param res
+* @author Felix
+*/
+async function getProcesses(req,res){
+  let outJSON = {messages: []};
+
+  //access provided parameters
+  var older_than = req.query.older_than;
+  var remove = req.query.remove;
+
+  //if param empty, assign default values
+  if(remove == undefined){
+    remove = true;
+  }
+  if(older_than == undefined || older_than == ""){
+    older_than = 0;
+  }
+
+  //check validity of parameters and convert them from strings
+  try{
+    if(!(older_than == undefined || older_than == "")){
+      older_than = parseInt(older_than);
+    }
+    if(remove.toLowerCase() == "true" || remove.toLowerCase() == "false"){
+      remove = (remove.toLowerCase() == "true");
+    }
+  }catch(err){
+    res.status(400);
+    res.send(`invalid parameters older_than: ${older_than}, remove: ${remove}`);
+  }
+
+  //get the Status messages
+  outJSON.messages = await queryStatuses({
+    created_at: {$gt: older_than}
+  }, res);
+
+  //remove the status messages from DB if specified
+  if(remove){
+    rmStatuses({
+      created_at: {$gt: older_than}
+    }, res);
+  }
+
+  //return the status messages
+  return outJSON.messages;
+}
+
+/**
+* @function queryStatuses
+* @desc function that queries the mongo status collection
+* @param queries, Object of mongoose queries
+* @param res, express response for error handling
+* @return mongoose docs
+*/
+async function queryStatuses(queries, res){
+  let output;
+  //look for statuses with the given parameters
+  await Status.find(
+    queries,
+    function(err, docs){
+      if(err){
+        res.status(500);
+        res.send("server error: couldn't query status messages");
+      } else {
+        output = docs;
+      }
+    }
+  );
+  return output;
+}
+
+/**
+* @function rmStatuses
+* @desc function that removes messages from the mongo status collection
+* @param queries, Object of mongoose queries
+* @param res, express response for error handling
+* @return true or false
+*/
+async function rmStatuses(queries, res){
+  let output = false;
+  await Status.deleteMany(
+    queries,
+    function(err){
+      if(err){
+        output = false;
+      } else {
+        output = true;
+      }
+    }
+  );
+  return output
+}
+
+/**
+* @function postProcesses middleware function for posting Processes
+* @desc middleware function that takes the attributes in a function body (x-www-form-urlencoded)
+* @param req
+* @param res
+* @author Felix
+*/
+async function postProcesses(req,res){
+  var created_at = req.body.created_at;
+  var message = req.body.message;
+
+  //check if all attributes are there
+  if(message == undefined || message == "" || created_at == undefined || created_at == ""){
+    res.status(400);
+    res.send(`invalid attributes: created_at: ${created_at}, message: ${message}`);
+  } else {
+    //add the status to the designated Mongo collection
+    Status.create({
+      created_at : created_at,
+      message : message
+    },
+    function(err, tweet){
+      if(err){
+        res.status(400);
+        res.send("error in posting status: ", err);
+      }
+    });
+    //if it went well, tell them
+    res.status(200);
+    res.send(`Status successfully posted`);
+  }
 }
