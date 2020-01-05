@@ -400,6 +400,9 @@ function postTweetToMongo(tweet){
       return false;
     }
   });
+
+  //indicate status
+  indicateStatus(`fetched tweet: ${tweet.id_str}`);
 }
 
 /**
@@ -570,4 +573,23 @@ async function postProcesses(req,res){
     res.status(200);
     res.send(`Status successfully posted`);
   }
+}
+
+/**
+* @function indicateStatus
+* @desc sends a POST request to the status API so the client side can know what the server is doing.
+* @param text String, the message of the status
+* @Author Felix
+*/
+async function indicateStatus(text){
+  var output;
+  var requestURL = "http://localhost:3000/status/newprocess";
+  //let requestURL = "https://localhost:3000/embedTweet?id="
+
+  request.post(requestURL, {form:
+    {
+      message: text,
+      created_at: Date.now()
+    }
+  });
 }
