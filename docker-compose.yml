@@ -1,0 +1,18 @@
+version: '3'
+services:
+  app:
+    container_name: geomergency-app
+    restart: always
+    build: .
+    ports:
+      - '3000:3000'
+    links:
+      - mongo
+  mongo:
+    container_name: geomergency-mongo
+    restart: always
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./data:/data

@@ -1,7 +1,5 @@
+.gitignore
 node_modules
-data
+npm-debug.log
 shortcuts.txt
-tokens.js
-misc
-.Rhistory
 docker-cheatsheet.txt
