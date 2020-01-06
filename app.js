@@ -198,6 +198,14 @@ async function tweetSearch(req,res){
   var fields = req.query.fields;
   var latest = req.query.latest;
 
+  //array-ize include and exclude
+  if(include != undefined){
+    include = include.split(",")
+  }
+  if(exclude!=undefined){
+    exclude = exclude.split(",")
+  }
+
   //check validity of parameters
   if (bbox == undefined){
     res.status(400),
@@ -268,14 +276,43 @@ async function tweetSearch(req,res){
 
   //QUERY include
   if(include != undefined){
-    //    include = include.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
-    let userRegEx = new RegExp(include);
-    for(let tweet in outJSON.tweets){
-      //if there is a match, push tweet to outJSON
-      if(
-        outJSON.tweets[tweet].text.includes(include)
-        ||(outJSON.tweets[tweet].text.match(userRegEx) !==null)
-      ){newOutJSON.tweets.push(outJSON.tweets[tweet]);}
+    //loop through each substring that has to be included
+    for(let i = 0; i < include.length; i++){
+      let userRegEx = new RegExp(include[i]);
+      //check for substrings existence in each tweet
+      for(let tweet of outJSON.tweets){
+        if(
+          tweet.text.includes(include[i])
+          ||tweet.text.match(userRegEx) !==null
+        ){
+          //lastly, make sure the tweet hasn't already been matched by previous substrings to prevent duplicates
+          /**
+          * @function containsPreviousSubstring
+          * @desc helping function that checks whether a previous substring is contained within the examined tweet
+          * only works within tweetSearch.
+          * @see tweetSearch
+          * @returns boolean
+          */
+          let containsPreviousSubstring = function(){
+            for(let j=0;j<i;j++){
+              let userRegExJ = new RegExp(include[j]);
+              if(
+                tweet.text.includes(include[j])
+                ||tweet.text.match(userRegExJ) !==null
+              ){
+              return true;}
+              else {
+                return false;
+              }
+            }
+          };
+          //still making sure the tweet hasn't been matched with previous substrings...
+          if(i==0){newOutJSON.tweets.push(tweet);
+          }else if(!containsPreviousSubstring()){
+            newOutJSON.tweets.push(tweet);
+          }
+        }
+      }
     }
     //make newOutJSON the new outJSON, reset the former
     outJSON = newOutJSON;
@@ -284,13 +321,16 @@ async function tweetSearch(req,res){
 
   //QUERY exclude
   if(exclude != undefined){
-    //    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
-    for(let i= outJSON.tweets.length-1; i >= 0; i--){
-      //console.log(outJSON.tweets[i].text)
-      if(
-        outJSON.tweets[i].text.includes(exclude)
-        //||(outJSON.tweets[i].text.match(userRegEx) !==null )
-      ){outJSON.tweets.splice(i,1);}
+    //loop through each substring and make sure they're in none of the tweets
+    for(let substring of exclude){
+      //    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+      for(let i= outJSON.tweets.length-1; i >= 0; i--){
+        //console.log(outJSON.tweets[i].text)
+        if(
+          outJSON.tweets[i].text.includes(substring)
+          //||(outJSON.tweets[i].text.match(userRegEx) !==null )
+        ){outJSON.tweets.splice(i,1);}
+      }
     }
   }
 
@@ -354,12 +394,12 @@ async function tweetSearch(req,res){
 module.exports = app;
 
 //TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
-// console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
-//   if(tweet.coordinates != null){
-//     // call getEmbeddedTweet() -> postTweetToMongo()
-//     getEmbeddedTweet(tweet);
-//   }
-// }))
+console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
+  if(tweet.coordinates != null){
+    // call getEmbeddedTweet() -> postTweetToMongo()
+    getEmbeddedTweet(tweet);
+  }
+}))
 
 /**
 * @function postTweetToMongo

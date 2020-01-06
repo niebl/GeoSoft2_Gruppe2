@@ -184,10 +184,10 @@ function updateProgressIndicator(message, currentTime){
 function makeQueryString(){
   let queryString = `bbox=${bbox}&older_than=${older_than}`;
   if(!(include.length == 0 || include == undefined || include[0] == "")){
-    queryString = queryString+`&include${include}`;
+    queryString = queryString+`&include=${include}`;
   }
   if(!(exclude.length == 0 || exclude == undefined || exclude[0] == "")){
-    queryString = queryString+`&exclude${exclude}`;
+    queryString = queryString+`&exclude=${exclude}`;
   }
   return queryString;
 }

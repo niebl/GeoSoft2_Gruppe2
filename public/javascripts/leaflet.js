@@ -382,29 +382,30 @@ async function rmTweetsByKeywords(bbox, include, exclude){
     bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
 
     //remove tweets from the browser
-    for(let tweet of tweets){
-      //remove the tweets from the browser
-      $("#tweet-browser").children("div").each(function(){
-        //extrct coordinates of div
-        var point = $(this).attr('coords').split(",");
-        point[0] = parseFloat(point[0]);
-        point[1] = parseFloat(point[1]);
-        point = turf.point([point[0],point[1]]);
+    $("#tweet-browser").children("div").each(function(){
+      //extrct coordinates of div
+      var point = $(this).attr('coords').split(",");
+      point[0] = parseFloat(point[0]);
+      point[1] = parseFloat(point[1]);
+      point = turf.point([point[0],point[1]]);
 
-        let included = false;
-        let contained = turf.booleanWithin(point, bbox);
+      let included = false;
+      let contained = turf.booleanWithin(point, bbox);
 
-        //check if the id strings were found in the answer
+      //check if the id strings were found in the answer
+      for(let tweet of tweets){
         if(tweet.id_str == $(this).attr("id_str")){
           included = true;
+          console.log($(this).attr("id_str"))
+          console.log("list: "+tweet.id_str)
         }
+      }
 
-        //remove if any of the conditions are met
-        if(!included || !contained){
-          $(this).remove();
-        }
-      });
-    }
+      //remove if any of the conditions are met
+      if(!included || !contained){
+        $(this).remove();
+      }
+    });
 
     //remove tweets from the map
     //ISSUE: TODO: following seems to incorrectly exclude some tweets.
