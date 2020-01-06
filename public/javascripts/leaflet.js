@@ -309,7 +309,7 @@ async function addTweetToMap(tweet){
     "properties": properties,
     "type": "Feature"
   });
-  tweetLayer.addData(newTweet)
+  tweetLayer.addData(newTweet);
 
   //add the tweet to the tweet-browser
   //provisional.
@@ -387,15 +387,12 @@ async function rmTweetsByKeywords(bbox, include, exclude){
       $("#tweet-browser").children("div").each(function(){
         //extrct coordinates of div
         var point = $(this).attr('coords').split(",");
-        point[0] = parseFloat(point[0])
-        point[1] = parseFloat(point[1])
+        point[0] = parseFloat(point[0]);
+        point[1] = parseFloat(point[1]);
         point = turf.point([point[0],point[1]]);
 
         let included = false;
         let contained = turf.booleanWithin(point, bbox);
-
-        //if include string is empty, defualt to true
-        if(include.length == 0 || include == undefined || include[0] == ""){included = true;}
 
         //check if the id strings were found in the answer
         if(tweet.id_str == $(this).attr("id_str")){
@@ -419,26 +416,21 @@ async function rmTweetsByKeywords(bbox, include, exclude){
       //TODO: text dependent removal of tweets from map
       //initialise the var deciding about geographic containment of tweets within bbox
       var contained = turf.booleanWithin(point, bbox);
-
       //remove out-of-bounds markers first
       if(!contained){
         tweetLayer._layers[marker].remove();
       }
+
       //then check the popups of remaining markers for tweets that should be excluded
       else {
         popupHTML = $(tweetLayer._layers[marker]._popup._content);
 
         for(let child of popupHTML){
-          child = $(child)
+          child = $(child);
           if(child.attr("class")=="tweetDiv"){
 
             //initialise variable deciding over inclusion of tweetDiv
             var included = false;
-
-            //if include is empty or undefined, default to true
-            if(include.length == 0 || include == undefined || include[0] == ""){
-              included = true;
-            }
 
             //check if id strings were found in the answer
             for(let tweet of tweets){
@@ -457,9 +449,6 @@ async function rmTweetsByKeywords(bbox, include, exclude){
               }
             }
           }
-          try{
-            tweetLayer._layers[marker]._popup._content = popupHTML.html();
-          } catch(error){/*ignore*/}
         }
 
         //update the popup if marker still exists

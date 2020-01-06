@@ -5,7 +5,6 @@ var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20]
 var include = [];
 var exclude = [];
-var tweetQueryString =
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
@@ -183,14 +182,14 @@ function updateProgressIndicator(message, currentTime){
 * @see getTweets
 */
 function makeQueryString(){
-  let queryString = `bbox=${bbox}&older_than${older_than}`
+  let queryString = `bbox=${bbox}&older_than=${older_than}`;
   if(!(include.length == 0 || include == undefined || include[0] == "")){
-    queryString = queryString+`&include${include}`
+    queryString = queryString+`&include${include}`;
   }
   if(!(exclude.length == 0 || exclude == undefined || exclude[0] == "")){
-    queryString = queryString+`&exclude${exclude}`
+    queryString = queryString+`&exclude${exclude}`;
   }
-  return queryString
+  return queryString;
 }
 
 /**

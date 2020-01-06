@@ -354,12 +354,12 @@ async function tweetSearch(req,res){
 module.exports = app;
 
 //TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
-console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
-  if(tweet.coordinates != null){
-    // call getEmbeddedTweet() -> postTweetToMongo()
-    getEmbeddedTweet(tweet);
-  }
-}))
+// console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
+//   if(tweet.coordinates != null){
+//     // call getEmbeddedTweet() -> postTweetToMongo()
+//     getEmbeddedTweet(tweet);
+//   }
+// }))
 
 /**
 * @function postTweetToMongo
