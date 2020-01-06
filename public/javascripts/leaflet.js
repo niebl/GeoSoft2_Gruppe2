@@ -441,7 +441,7 @@ async function rmTweetsByKeywords(bbox, include, exclude){
             }
 
             //check if id strings were found in the answer
-            for(let tweet in tweets){
+            for(let tweet of tweets){
               if(tweet.id_str == $(child).attr("id_str")){
                 included = true;
               }

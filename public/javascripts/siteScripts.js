@@ -5,6 +5,7 @@ var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20]
 var include = [];
 var exclude = [];
+var tweetQueryString =
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
@@ -176,13 +177,30 @@ function updateProgressIndicator(message, currentTime){
 }
 
 /**
+* @function makeQueryString
+* @desc function that returns a usable query string to search for tweets with given parameters. Uses global variables
+* @returns String, that is used as parameter for getTweets
+* @see getTweets
+*/
+function makeQueryString(){
+  let queryString = `bbox=${bbox}&older_than${older_than}`
+  if(!(include.length == 0 || include == undefined || include[0] == "")){
+    queryString = queryString+`&include${include}`
+  }
+  if(!(exclude.length == 0 || exclude == undefined || exclude[0] == "")){
+    queryString = queryString+`&exclude${exclude}`
+  }
+  return queryString
+}
+
+/**
 * @function updateMapTweets
 * @desc updates the map with the tweets that have been fetched from getTweets() function
 * @see getTweets
 */
 async function updateMapTweets(){
   var tweetPromise = new Promise(async function(resolve, reject){
-    var tweets = await getTweets("bbox="+bbox+"&older_than="+older_than);
+    var tweets = await getTweets(makeQueryString());
     resolve(tweets.tweets);
   });
 
@@ -249,7 +267,7 @@ async function checkTweetUpdates(interval){
     var tweetPromise = new Promise(async function(resolve, reject){
       //indicate event
       updateProgressIndicator("checking for new tweets");
-      var tweets = await getTweets("bbox="+bbox+"&older_than="+older_thanCheck+"&fields=created_at");
+      var tweets = await getTweets(makeQueryString()+"&fields=created_at");
       resolve(tweets.tweets);
     });
 
