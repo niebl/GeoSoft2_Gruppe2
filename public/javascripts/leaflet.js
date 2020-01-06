@@ -396,8 +396,6 @@ async function rmTweetsByKeywords(bbox, include, exclude){
       for(let tweet of tweets){
         if(tweet.id_str == $(this).attr("id_str")){
           included = true;
-          console.log($(this).attr("id_str"))
-          console.log("list: "+tweet.id_str)
         }
       }
 
