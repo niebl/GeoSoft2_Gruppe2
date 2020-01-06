@@ -358,6 +358,7 @@ function removeTweetsOutOfSelection(bbox, include, exclude){
 * @param exclude array of substrings that are to be excluded frin the tweets
 * @see removeTweetsOutOfSelection
 * @author Felix
+* //TODO:case insensitive keywords
 */
 async function rmTweetsByKeywords(bbox, include, exclude){
   //build the request string
@@ -406,13 +407,10 @@ async function rmTweetsByKeywords(bbox, include, exclude){
     });
 
     //remove tweets from the map
-    //ISSUE: TODO: following seems to incorrectly exclude some tweets.
-    //              ISSUE probably starts at line 428
     for(var marker in tweetLayer._layers){
       //EXCTRACT COORDINATES
       var point = turf.point([tweetLayer._layers[marker]._latlng.lng,tweetLayer._layers[marker]._latlng.lat]);
 
-      //TODO: text dependent removal of tweets from map
       //initialise the var deciding about geographic containment of tweets within bbox
       var contained = turf.booleanWithin(point, bbox);
       //remove out-of-bounds markers first
