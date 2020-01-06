@@ -16,7 +16,7 @@ var older_thanStatusCheck;
 */
 const nearestTweetRadius = 50;
 const updateCheckInterval= 10000;
-const statusCheckInterval= 1000;
+const statusCheckInterval= 3000;
 
 //initialise with the current timestamp, -5 minutes
 older_than = Date.now() - 300000;
@@ -84,8 +84,11 @@ $("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
 //remove the tweet from map
 $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
   //get the attributes from the parent element of the button
-  var coordsInput = $(e.target).parent().attr('coords').split(",")
-  var idInput = $(e.target).parent().attr('id_str').split(",")
+  var coordsInput = $(e.target).parent().attr('coords');
+  var idInput = $(e.target).parent().attr('id_str');
+
+  coordsInput.split(",");
+  idInput.split(",");
 
   //parse the coordinates and swap lat and lon
   var coords = []
@@ -147,6 +150,9 @@ $('#clearCoords').on('click', function(e){
 $('#confirmFilter').on('click', function(e){
   include = $("input[name='includeKeywords']").val().split(",")
   exclude = $("input[name='excludeKeywords']").val().split(",")
+
+  console.log(include)
+  console.log(exclude)
 
   removeTweetsOutOfSelection(bboxArray, include, exclude);
 })
@@ -317,7 +323,6 @@ async function getMessages(params){
   return output;
 }
 
-
 /**
 * @function updateTweetNotifs
 * @desc function that is being used to increase or clear the notifications of new tweets.
@@ -331,23 +336,23 @@ function updateTweetNotifs(arguments){
   var increment;
 
   //default clear to false unless something else is passed. dont accept non-booleans
-  if(arguments.clear == undefined||arguments.clear!=true){clear = false}
-    else{clear = arguments.clear};
+  if(arguments.clear == undefined||arguments.clear!=true){clear = false;}
+    else{clear = arguments.clear;}
   //default inrement to 0 unless something else is passed. don't accept non-integers
-  if(arguments.increment == undefined||!Number.isInteger(arguments.increment)){increment = 0}
-    else{increment = arguments.increment};
+  if(arguments.increment == undefined||!Number.isInteger(arguments.increment)){increment = 0;}
+    else{increment = arguments.increment;}
 
   //clear if clear is true
   if(clear){
     $("#update-badge").removeClass("visible");
     $("#update-badge").addClass("invisible");
-    $("#update-badge").html(0)
+    $("#update-badge").html(0);
   }
 
   //increment by the specified amount
   if(increment != 0){
-    let count = parseInt($("#update-badge").html())
-    $("#update-badge").html(count+increment)
+    let count = parseInt($("#update-badge").html());
+    $("#update-badge").html(count+increment);
 
     //if there is a negative correction to be made, don't update the div classes. only the html
     if(increment > 0){

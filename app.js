@@ -35,7 +35,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // mongoose setup
-
 mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true, useUnifiedTopology: true}, function(err){
   if (err) {
     console.log("mongoDB connect failed");
@@ -423,14 +422,14 @@ async function getEmbeddedTweet(tweet){
     uri: requestURL,
     method: 'GET',
     encoding: null,
-  }
+  };
   await request(requestSettings, function(error, response, body){
-    if(error){console.log(error)}
+    if(error){console.log(error);}
     	else{
       tweet.embeddedTweet = JSON.parse(body).html;
       postTweetToMongo(tweet);
     }
-  })
+  });
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -539,7 +538,7 @@ async function rmStatuses(queries, res){
       }
     }
   );
-  return output
+  return output;
 }
 
 /**

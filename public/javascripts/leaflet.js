@@ -341,7 +341,7 @@ function removeTweetsOutOfSelection(bbox, include, exclude){
       bbox[i] = parseFloat(bbox[i]);
     }
   }
-  bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
+  //bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
 
   //remove the tweets from the browser
   rmTweetsByKeywords(bbox, include, exclude);
@@ -362,13 +362,15 @@ function removeTweetsOutOfSelection(bbox, include, exclude){
 async function rmTweetsByKeywords(bbox, include, exclude){
   //build the request string
   var requestURL = `bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}`;
-  if(!(include.length == 0 || include == undefined)){
+  if(!(include.length == 0 || include == undefined || include[0] == "")){
     requestURL = requestURL + `&include=${include.join()}`;
   }
-  if(!(include.length == 0 || include == undefined)){
+  if(!(exclude.length == 0 || exclude == undefined || exclude[0] == "")){
     requestURL = requestURL + `&exclude=${exclude.join()}`;
   }
   requestURL = requestURL + "&fields=id_str";
+
+  console.log(requestURL)
 
   var tweetPromise = new Promise(async function(resolve, reject){
     //get the included tweets and resolve
@@ -393,7 +395,7 @@ async function rmTweetsByKeywords(bbox, include, exclude){
         let contained = turf.booleanWithin(point, bbox);
 
         //if include string is empty, defualt to true
-        if(include.length == 0 || include == undefined){included = true;}
+        if(include.length == 0 || include == undefined || include[0] == ""){included = true;}
 
         //check if the id strings were found in the answer
         if(tweet.id_str == $(this).attr("id_str")){
@@ -425,36 +427,44 @@ async function rmTweetsByKeywords(bbox, include, exclude){
       //then check the popups of remaining markers for tweets that should be excluded
       else {
         popupHTML = $(tweetLayer._layers[marker]._popup._content);
-        console.log("the popup")
-        console.log(popupHTML)
-        popupHTML.children("div").each(function(){
-          console.log("the child")
-          console.log(this)
-          for(let tweet of tweets){
-            //initialise variable deciding over inclusion of tweet
-            var included = false;
-            //when include is empty or undefined, default to true
-            if(include.length == 0 || include == undefined){included = true;}
 
-            //check if the id strings were found in the answer
-            console.log($(this).attr("id_str"))
-            if(tweet.id_str == $(this).attr("id_str")){
+        for(let child of popupHTML){
+          child = $(child)
+          if(child.attr("class")=="tweetDiv"){
+
+            //initialise variable deciding over inclusion of tweetDiv
+            var included = false;
+
+            //if include is empty or undefined, default to true
+            if(include.length == 0 || include == undefined || include[0] == ""){
               included = true;
+            }
+
+            //check if id strings were found in the answer
+            for(let tweet in tweets){
+              if(tweet.id_str == $(child).attr("id_str")){
+                included = true;
+              }
             }
 
             if(!included){
               //remove entire marker if there is only one tweet left
               if(popupHTML.children("div").length <= 1){
                 tweetLayer._layers[marker].remove();
+                break;
               } else {
-                this.remove();
+                child.remove();
               }
             }
           }
-        });
+          try{
+            tweetLayer._layers[marker]._popup._content = popupHTML.html();
+          } catch(error){/*ignore*/}
+        }
+
         //update the popup if marker still exists
         try{
-          tweetLayer._layers[marker]._popup._content = popupHTML.html();
+          tweetLayer._layers[marker]._popup._content = popupHTML.prop('outerHTML');
         } catch(error){/*ignore*/}
       }
     }
