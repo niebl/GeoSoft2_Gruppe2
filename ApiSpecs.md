@@ -10,20 +10,27 @@
   |------|-----|
   |  GET | `/TweetAPI/search` |
 
- * The endpoint to retreive radar data `/Radar`:
-
-|**method**|**path**|
-  |------|-----|
-  |  GET | `/Radar/getCapabilities` |
-  |  GET | `/Radar/raster` |
-  |  GET | `/Radar/vector` |
-
 * The API to handle status indicator communication `/status`:
 
 |**method**|**path**|
   |------|-----|
   |  GET | `/status/currentprocesses` |
   |  POST| `/status/newprocess` |
+
+* The API to handle status indicator communication `/radar`:
+
+|**method**|**path**|
+  |------|-----|
+  |  GET | `/radar/getCapabilities` |
+  |  GET | `/radar/rainShapes` |
+
+* The API to handle status indicator communication `/statistics`:
+
+|**method**|**path**|
+  |------|-----|
+  |  GET | `/statistics/wordcloud` |
+  |  GET | `/statistics/kde` |
+  |  GET | `/statistics/quadcount` |
 
 ## Endpoints and Methods
 
@@ -52,6 +59,8 @@
   Allows a server component to tell the API what it is currently doing
   **Parameters**
 
+* #### GET `/radar/getCapabilities`
+  returns the capabilities of Radar API
 
 <hr>
 
@@ -92,12 +101,37 @@
 |----------|------------|----------------|
 |`statuses/newprocess`| POST |Post a status indicator message to the Status API|  
 
+#### Body Parameters  
 Requires the body to be composed in x-www-form-urlencoded!
 
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
 |created_at|number|required|UNIX-timestamp (in milliseconds) of the time the message was posted|
 |message|String|required|The String containing the message part of the message. this will be displayed on site in the progress-indicator|  
+
+### radar
+#### Request
+| **Name** | **Method** | **Description**|
+|----------|------------|----------------|
+|`radar/getCapabilities`| GET |get the capabilities of the Radar API|
+
+#### General Search Parameters
+
+| **Name** | **Data Type** |**Required / Optional**| **Description**|
+|----------|---------------|-----------------------|----------------|
+|||||
+
+#### Request
+
+| **Name** | **Method** | **Description**|
+|----------|------------|----------------|
+|TODO|TODO|TODO|
+
+#### General Search Parameters
+
+| **Name** | **Data Type** |**Required / Optional**| **Description**|
+|----------|---------------|-----------------------|----------------|
+|||||
 
 <hr>
 
