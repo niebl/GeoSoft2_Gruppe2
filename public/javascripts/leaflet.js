@@ -154,6 +154,9 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 //   })
 // }
 
+//initialise the map to the coordinates that are given in the URL
+initialiseView();
+
 ////////////////////////////////////////////////////////////////////////////////
 // functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -309,7 +312,7 @@ async function addTweetToMap(tweet){
     "properties": properties,
     "type": "Feature"
   });
-  tweetLayer.addData(newTweet)
+  tweetLayer.addData(newTweet);
 
   //add the tweet to the tweet-browser
   //provisional.
@@ -341,7 +344,7 @@ function removeTweetsOutOfSelection(bbox, include, exclude){
       bbox[i] = parseFloat(bbox[i]);
     }
   }
-  bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
+  //bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
 
   //remove the tweets from the browser
   rmTweetsByKeywords(bbox, include, exclude);
@@ -358,14 +361,15 @@ function removeTweetsOutOfSelection(bbox, include, exclude){
 * @param exclude array of substrings that are to be excluded frin the tweets
 * @see removeTweetsOutOfSelection
 * @author Felix
+* //TODO:case insensitive keywords
 */
 async function rmTweetsByKeywords(bbox, include, exclude){
   //build the request string
   var requestURL = `bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}`;
-  if(!(include.length == 0 || include == undefined)){
+  if(!(include.length == 0 || include == undefined || include[0] == "")){
     requestURL = requestURL + `&include=${include.join()}`;
   }
-  if(!(include.length == 0 || include == undefined)){
+  if(!(exclude.length == 0 || exclude == undefined || exclude[0] == "")){
     requestURL = requestURL + `&exclude=${exclude.join()}`;
   }
   requestURL = requestURL + "&fields=id_str";
@@ -380,83 +384,119 @@ async function rmTweetsByKeywords(bbox, include, exclude){
     bbox = turf.bboxPolygon([bbox[1],bbox[0],bbox[3],bbox[2]]);
 
     //remove tweets from the browser
-    for(let tweet of tweets){
-      //remove the tweets from the browser
-      $("#tweet-browser").children("div").each(function(){
-        //extrct coordinates of div
-        var point = $(this).attr('coords').split(",");
-        point[0] = parseFloat(point[0])
-        point[1] = parseFloat(point[1])
-        point = turf.point([point[0],point[1]]);
+    $("#tweet-browser").children("div").each(function(){
+      //extrct coordinates of div
+      var point = $(this).attr('coords').split(",");
+      point[0] = parseFloat(point[0]);
+      point[1] = parseFloat(point[1]);
+      point = turf.point([point[0],point[1]]);
 
-        let included = false;
-        let contained = turf.booleanWithin(point, bbox);
+      let included = false;
+      let contained = turf.booleanWithin(point, bbox);
 
-        //if include string is empty, defualt to true
-        if(include.length == 0 || include == undefined){included = true;}
-
-        //check if the id strings were found in the answer
+      //check if the id strings were found in the answer
+      for(let tweet of tweets){
         if(tweet.id_str == $(this).attr("id_str")){
           included = true;
         }
+      }
 
-        //remove if any of the conditions are met
-        if(!included || !contained){
-          $(this).remove();
-        }
-      });
-    }
+      //remove if any of the conditions are met
+      if(!included || !contained){
+        $(this).remove();
+      }
+    });
 
     //remove tweets from the map
-    //ISSUE: TODO: following seems to incorrectly exclude some tweets.
-    //              ISSUE probably starts at line 428
     for(var marker in tweetLayer._layers){
       //EXCTRACT COORDINATES
       var point = turf.point([tweetLayer._layers[marker]._latlng.lng,tweetLayer._layers[marker]._latlng.lat]);
 
-      //TODO: text dependent removal of tweets from map
       //initialise the var deciding about geographic containment of tweets within bbox
       var contained = turf.booleanWithin(point, bbox);
-
       //remove out-of-bounds markers first
       if(!contained){
         tweetLayer._layers[marker].remove();
       }
+
       //then check the popups of remaining markers for tweets that should be excluded
       else {
         popupHTML = $(tweetLayer._layers[marker]._popup._content);
-        console.log("the popup")
-        console.log(popupHTML)
-        popupHTML.children("div").each(function(){
-          console.log("the child")
-          console.log(this)
-          for(let tweet of tweets){
-            //initialise variable deciding over inclusion of tweet
-            var included = false;
-            //when include is empty or undefined, default to true
-            if(include.length == 0 || include == undefined){included = true;}
 
-            //check if the id strings were found in the answer
-            console.log($(this).attr("id_str"))
-            if(tweet.id_str == $(this).attr("id_str")){
-              included = true;
+        for(let child of popupHTML){
+          child = $(child);
+          if(child.attr("class")=="tweetDiv"){
+
+            //initialise variable deciding over inclusion of tweetDiv
+            var included = false;
+
+            //check if id strings were found in the answer
+            for(let tweet of tweets){
+              if(tweet.id_str == $(child).attr("id_str")){
+                included = true;
+              }
             }
 
             if(!included){
               //remove entire marker if there is only one tweet left
               if(popupHTML.children("div").length <= 1){
                 tweetLayer._layers[marker].remove();
+                break;
               } else {
-                this.remove();
+                child.remove();
               }
             }
           }
-        });
+        }
+
         //update the popup if marker still exists
         try{
-          tweetLayer._layers[marker]._popup._content = popupHTML.html();
+          tweetLayer._layers[marker]._popup._content = popupHTML.prop('outerHTML');
         } catch(error){/*ignore*/}
       }
     }
   });
+}
+
+/**
+* @function getWindowCoordinates
+* @desc function that gets window coordinates and zoom-level of the browser search-bar
+* @returns Object: {lat: float, Lon: float, Zoom: number}
+*/
+function getWindowCoordinates(){
+  //get the individual numbers from the URL as strings
+  coords = $(location).attr('pathname').split("/");
+  coords = coords[coords.length - 1];
+  coords = coords.split(",");
+
+  //numberify
+  for(let number in coords){
+    coords[number] = parseFloat(coords[number]);
+  }
+
+  //finish the output-object
+  coords = {lat:coords[0], lon:coords[1], zoom:parseInt(coords[2])};
+
+  return coords;
+}
+
+/**
+* @function initialiseView
+* @desc sets the map view to what was specified in the URL
+*/
+function initialiseView(){
+  //set the view to where coordinates specified
+  let coords;
+  coords = getWindowCoordinates();
+
+  //check if numbers are valid
+  if(!(
+    !isNaN(coords[0]) &&
+    !isNaN(coords[1]) &&
+    Number.isInteger(coords[2])
+  )){
+    map.setView(new L.LatLng(coords.lat,coords.lon), coords.zoom);
+  }else{
+    return false;
+  }
 }

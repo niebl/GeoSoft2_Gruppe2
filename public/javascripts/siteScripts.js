@@ -2,7 +2,7 @@
 
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
-var bboxArray = [55.22,5.00,47.15,15.20]
+var bboxArray = [55.22,5.00,47.15,15.20];
 var include = [];
 var exclude = [];
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
@@ -14,142 +14,169 @@ var older_thanStatusCheck;
 * @var nearestTweetRadius.
 * the minimal distance a tweet is allowed to have to another in meters.
 */
-const nearestTweetRadius = 50;
-const updateCheckInterval= 10000;
-const statusCheckInterval= 1000;
+var nearestTweetRadius;
+var updateCheckInterval;
+var statusCheckInterval;
 
-//initialise with the current timestamp, -5 minutes
-older_than = Date.now() - 300000;
-older_thanCheck = older_than;
-older_thanStatusCheck = Date.now();
+main();
 
-//begin the periodic update checks
-checkTweetUpdates(updateCheckInterval);
-checkStatusUpdates(statusCheckInterval);
+function main(err){
 
-////////////////////////////////////////////////////////////////////////////////
-// site-events
-////////////////////////////////////////////////////////////////////////////////
+  nearestTweetRadius = 50;
+  updateCheckInterval= 10000;
+  statusCheckInterval= 2000;
 
-//toggle side-bar elements
-//toggle tweet options
-$("#parameter-toggle").click(function(e){
-  e.preventDefault();
-  $("#browser-controls").toggleClass("toggled");
-});
-//toggle tweet-browser
-$("#browser-toggle").click(function(e){
-  e.preventDefault();
-  $("#tweet-browser").toggleClass("toggled");
-});
+  //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
+  older_than = Date.now() - 300000;
+  older_thanCheck = older_than;
+  //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
+  older_thanStatusCheck = Date.now() - 10000;
 
-//click of UPDATE MAP button
-$("#update-map").click(function(){
-  updateMapTweets();
-});
-//toggle sidebar button
-$("#sidebarCollapse").click(function(e){
-  e.preventDefault();
-  $("#wrapper").toggleClass("toggled");
-  setTimeout(function(){ map.invalidateSize()}, 400);
-});
+  //begin the periodic update checks
+  checkTweetUpdates(updateCheckInterval);
+  checkStatusUpdates(statusCheckInterval);
 
-//go to tweet
-$("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
-  //get the attributes from the parent element of the button
-  var coordsInput = $(e.target).parent().attr('coords').split(",")
-  var idInput = $(e.target).parent().attr('id_str').split(",")
+  ////////////////////////////////////////////////////////////////////////////////
+  // site-events
+  ////////////////////////////////////////////////////////////////////////////////
 
-  //parse the coordinates and swap lat and lon
-  var coords = []
-  coords[0] = parseFloat(coordsInput[1])
-  coords[1] = parseFloat(coordsInput[0])
+  //toggle side-bar elements
+  //toggle tweet options
+  $("#parameter-toggle").click(function(e){
+    e.preventDefault();
+    $("#browser-controls").toggleClass("toggled");
+  });
+  //toggle tweet-browser
+  $("#browser-toggle").click(function(e){
+    e.preventDefault();
+    $("#tweet-browser").toggleClass("toggled");
+  });
 
-  //set the view of the map to the tweet and zoom in
-  map.setView(coords, 13,
-    // {
-    // "animate": true,
-    // "pan":{
-    //   "duration": 0.5
-    // }
-    // }
-  );
-  for(marker in tweetLayer._layers){
-    if(tweetLayer._layers[marker]._popup._content.includes(idInput)){
-      tweetLayer._layers[marker].openPopup();
-    }
-  }
-  //todo: open the popup
-});
-//remove the tweet from map
-$("#tweet-browser, #map").on('click', '.removeTweet', function(e){
-  //get the attributes from the parent element of the button
-  var coordsInput = $(e.target).parent().attr('coords').split(",")
-  var idInput = $(e.target).parent().attr('id_str').split(",")
+  //click of UPDATE MAP button
+  $("#update-map").click(function(){
+    updateMapTweets();
+  });
+  //toggle sidebar button
+  $("#sidebarCollapse").click(function(e){
+    e.preventDefault();
+    $("#wrapper").toggleClass("toggled");
+    setTimeout(function(){ map.invalidateSize();}, 400);
+  });
 
-  //parse the coordinates and swap lat and lon
-  var coords = []
-  coords[0] = parseFloat(coordsInput[1])
-  coords[1] = parseFloat(coordsInput[0])
+  //go to tweet
+  $("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
+    //get the attributes from the parent element of the button
+    var coordsInput = $(e.target).parent().attr('coords').split(",");
+    var idInput = $(e.target).parent().attr('id_str').split(",");
 
-  updateProgressIndicator(`removing tweet <font color="yellow">${idInput}</font> from view`)
+    //parse the coordinates and swap lat and lon
+    var coords = [];
+    coords[0] = parseFloat(coordsInput[1]);
+    coords[1] = parseFloat(coordsInput[0]);
 
-  //remove from the browser
-  $("#tweet"+idInput).remove();
-
-  //remove from the map
-  for(marker in tweetLayer._layers){
-    //if the tweets id is found in the popup, remove it's div
-    //based on https://stackoverflow.com/questions/16940274/remove-div-and-its-content-from-html-string/16940353#16940353
-    if(tweetLayer._layers[marker]._popup._content.includes(idInput)){
-      //get the html popup content to work with jquery
-      let popupContent = tweetLayer._layers[marker]._popup._content
-      popupContent = $(popupContent);
-      editor = $("<p>").append(popupContent);
-      //remove the according div and assign the new updated content
-      editor.find("#mapTweet"+idInput).remove();
-      popupContent = editor.html();
-      tweetLayer._layers[marker]._popup._content = popupContent;
-
-      //remove the layer if there is no popup content
-      if(popupContent == ""){
-        tweetLayer._layers[marker].remove()
-      } else {
-        //update the popup in map view
-        tweetLayer._layers[marker].closePopup();
+    //set the view of the map to the tweet and zoom in
+    map.setView(coords, 13,
+      // {
+      // "animate": true,
+      // "pan":{
+      //   "duration": 0.5
+      // }
+      // }
+    );
+    for(let marker in tweetLayer._layers){
+      if(tweetLayer._layers[marker]._popup._content.includes(idInput)){
         tweetLayer._layers[marker].openPopup();
       }
     }
-  }
-})
+    //todo: open the popup
+  });
+  //remove the tweet from map
+  $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
+    //get the attributes from the parent element of the button
+    var coordsInput = $(e.target).parent().attr('coords');
+    var idInput = $(e.target).parent().attr('id_str');
 
-//confirm Coords
-$('#confirmCoords').on('click', function(e){
-  bboxArray = [parseFloat($("input[name='bboxNorth']").val()),
-          parseFloat($("input[name='bboxWest']").val()),
-          parseFloat($("input[name='bboxSouth']").val()),
-          parseFloat($("input[name='bboxEast']").val())]
+    coordsInput.split(",");
+    idInput.split(",");
 
-  removeTweetsOutOfSelection(bboxArray, include, exclude);
+    //parse the coordinates and swap lat and lon
+    var coords = [];
+    coords[0] = parseFloat(coordsInput[1]);
+    coords[1] = parseFloat(coordsInput[0]);
 
-  drawnRect.clearLayers()
+    updateProgressIndicator(`removing tweet <font color="yellow">${idInput}</font> from view`);
 
-  var rectBounds = [[bbox[0],bbox[1]],[bbox[2],bbox[3]]];
-  L.rectangle(rectBounds).addTo(drawnRect)
-})
-//clear coords
-$('#clearCoords').on('click', function(e){
-  drawnRect.clearLayers();
-  bbox = defaultBbox;
-})
+    //remove from the browser
+    $("#tweet"+idInput).remove();
 
-//FILTER words
-$('#confirmFilter').on('click', function(e){
-  include = $("input[name='includeKeywords']").val().split(",")
-  exclude = $("input[name='excludeKeywords']").val().split(",")
+    //remove from the map
+    for(let marker in tweetLayer._layers){
+      //if the tweets id is found in the popup, remove it's div
+      //based on https://stackoverflow.com/questions/16940274/remove-div-and-its-content-from-html-string/16940353#16940353
+      if(tweetLayer._layers[marker]._popup._content.includes(idInput)){
+        //get the html popup content to work with jquery
+        let popupContent = tweetLayer._layers[marker]._popup._content;
+        popupContent = $(popupContent);
+        editor = $("<p>").append(popupContent);
+        //remove the according div and assign the new updated content
+        editor.find("#mapTweet"+idInput).remove();
+        popupContent = editor.html();
+        tweetLayer._layers[marker]._popup._content = popupContent;
 
-  removeTweetsOutOfSelection(bboxArray, include, exclude);
-})
+        //remove the layer if there is no popup content
+        if(popupContent == ""){
+          tweetLayer._layers[marker].remove();
+        } else {
+          //update the popup in map view
+          tweetLayer._layers[marker].closePopup();
+          tweetLayer._layers[marker].openPopup();
+        }
+      }
+    }
+  });
+
+  //confirm Coords
+  $('#confirmCoords').on('click', function(e){
+    bboxArray = [parseFloat($("input[name='bboxNorth']").val()),
+    parseFloat($("input[name='bboxWest']").val()),
+    parseFloat($("input[name='bboxSouth']").val()),
+    parseFloat($("input[name='bboxEast']").val())];
+
+    removeTweetsOutOfSelection(bboxArray, include, exclude);
+
+    drawnRect.clearLayers();
+
+    var rectBounds = [[bbox[0],bbox[1]],[bbox[2],bbox[3]]];
+    L.rectangle(rectBounds).addTo(drawnRect);
+  });
+  //clear coords
+  $('#clearCoords').on('click', function(e){
+    drawnRect.clearLayers();
+    bbox = defaultBbox;
+  });
+
+  //FILTER words
+  $('#confirmFilter').on('click', function(e){
+    include = $("input[name='includeKeywords']").val().split(",");
+    exclude = $("input[name='excludeKeywords']").val().split(",");
+
+    removeTweetsOutOfSelection(bboxArray, include, exclude);
+  });
+
+  //set url-coordinates
+  $('#updateURLCoords').on('click', function(e){
+    e.preventDefault();
+    //fetch coordinates and zoom-level from the map
+    var coords = {
+      lat: map._lastCenter.lat,
+      lon: map._lastCenter.lng,
+      zoom : map._zoom
+    };
+
+    //set the coordinates in the URL to the new value
+    setWindowCoordinates(coords);
+  });
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // functions
@@ -170,13 +197,30 @@ function updateProgressIndicator(message, currentTime){
 }
 
 /**
+* @function makeQueryString
+* @desc function that returns a usable query string to search for tweets with given parameters. Uses global variables
+* @returns String, that is used as parameter for getTweets
+* @see getTweets
+*/
+function makeQueryString(){
+  let queryString = `bbox=${bbox}&older_than=${older_than}`;
+  if(!(include.length == 0 || include == undefined || include[0] == "")){
+    queryString = queryString+`&include=${include}`;
+  }
+  if(!(exclude.length == 0 || exclude == undefined || exclude[0] == "")){
+    queryString = queryString+`&exclude=${exclude}`;
+  }
+  return queryString;
+}
+
+/**
 * @function updateMapTweets
 * @desc updates the map with the tweets that have been fetched from getTweets() function
 * @see getTweets
 */
 async function updateMapTweets(){
   var tweetPromise = new Promise(async function(resolve, reject){
-    var tweets = await getTweets("bbox="+bbox+"&older_than="+older_than);
+    var tweets = await getTweets(makeQueryString());
     resolve(tweets.tweets);
   });
 
@@ -216,14 +260,13 @@ async function getTweets(params){
   let output;
   var requestURL = "/tweetAPI/search?";
   requestURL = requestURL + params;
-  updateProgressIndicator("fetching data from tweet API");
 
   //console.log(requestURL)
   await $.ajax({
     url: requestURL,
     success: function(data){
       output = data;
-      updateProgressIndicator("received data from tweet-API");
+      updateProgressIndicator("successfully received data from tweet-API");
     },
     error: function(xhr, ajaxOptions, thrownError){
       updateProgressIndicator(`<font color="red">connection to tweet-API failed</font>`);
@@ -243,7 +286,7 @@ async function checkTweetUpdates(interval){
     var tweetPromise = new Promise(async function(resolve, reject){
       //indicate event
       updateProgressIndicator("checking for new tweets");
-      var tweets = await getTweets("bbox="+bbox+"&older_than="+older_thanCheck+"&fields=created_at");
+      var tweets = await getTweets(makeQueryString()+"&fields=created_at");
       resolve(tweets.tweets);
     });
 
@@ -260,8 +303,8 @@ async function checkTweetUpdates(interval){
       older_thanCheck = Date.now();
     });
   },
-    interval
-  );
+  interval
+);
 }
 
 /**
@@ -289,8 +332,8 @@ async function checkStatusUpdates(interval){
       }
     });
   },
-    interval
-  );
+  interval
+);
 }
 
 /**
@@ -311,12 +354,12 @@ async function getMessages(params){
       output = data;
     },
     error: function(xhr, ajaxOptions, thrownError){
+      //not shown in status indicator, since this is a trivial, non-app-breaking issue
       console.log(`call to status-API failed`);
     }
   });
   return output;
 }
-
 
 /**
 * @function updateTweetNotifs
@@ -331,23 +374,23 @@ function updateTweetNotifs(arguments){
   var increment;
 
   //default clear to false unless something else is passed. dont accept non-booleans
-  if(arguments.clear == undefined||arguments.clear!=true){clear = false}
-    else{clear = arguments.clear};
+  if(arguments.clear == undefined||arguments.clear!=true){clear = false;}
+  else{clear = arguments.clear;}
   //default inrement to 0 unless something else is passed. don't accept non-integers
-  if(arguments.increment == undefined||!Number.isInteger(arguments.increment)){increment = 0}
-    else{increment = arguments.increment};
+  if(arguments.increment == undefined||!Number.isInteger(arguments.increment)){increment = 0;}
+  else{increment = arguments.increment;}
 
   //clear if clear is true
   if(clear){
     $("#update-badge").removeClass("visible");
     $("#update-badge").addClass("invisible");
-    $("#update-badge").html(0)
+    $("#update-badge").html(0);
   }
 
   //increment by the specified amount
   if(increment != 0){
-    let count = parseInt($("#update-badge").html())
-    $("#update-badge").html(count+increment)
+    let count = parseInt($("#update-badge").html());
+    $("#update-badge").html(count+increment);
 
     //if there is a negative correction to be made, don't update the div classes. only the html
     if(increment > 0){
@@ -355,4 +398,14 @@ function updateTweetNotifs(arguments){
       $("#update-badge").addClass("visible");
     }
   }
+}
+
+/**
+* @function setWindowCoordinates
+* @desc function that sets window coordinates and zoom-level of the browser search-bar, without updating the page
+* @param Coords Object: {lat: float, Lon: float, Zoom: number}
+* @returns boolean
+*/
+function setWindowCoordinates(coords){
+  window.history.replaceState(false, "Geomergency", `/geomergency/${coords.lat},${coords.lon},${coords.zoom}`);
 }
