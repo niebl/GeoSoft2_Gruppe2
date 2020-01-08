@@ -1,9 +1,11 @@
 /*jshint esversion: 8 */
 const token = require('./tokens.js');
 
-
+//load the additional script collections for the server
 var twitterApiExt = require('./twitApiExt.js');
+var utilities = require('./utilityFunctions.js')
 
+//load all required packages
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -53,6 +55,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // sets paths to routers
 app.use('/', indexRouter);
+app.use('/geomergency', indexRouter);
+app.use('/geomergency/:coords', indexRouter);
 app.use('/users', usersRouter);
 
 
@@ -74,7 +78,7 @@ app.use('/gemeinden', express.static(__dirname + '/public/jsons/landkreise.json'
 // mongoDB models:
 var Kreis = require("./models/kreis");
 var UnwetterKreis = require("./models/unwetterkreis");
-const Status = require("./models/status.js")
+const Status = require("./models/status.js");
 const Tweet = require('./models/tweet.js');
 
 var weatherRouter = require("./routes/badweather");
@@ -441,7 +445,7 @@ function postTweetToMongo(tweet){
   });
 
   //indicate status
-  indicateStatus(`fetched tweet: ${tweet.id_str}`);
+  utilities.indicateStatus(`fetched tweet: ${tweet.id_str}`);
 }
 
 /**
@@ -612,23 +616,4 @@ async function postProcesses(req,res){
     res.status(200);
     res.send(`Status successfully posted`);
   }
-}
-
-/**
-* @function indicateStatus
-* @desc sends a POST request to the status API so the client side can know what the server is doing.
-* @param text String, the message of the status
-* @Author Felix
-*/
-async function indicateStatus(text){
-  var output;
-  var requestURL = "http://localhost:3000/status/newprocess";
-  //let requestURL = "https://localhost:3000/embedTweet?id="
-
-  request.post(requestURL, {form:
-    {
-      message: text,
-      created_at: Date.now()
-    }
-  });
 }

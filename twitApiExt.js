@@ -2,7 +2,7 @@
 const token = require('./tokens.js');
 //use twitter package. src: https://github.com/jdub/node-twitter
 const Twitter = require('twitter');
-const app = require('./app.js')
+var utilities = require('./utilityFunctions.js');
 
 module.exports = {
 
@@ -27,12 +27,14 @@ module.exports = {
   */
   tweetStreamExt : function(params, callback){
     var stream = this.client.stream('statuses/filter', params);
+    utilities.indicateStatus("starting twitter-API stream")
     stream.on('data', function(event){
       callback(event);
     });
 
     stream.on('error', function(error) {
       console.log(error);
+      utilities.indicateStatus(error)
     });
   },
 

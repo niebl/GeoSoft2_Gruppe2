@@ -154,6 +154,9 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 //   })
 // }
 
+//initialise the map to the coordinates that are given in the URL
+initialiseView();
+
 ////////////////////////////////////////////////////////////////////////////////
 // functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,8 +374,6 @@ async function rmTweetsByKeywords(bbox, include, exclude){
   }
   requestURL = requestURL + "&fields=id_str";
 
-  console.log(requestURL)
-
   var tweetPromise = new Promise(async function(resolve, reject){
     //get the included tweets and resolve
     var tweets = await getTweets(requestURL);
@@ -455,4 +456,47 @@ async function rmTweetsByKeywords(bbox, include, exclude){
       }
     }
   });
+}
+
+/**
+* @function getWindowCoordinates
+* @desc function that gets window coordinates and zoom-level of the browser search-bar
+* @returns Object: {lat: float, Lon: float, Zoom: number}
+*/
+function getWindowCoordinates(){
+  //get the individual numbers from the URL as strings
+  coords = $(location).attr('pathname').split("/");
+  coords = coords[coords.length - 1];
+  coords = coords.split(",");
+
+  //numberify
+  for(let number in coords){
+    coords[number] = parseFloat(coords[number]);
+  }
+
+  //finish the output-object
+  coords = {lat:coords[0], lon:coords[1], zoom:parseInt(coords[2])};
+
+  return coords;
+}
+
+/**
+* @function initialiseView
+* @desc sets the map view to what was specified in the URL
+*/
+function initialiseView(){
+  //set the view to where coordinates specified
+  let coords;
+  coords = getWindowCoordinates();
+
+  //check if numbers are valid
+  if(!(
+    !isNaN(coords[0]) &&
+    !isNaN(coords[1]) &&
+    Number.isInteger(coords[2])
+  )){
+    map.setView(new L.LatLng(coords.lat,coords.lon), coords.zoom);
+  }else{
+    return false;
+  }
 }
