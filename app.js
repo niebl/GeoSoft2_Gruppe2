@@ -73,7 +73,7 @@ app.use("/leafletscript", express.static(__dirname + '/public/javascripts/leafle
 app.use("/siteScripts", express.static(__dirname+'/public/javascripts/siteScripts.js'));
 
 
-app.use('/gemeinden', express.static(__dirname + '/public/jsons/landkreise.json'));
+app.use('/gemeinden', express.static(__dirname + '/public/jsons/landkreiseSimp.json'));
 
 // mongoDB models:
 var Kreis = require("./models/kreis");
