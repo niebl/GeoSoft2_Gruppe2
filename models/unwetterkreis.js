@@ -4,13 +4,25 @@ var mongoose = require('mongoose');
 var unwetterKreisSchema = mongoose.Schema({
   geojson:{
     type: { type: String },
+    id: {type: String, unique: true},
+    bbox: Array,
     properties: {
-      name: String,
-      event: Array
+      AREADESC: {type: String},
+      EVENT: {type: String},
+      ECGROUP: {type: String},
+      URGENCY: {type: String},
+      SENT: {type: String},
+      ONSET: {type: String},
+      EXPIRED: {type: String},
+      HEADLINE: {type: String},
+      DESCRIPTION: {type: String},
+      PARAMETERNAME: {type: String},
+      PARAMETERVALUE: {type: String}
     },
     geometry: {
        type: { type: String },
-       coordinates: Array}
+       coordinates: Array
+  	  }
     }
   }
 );
