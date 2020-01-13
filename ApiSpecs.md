@@ -32,6 +32,12 @@
   |  GET | `/statistics/kde` |
   |  GET | `/statistics/quadcount` |
 
+* The API to handle status indicator communication `/weather`:
+
+|**method**|**path**|
+  |------|-----|
+  |  GET | `/weather/warnings` |
+
 ## Endpoints and Methods
 
 
@@ -62,10 +68,16 @@
 * #### GET `/radar/getCapabilities`
   returns the capabilities of Radar API
 
+* #### GET `/weather/warnings`
+  returns shapes of German districts that have issued warnings of weather against them by the DWD.
+  **Parameters**
+  * `bbox` the geographical boundaries with which the resulting district borders can overlap. (WGS84)
+  * `events` list of types of events to include in the results.
+
 <hr>
 
 ## Parameters
-### Tweet-Search
+### __end-point: Tweet-Search__
 #### Request
 
 | **Name** | **Method** | **Description**|
@@ -83,7 +95,7 @@
 |fields|string array|optional|The fields that are to be included in the returned tweets' JSON. formatted as an array of strings: `fields=field1,field2,...,fieldN`|
 |latest|Boolean|optional|If true, only the latest tweet that meets all the queries will be returned|
 
-### status
+### __end-point: status__
 #### Request
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
@@ -109,7 +121,7 @@ Requires the body to be composed in x-www-form-urlencoded!
 |created_at|number|required|UNIX-timestamp (in milliseconds) of the time the message was posted|
 |message|String|required|The String containing the message part of the message. this will be displayed on site in the progress-indicator|  
 
-### radar
+### __end-point: radar__
 #### Request
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
@@ -132,6 +144,20 @@ Requires the body to be composed in x-www-form-urlencoded!
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
 |||||
+
+### __end-point: weather__
+#### Request
+
+| **Name** | **Method** | **Description**|
+|----------|------------|----------------|
+|`weather/warnings`| GET |Search for|
+
+#### General Search Parameters
+
+| **Name** | **Data Type** |**Required / Optional**| **Description**|
+|----------|---------------|-----------------------|----------------|
+|bbox|number array|optional|bounding box of 2 coordinates in the WGS84 format, represented as an array of four numbers: `bbox={lat northwest corner},{lon northwest corner},{lat southeast corner},{lon southeast corner}`|
+|events|string array|optional|The types of events to look for. for types of events, refer to <a href="https://www.dwd.de/DE/leistungen/opendata/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2">DWD documentation</a> chapter 3.1.1|
 
 <hr>
 

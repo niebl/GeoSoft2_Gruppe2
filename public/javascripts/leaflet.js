@@ -37,14 +37,14 @@ var tweetLayer = L.geoJson(false,{
   onEachFeature: onEachTweet
 });
 
+//create layer for selection rectangle
+var drawnRect = new L.FeatureGroup();
+
 /**
 * create layer for counties
 *
 */
 var kreisLayer = L.featureGroup(false)
-
-//create layer for selection rectangle
-var drawnRect = new L.FeatureGroup();
 
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
@@ -112,27 +112,27 @@ map.on('draw:created', function(e){
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-kreisPromise = new Promise(async function(resolve, reject){
-  var requestURL = "/weather/kreise";
-  var response = await $.ajax({
-    url: requestURL,
-    dataType: 'text',
-    //contentType: 'application/json',
-    //success: embeddedCallback,
-    success: async function(data){
-      console.log(data)
-      getKreise()
-    },
-    error: function(xhr, ajaxOptions, thrownError){
-      console.log(xhr.status);
-      console.log(id_str)
-      console.log(thrownError)
-      output = {html: thrownError}
-    }
-  });
-})
+// kreisPromise = new Promise(async function(resolve, reject){
+//   var requestURL = "/weather/kreise";
+//   var response = await $.ajax({
+//     url: requestURL,
+//     dataType: 'text',
+//     //contentType: 'application/json',
+//     //success: embeddedCallback,
+//     success: async function(data){
+//       console.log(data)
+//       getKreise()
+//     },
+//     error: function(xhr, ajaxOptions, thrownError){
+//       console.log(xhr.status);
+//       console.log(id_str)
+//       console.log(thrownError)
+//       output = {html: thrownError}
+//     }
+//   });
+// })
 async function getKreise(){
-  var requestURL = "weather/getUnwetter"
+  var requestURL = "weather/warnings"
   return await $.ajax({
     url: requestURL,
     success: async function(data){
@@ -156,6 +156,7 @@ async function getKreise(){
 
 //initialise the map to the coordinates that are given in the URL
 initialiseView();
+getKreise();
 
 ////////////////////////////////////////////////////////////////////////////////
 // functions

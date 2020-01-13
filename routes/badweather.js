@@ -1,11 +1,27 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 var request = require('request');
 var express = require('express');
 var router = express.Router();
+const kreisgrenzen = require('../public/jsons/landkreiseSimp');
+
+var utilities = require('../utilityFunctions.js');
 
 var Kreis = require("../models/kreis");
 var UnwetterKreis = require("../models/unwetterkreis");
 
+const weatherUpdateInterval = 300000;
+
+function main(){
+  //periodically update the weather in 5 minute intervals
+  loadUnwetter();
+  periodicallyUpdateWeather(weatherUpdateInterval);
+}
+
+main();
+
+////////////////////////////////////////////////////////////////////////////////
+// endpoints
+////////////////////////////////////////////////////////////////////////////////
 
 /** requesting GEJSOn of deutsche Kreise
   * @author Dorian
@@ -38,103 +54,11 @@ router.get('/getBorders', (req, res) => {
     });
 });
 
-
-
-/** Adding German "kreisgrenzen" into db
-  * @author Dorian
-  *
-  */
-router.get("/kreise", (req, res ) =>{
-  var requestSettings = {
-        url: "http://localhost:3000/gemeinden",
-        method: 'GET'
-    };
-  request(requestSettings, function(error, response, body) {
-    if(error){
-      console.log(error);
-    }
-    var kreisListe = JSON.parse(body).features;
-    for(var i= 0; i <= kreisListe.length -1; i++){
-        console.log( kreisListe[i].geometry.type);
-        var addKreis = new Kreis({
-          geojson: {
-            type: "Feature",
-            properties: {
-              name: kreisListe[i].properties.GEN,
-            },
-            geometry: {
-              type: kreisListe[i].geometry.type,
-              coordinates: kreisListe[i].geometry.coordinates
-           }
-         }
-        });
-        //addKreis.properties.name = kreisListe[i].properties.GEN;
-        addKreis.save();
-        if(i == kreisListe.length -1 ){
-          res.send('Regions of germany added into db');
-        }
-    }
-
-  });
-});
-
 router.get('/deleteUnwetter', (req, res) => {
     UnwetterKreis.deleteMany({}, (err, result) => {
       next();
     });
 });
-
-router.get('/loadUnwetter', (req, res, next) => {
-    UnwetterKreis.deleteMany({}, (err, result) => {
-      next();
-    });
-}, (req, res) => {
-  var requestSettings = {
-        url: "http://localhost:3000/gemeinden",
-        method: 'GET'
-    };
-  request('https://www.dwd.de/DWD/warnungen/warnapp/json/warnings.json', function(error, response, body) {
-    if(error){
-      console.log(error);
-    }
-
-    var toJson = body.slice(24, body.length - 2);
-    var warnings =  JSON.parse(toJson);
-    var dangerzone  = [];
-    for(var key in warnings.warnings){
-      dangerzone.push([warnings.warnings[key][0].regionName, warnings.warnings[key][0].event]);
-    }
-
-    Kreis.find({}, function(err, result){
-      if(err){
-        console.log(err);
-      }
-      var zet = [];
-      dangerzone.forEach((item, index) =>{
-        for(var i= 0; i < result.length; i++){
-          if(item[0].includes(result[i].geojson.properties.name)){
-            var addUnwetterKreis = new UnwetterKreis({
-              geojson: {
-                type: "Feature",
-                properties: {
-                  name: result[i].geojson.properties.name,
-                  event: item[1]
-                },
-                geometry: {
-                  type: result[i].geojson.geometry.type,
-                  coordinates: result[i].geojson.geometry.coordinates
-               }
-             }
-            });
-            addUnwetterKreis.save();
-          }
-        }
-      });
-      res.send(dangerzone);
-    });
-});
-});
-
 
 /** requesting GEJSOn of bad Weather events
   * @author Dorian
@@ -142,10 +66,10 @@ router.get('/loadUnwetter', (req, res, next) => {
   * @example http://localhost:3000/getUnwetter?event=GLATTEIS&name=Münster
   */
 
-  router.get("/getUnwetter", (req, res)=>{
+router.get("/warnings", (req, res)=>{
   var query = {};
   if(req.query.event){
-    var event = str.toUpperCase(req.query.event);
+    var event = req.query.event.toUpperCase();
     query['geojson.properties.event'] = event;
   }
   if(req.query.name){
@@ -170,5 +94,145 @@ router.get('/loadUnwetter', (req, res, next) => {
     res.json(json);
   });
 });
+
+////////////////////////////////////////////////////////////////////////////////
+// functions
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+* @function loadBorders
+* loads the border-geoJSON into the mongoDB
+* @returns boolean whether laoding all districts was successful
+* @Author Dorian, Felix
+*/
+async function loadBorders(){
+  //get a list of each district
+  var kreisliste = kreisgrenzen.features;
+  for(let kreis of kreisliste){
+    console.log(kreis.properties.GEN)
+    //save each district to the mongoDB
+    try {
+      var newKreis = new Kreis({
+      geojson: {
+        type: "Feature",
+        properties: {
+          name: kreis.properties.GEN,
+        },
+        geometry: {
+          type: kreis.geometry.type,
+          coordinates: kreis.geometry.coordinates
+       }
+     }
+    });
+    await newKreis.save();
+    //if it was unsuccessful, notify the system
+    }catch(error){
+      console.log("error in loading district-borders");
+      console.log(error);
+      utilities.indicateStatus(`error in loading district-borders: ${error}`);
+
+      //terminate function
+      return false;
+    }
+  }
+  //if there was no error, indicate success
+  console.log("successfully loaded district-borders into MongoDB");
+  utilities.indicateStatus(`successfully loaded district-borders into MongoDB`);
+  return true;
+}
+
+/**
+* @function loadUnwetter
+* function that loads new weather-alert-data into the database if called
+* devnote: still very high runtime. might not be of high priority since it's not called often, but improvement is encouraged
+* @author Dorian, FELIX
+* //TODO: manche Kreise (Freiburg, Kreis Augsburg, Stadt münchen, etc) bekommen keine Warnungen. Grund: if(warning.regionName.includes(kreis.properties.GEN)) nicht genau genug
+*/
+function loadUnwetter(){
+  utilities.indicateStatus("updating weather warnings from DWD-API");
+  request('https://www.dwd.de/DWD/warnungen/warnapp/json/warnings.json', function(error, response, body) {
+    if(error){
+      console.log(error);
+      utilities.indicateStatus(`<font color="red">error in connecting to DWD-API of weather warnings: ${error}</font>`);
+    }
+    //clear the database of previous entries
+    unwetterKreis.remove({});
+
+    //convert jsonp to json and parse the warnings
+    var responseJSON = body.slice(24, body.length - 2);
+    responseJSON = JSON.parse(responseJSON);
+
+    //create an array that can be worked with better and migrate the needed response data there
+    warnings = [];
+    for(let key in responseJSON.warnings){
+      warnings.push({
+        regionName: responseJSON.warnings[key][0].regionName,
+        event: responseJSON.warnings[key][0].event
+      });
+    }
+    //clear responseJSON so it doesn't take up
+    responseJSON = undefined;
+
+    //first, load the districts
+    var kreise = kreisgrenzen.features;
+
+    //create local array containing Warnkreise
+    let warnkreise = [];
+
+    for(let warning of warnings){
+      for(let kreis of kreise){
+        if(warning.regionName.includes(kreis.properties.GEN)){
+          //console.dir(kreis)
+
+          let warningFound = false;
+
+          //try to find an existing district warning first
+          for(let kreisWarnung of warnkreise){
+            if(kreisWarnung.geojson.properties.name == kreis.properties.GEN){
+              kreisWarnung.geojson.properties.event.push(warning.event);
+              warningFound = true;
+              break;
+            }
+          }
+          //create a new warning if the warning district was previously not on the list
+          if(!warningFound){
+            let newKreisWarnung = new UnwetterKreis({
+              geojson: {
+                type: "Feature",
+                properties:{
+                  name: kreis.properties.GEN,
+                  event: [warning.event]
+                },
+                geometry:{
+                  type: kreis.geometry.type,
+                  coordinates: kreis.geometry.coordinates
+                }
+              }
+            });
+            warnkreise.push(newKreisWarnung);
+            kreisWarnung = undefined;
+          }
+        }
+      }
+    }
+    //finally, save the warnings to the db
+    for(let kreisWarnung of warnkreise){
+       kreisWarnung.save();
+    }
+    utilities.indicateStatus("weather-warning update successful");
+  });
+}
+
+/**
+* @function periodicallyUpdateWeather
+* @desc periodically gets updates from the DWD weather warning API in the given interval if called
+* @param interval integer of interval length in milliseconds
+*/
+function periodicallyUpdateWeather(interval){
+  setInterval(
+    loadUnwetter(),
+    interval
+  );
+}
 
 module.exports = router;

@@ -301,6 +301,9 @@ async function checkTweetUpdates(interval){
 
       //update the timestamp
       older_thanCheck = Date.now();
+
+      //terminate
+      return true
     });
   },
   interval
@@ -330,6 +333,9 @@ async function checkStatusUpdates(interval){
           updateProgressIndicator(message.message, message.created_at);
         }
       }
+
+      //terminate
+      return true
     });
   },
   interval

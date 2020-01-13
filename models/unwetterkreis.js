@@ -6,7 +6,7 @@ var unwetterKreisSchema = mongoose.Schema({
     type: { type: String },
     properties: {
       name: String,
-      event: String
+      event: Array
     },
     geometry: {
        type: { type: String },
