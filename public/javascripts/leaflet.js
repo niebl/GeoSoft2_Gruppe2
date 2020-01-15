@@ -141,7 +141,10 @@ async function getKreise(){
         kreisLayer.addLayer(L.geoJson(feature,{
           fillOpacity: 0.3,
           color: 'purple'
-        }).bindPopup(feature.properties.name+"<br>"+feature.properties.event)
+        }).bindPopup(
+        feature.properties.AREADESC+"<hr>"
+        + feature.properties.EVENT
+        )
       )
       }
 

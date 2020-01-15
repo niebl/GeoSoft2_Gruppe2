@@ -8,7 +8,7 @@ var unwetterKreisSchema = mongoose.Schema({
     bbox: Array,
     properties: {
       AREADESC: {type: String},
-      EVENT: {type: String},
+      EVENT: [String],
       ECGROUP: {type: String},
       URGENCY: {type: String},
       SENT: {type: String},
@@ -21,7 +21,7 @@ var unwetterKreisSchema = mongoose.Schema({
     },
     geometry: {
        type: { type: String },
-       coordinates: Array
+       coordinates: [Array]
   	  }
     }
   }
