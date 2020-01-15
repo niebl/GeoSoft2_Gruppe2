@@ -137,7 +137,7 @@ async function getKreise(){
     url: requestURL,
     success: async function(data){
       //console.log(data)
-      for(let feature of data.features){
+      for(let feature of data){
         kreisLayer.addLayer(L.geoJson(feature,{
           fillOpacity: 0.3,
           color: 'purple'
