@@ -76,44 +76,40 @@ router.get('/getBorders', (req, res) => {
 
     //BoundingBox
     if(bbox!=undefined){
-      bbox = utilities.parseBBOX(bbox)
+      bbox = utilities.parseBBOX(bbox);
       if(bbox instanceof Error){
-        res.status(400)
-        res.send(bbox+"<hr>")
+        res.status(400);
+        res.send(bbox+"<hr>");
       }
     }
 
     //events
     if(events!=undefined){
-      events = events.split(",")
+      events = events.split(",");
     }
     //TODO: check validity of each event
 
     //build query object
     var query = {};
 
-    if(events!=undefined){
-      query['properties.EVENT'] = {
-        $or: events
-      };
-    }
 
 
     let unwetterPromise = new Promise(async function(resolve, reject){
       resolve(await queryUnwetter(query));
-    })
+    });
 
     unwetterPromise.then(function(results){
 
+      //GEOGRAPHIC FILTERING
       //devnote: only compares bboxes at the moment. so districts will show up that are not directly within selected bbox
       if(bbox!=undefined){
-        let turfbbox = turf.bboxPolygon([bbox[1],bbox[2],bbox[3],bbox[0]])
+        let turfbbox = turf.bboxPolygon([bbox[1],bbox[2],bbox[3],bbox[0]]);
 
         for(let shape of results){
-          shapebbox = turf.bboxPolygon(shape.bbox)
+          shapebbox = turf.bboxPolygon(shape.bbox);
           //console.log(shape)
           if(turf.booleanOverlap(shapebbox,turfbbox)||turf.booleanWithin(shapebbox,turfbbox)){
-            out.push(shape)
+            out.push(shape);
           } else {
             //console.log("outside")
           }
@@ -122,38 +118,37 @@ router.get('/getBorders', (req, res) => {
         out = results;
       }
 
-      res.send(out)
-    })
+      //reset output
+      results = out;
+      out = [];
 
+      //EVENT KEYWORD FILTERING
+      if(events!=undefined){
+        //check each shape if it contains the searched event
+        let keywordFound;
+        for(let shape of results){
+          keywordFound = false;
+          for(let weatherEvents of shape.properties.EVENT){
+            for(let keyword of events){
+              //compare each searched keyoword for each listed event in the district
+              if(weatherEvents.toUpperCase() == keyword.toUpperCase()){
+                //if one is found, give green light to add to the output
+                keywordFound = true;
+                break;
+              }
+            }
+          }
+          if(keywordFound){
+            out.push(shape);
+          }
+        }
 
+      } else {
+        out = results;
+      }
 
-
-    // var query = {};
-    // if(req.query.event){
-    //   var event = req.query.event.toUpperCase();
-    //   query['geojson.properties.event'] = event;
-    // }
-    // if(req.query.name){
-    //   // query = {'geojson.properties.name' : req.query.name};
-    //   query['geojson.properties.name'] = req.query.name;
-    // }
-    // if(req.query.coordinates){
-    //   var coords = req.query.coordinates.split(",");
-    //   query['geojson.geometry']=
-    //    {$geoIntersects: {$geometry: {
-    //     type: "Point",
-    //     coordinates: coords}}};
-    // }
-    // UnwetterKreis.find(query, (err, result)=>{
-    // if(err){
-    //     console.log(err);
-    //   }
-    //   var json = {type: "FeatureCollection", features:[]};
-    //   result.forEach((item, index) =>{
-    //     json.features.push(item.geojson);
-    //   });
-    //   res.json(json);
-    // });
+      res.send(out);
+    });
   });
 
   ////////////////////////////////////////////////////////////////////////////////
