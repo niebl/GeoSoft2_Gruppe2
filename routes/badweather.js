@@ -34,11 +34,11 @@ router.get('/getBorders', (req, res) => {
   var regions ={type:"FeatureCollection", features:[]};
   var query = {};
   if(req.query.name){
-    query['geojson.properties.name'] = req.query.name;
+    query['properties.name'] = req.query.name;
   }
   if(req.query.coordinates){
     var coords = req.query.coordinates.split(",");
-    query['geojson.geometry']=
+    query['geometry']=
     {$geoIntersects: {$geometry: {
       type: "Point",
       coordinates: coords}}};
@@ -50,7 +50,7 @@ router.get('/getBorders', (req, res) => {
       }
 
       for(var i= 0; i < result.length; i++){
-        regions.features.push(result[i].geojson);
+        regions.features.push(result[i]);
       }
       res.json(regions);
     });
@@ -69,7 +69,7 @@ router.get('/getBorders', (req, res) => {
   */
 
   router.get("/warnings", async(req, res)=>{
-    let out;
+    let out = [];
 
     var bbox = req.query.bbox;
     var events = req.query.events;
@@ -93,36 +93,35 @@ router.get('/getBorders', (req, res) => {
     var query = {};
 
     if(events!=undefined){
-      query['geojson.properties.EVENT'] = {
+      query['properties.EVENT'] = {
         $or: events
       };
     }
 
-    console.log(query)
 
     let unwetterPromise = new Promise(async function(resolve, reject){
       resolve(await queryUnwetter(query));
     })
 
     unwetterPromise.then(function(results){
-      console.log(results[0])
-      console.log(bbox)
 
+      //devnote: only compares bboxes at the moment. so districts will show up that are not directly within selected bbox
       if(bbox!=undefined){
-        let turfbbox = turf.bboxPolygon(bbox)
-        console.log(turfbbox)
+        let turfbbox = turf.bboxPolygon([bbox[1],bbox[2],bbox[3],bbox[0]])
 
         for(let shape of results){
+          shapebbox = turf.bboxPolygon(shape.bbox)
           //console.log(shape)
-          if(turf.booleanWithin(shape.geojson,turfbbox)){
-            out.push(shape.geojson)
+          if(turf.booleanOverlap(shapebbox,turfbbox)||turf.booleanWithin(shapebbox,turfbbox)){
+            out.push(shape)
+          } else {
+            //console.log("outside")
           }
         }
       } else {
         out = results;
       }
 
-      console.log(out)
       res.send(out)
     })
 
@@ -174,15 +173,13 @@ router.get('/getBorders', (req, res) => {
       //save each district to the mongoDB
       try {
         var newKreis = new Kreis({
-          geojson: {
-            type: "Feature",
-            properties: {
-              name: kreis.properties.GEN,
-            },
-            geometry: {
-              type: kreis.geometry.type,
-              coordinates: kreis.geometry.coordinates
-            }
+          type: "Feature",
+          properties: {
+            name: kreis.properties.GEN,
+          },
+          geometry: {
+            type: kreis.geometry.type,
+            coordinates: kreis.geometry.coordinates
           }
         });
         await newKreis.save();
@@ -245,33 +242,31 @@ router.get('/getBorders', (req, res) => {
               if(kreis.properties.AREADESC == existingDistricts[i]){
                 districtfound = true;
                 //TODO: append more info
-                warnkreise[i].geojson.properties.EVENT.push(kreis.properties.EVENT);
+                warnkreise[i].properties.EVENT.push(kreis.properties.EVENT);
               }
             }
             if(!districtfound){
               //the warning doesn't exist yet on the list, add it
               let newKreisWarnung = new UnwetterKreis({
-                geojson: {
-                  type: kreis.type,
-                  id: kreis.id,
-                  bbox: kreis.bbox,
-                  geometry: {
-                    type: kreis.geometry.type,
-                    coordinates: kreis.geometry.coordinates
-                  },
-                  properties:  {
-                    AREADESC: kreis.properties.AREADESC,
-                    EVENT: kreis.properties.EVENT,
-                    ECGROUP: kreis.properties.ECGROUP,
-                    URGENCY: kreis.properties.URGENCY,
-                    SENT: kreis.properties.SENT,
-                    ONSET: kreis.properties.ONSET,
-                    EXPIRED: kreis.properties.EXPIRED,
-                    HEADLINE: kreis.properties.HEADLINE,
-                    DESCRIPTION: kreis.properties.DESCRIPTION,
-                    PARAMETERNAME: kreis.properties.PARAMETERNAME,
-                    PARAMETERVALUE: kreis.properties.PARAMETERVALUE
-                  }
+                type: kreis.type,
+                id: kreis.id,
+                bbox: kreis.bbox,
+                geometry: {
+                  type: kreis.geometry.type,
+                  coordinates: kreis.geometry.coordinates
+                },
+                properties:  {
+                  AREADESC: kreis.properties.AREADESC,
+                  EVENT: kreis.properties.EVENT,
+                  ECGROUP: kreis.properties.ECGROUP,
+                  URGENCY: kreis.properties.URGENCY,
+                  SENT: kreis.properties.SENT,
+                  ONSET: kreis.properties.ONSET,
+                  EXPIRED: kreis.properties.EXPIRED,
+                  HEADLINE: kreis.properties.HEADLINE,
+                  DESCRIPTION: kreis.properties.DESCRIPTION,
+                  PARAMETERNAME: kreis.properties.PARAMETERNAME,
+                  PARAMETERVALUE: kreis.properties.PARAMETERVALUE
                 }
               });
               warnkreise.push(newKreisWarnung);
