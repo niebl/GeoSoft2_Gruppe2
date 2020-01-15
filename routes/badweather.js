@@ -16,7 +16,7 @@ const weatherUpdateInterval = 300000;
 function main(){
   //periodically update the weather in 5 minute intervals
   loadUnwetter();
-  //periodicallyUpdateWeather(weatherUpdateInterval);
+  periodicallyUpdateWeather(weatherUpdateInterval);
 }
 
 main();
@@ -323,7 +323,7 @@ router.get('/getBorders', (req, res) => {
   */
   function periodicallyUpdateWeather(interval){
     setInterval(
-      loadUnwetter(),
+      loadUnwetter,
       interval
     );
   }

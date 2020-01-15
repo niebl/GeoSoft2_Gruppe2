@@ -49,7 +49,7 @@ var kreisLayer = L.featureGroup(false)
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
   "Tweets": tweetLayer,
-  "Kreise": kreisLayer,
+  "District-Warnings": kreisLayer,
   "Selection": drawnRect
 };
 
@@ -131,39 +131,72 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 //     }
 //   });
 // })
-async function getKreise(){
-  var requestURL = "weather/warnings"
+
+//initialise the map to the coordinates that are given in the URL
+initialiseView();
+
+////////////////////////////////////////////////////////////////////////////////
+// functions
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+* @function getWarnings
+* @desc queries the weather/warnings endpoint for new district weather warnings and adds them to the map
+* also clears the Kreiswarnings-layer first
+* @param query Object containing the query parameters
+* @author Felix
+*/
+async function getWarnings(query){
+  //clear kreisLayer
+  kreisLayer.clearLayers();
+  
+  //set up request URL
+  var requestURL = "weather/warnings";
+
+  if(query != undefined){
+      //variable to let the URL builder know whether a parameter was already entered in the query
+    var noPriorParam = true;
+
+    if(query.bbox != undefined && query.bbox != []){
+      console.log(query.bbox)
+      requestURL = requestURL+`?bbox=${query.bbox}`;
+      noPriorParam = false;
+    }
+    if(query.events != [] && query.events != undefined){
+      if(noPriorParam){
+        requestURL = requestURL+`?`;
+      } else {
+        requestURL = requestURL+`&`;
+      }
+      requestURL = requestURL+`events=${query.events}`;
+      noPriorParam = false;
+    }
+  }
+
   return await $.ajax({
     url: requestURL,
     success: async function(data){
       //console.log(data)
       for(let feature of data){
         kreisLayer.addLayer(L.geoJson(feature,{
-          fillOpacity: 0.3,
+          fillOpacity: 0.1,
           color: 'purple'
         }).bindPopup(
-        feature.properties.AREADESC+"<hr>"
-        + feature.properties.EVENT
+          feature.properties.AREADESC+"<hr>" +
+          feature.properties.EVENT
         )
-      )
-      }
+      );
+    }
 
     },
     error: function(xhr, ajaxOptions, thrownError){
-      console.log("error in getTweets")
+      console.log("error in getWarnings");
       console.log(xhr.status);
-      console.log(thrownError)
+      console.log(requestURL)
+      console.log(thrownError);
     }
-  })
+  });
 }
-
-//initialise the map to the coordinates that are given in the URL
-initialiseView();
-getKreise();
-
-////////////////////////////////////////////////////////////////////////////////
-// functions
-////////////////////////////////////////////////////////////////////////////////
 
 /**
 * @function tweetToLayer
