@@ -5,6 +5,7 @@ var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
 var include = [];
 var exclude = [];
+var eventfilter = [];
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
@@ -17,14 +18,17 @@ var older_thanStatusCheck;
 var nearestTweetRadius;
 var updateCheckInterval;
 var statusCheckInterval;
+var warningUpdateInterval;
 
 main();
 
 function main(err){
 
   nearestTweetRadius = 50;
+
   updateCheckInterval= 10000;
   statusCheckInterval= 2000;
+  warningUpdateInterval = 300000;
 
   //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
   older_than = Date.now() - 300000;
@@ -35,6 +39,16 @@ function main(err){
   //begin the periodic update checks
   checkTweetUpdates(updateCheckInterval);
   checkStatusUpdates(statusCheckInterval);
+
+  //initialise the periodic update of the district weather warnings
+  getWarnings();
+  setInterval(
+    getWarnings({
+      bbox : bbox,
+      events : eventfilter
+    }),
+    warningUpdateInterval
+  )
 
   ////////////////////////////////////////////////////////////////////////////////
   // site-events
@@ -301,6 +315,9 @@ async function checkTweetUpdates(interval){
 
       //update the timestamp
       older_thanCheck = Date.now();
+
+      //terminate
+      return true
     });
   },
   interval
@@ -330,6 +347,9 @@ async function checkStatusUpdates(interval){
           updateProgressIndicator(message.message, message.created_at);
         }
       }
+
+      //terminate
+      return true
     });
   },
   interval
