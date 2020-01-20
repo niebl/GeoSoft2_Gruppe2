@@ -1,6 +1,8 @@
 # API specifications `status`
 
-[Based on](https://idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html)
+specification formatting based on [idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html](https://idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html)
+
+specification of the API that internally handles messages of currently running processes and error statuses.
 
 ## Resource Descriptions
  ### Available Methods
@@ -75,4 +77,18 @@ localhost:3000/status/currentprocesses?remove=true&older_than=0
         "__v": 0
     }
 ]
+```
+
+### POST `/status/newprocess`
+#### request example
+```
+curl --location --request POST 'localhost:3000/status/newprocess' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'created_at=1578215915' \
+--data-urlencode 'message=this is a message'
+```
+
+### response example
+```
+Status successfully posted
 ```
