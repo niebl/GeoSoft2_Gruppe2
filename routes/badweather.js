@@ -68,7 +68,7 @@ router.get('/getBorders', (req, res) => {
   * @example http://localhost:3000/getUnwetter?event=GLATTEIS&name=Münster
   */
 
-  router.get("/warnings", async(req, res)=>{
+  router.get("", async(req, res)=>{
     let out = [];
 
     var bbox = req.query.bbox;
@@ -296,14 +296,13 @@ router.get('/getBorders', (req, res) => {
       return new Promise(async function(resolve, reject){
         await UnwetterKreis.find(
           queries,
+          {__v:0, _id:0},
           async function(err,docs){
             if(err){
               console.log("~~~~~! error in mongoDB query !~~~~~");
               console.log(error);
               return reject()
             } else {
-              console.log("SUCCESSFUL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-              console.log(docs[0])
               return resolve(docs);
             }
           }

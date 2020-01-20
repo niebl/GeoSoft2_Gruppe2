@@ -272,7 +272,7 @@ async function updateMapTweets(){
 */
 async function getTweets(params){
   let output;
-  var requestURL = "/tweetAPI/search?";
+  var requestURL = "/tweets?";
   requestURL = requestURL + params;
 
   //console.log(requestURL)
@@ -365,7 +365,7 @@ async function checkStatusUpdates(interval){
 */
 async function getMessages(params){
   let output;
-  var requestURL = "/status/currentprocesses?";
+  var requestURL = "/statuses?";
   requestURL = requestURL + params;
 
   await $.ajax({

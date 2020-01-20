@@ -154,6 +154,7 @@ async function queryTweets(queries){
   let output;
   await Tweet.find(
     queries,
+    {__v:0, _id:0},
     function(err,docs){
       if(err){
         console.log("~~~~~! error in mongoDB query !~~~~~");
@@ -172,7 +173,7 @@ async function queryTweets(queries){
 
 //~~~~~~~API-endpoints~~~~~~~
 //public DB search API
-app.get('/tweetAPI/search', async (req, res) => {
+app.get('/tweets', async (req, res) => {
   res.send(await tweetSearch(req, res));
 });
 
@@ -480,10 +481,10 @@ async function getEmbeddedTweet(tweet){
 //status-indication api
 ////////////////////////////////////////////////////////////////////////////////
 //endpoints
-app.get('/status/currentprocesses', async (req,res)=> {
+app.get('/statuses', async (req,res)=> {
   res.send(await getProcesses(req, res));
 });
-app.post('/status/newprocess', async (req,res)=> {
+app.post('/statuses', async (req,res)=> {
   res.send(await postProcesses(req, res));
 });
 
@@ -515,8 +516,10 @@ async function getProcesses(req,res){
     if(!(older_than == undefined || older_than == "")){
       older_than = parseInt(older_than);
     }
-    if(remove.toLowerCase() == "true" || remove.toLowerCase() == "false"){
-      remove = (remove.toLowerCase() == "true");
+    if(typeof remove != "boolean"){
+      if(remove.toLowerCase() == "true" || remove.toLowerCase() == "false"){
+        remove = (remove.toLowerCase() == "true");
+      }
     }
   }catch(err){
     res.status(400);
@@ -549,17 +552,14 @@ async function getProcesses(req,res){
 async function queryStatuses(queries, res){
   let output;
   //look for statuses with the given parameters
-  await Status.find(
+  output = await Status.find(
     queries,
-    function(err, docs){
-      if(err){
-        res.status(500);
-        res.send("server error: couldn't query status messages");
-      } else {
-        output = docs;
-      }
-    }
+
+    //exclude __V and _id
+    {__v:0, _id:0}
   );
+
+  console.log(output)
   return output;
 }
 
