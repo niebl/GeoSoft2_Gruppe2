@@ -22,8 +22,8 @@ router.get("/r", (req, res ) =>{
     });
 });
 
-router.get("/rad", (req, res ) =>{
-  var url = 'http://localhost:8000/radio';
+router.get("/precipitation", (req, res ) =>{
+  var url = 'http://localhost:8000/radarhourly';
   var requestSettings = {
         url: url,
         method: 'GET',
@@ -33,18 +33,24 @@ router.get("/rad", (req, res ) =>{
     request(requestSettings, function(error, response, body) {
 
         var rbody= (JSON.parse(JSON.parse(body)));
-        rbody = rbody.features;
-        for(var i= 0; i < rbody.length; i++){
-          var addPrec = new Precipitation({
-            geojson: rbody[i]
-          });
-          //addKreis.properties.name = kreisListe[i].properties.GEN;
-          addPrec.save();
-          if(i == rbody.length -1 ){
-            res.send('Radar of germany added into db');
-          }
-        }
+        rbody = rbody;
 
+        console.log(rbody.features);
+        for(let feature of rbody.features){
+          console.log("FeaturE: "+ feature);
+          var addRadar = new Precipitation({
+            type: feature.type,
+            properties: {
+              level: feature.properties.layer
+            },
+            geometry: {
+              type: feature.geometry.type,
+              coordinates: feature.geometry.coordinates
+            }
+          });
+          addRadar.save();
+        }
+        res.send('Radar of germany added into db');
     });
 });
 
@@ -100,7 +106,7 @@ router.get("/getrad", (req, res) => {
       }
 
       for(var i= 0; i < result.length; i++){
-          regions.features.push(result[i].geojson);
+          regions.features.push(result[i]);
       }
         res.json(regions);
     });

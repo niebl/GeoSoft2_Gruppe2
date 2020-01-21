@@ -204,7 +204,7 @@ router.get('/getBorders', (req, res) => {
   function loadUnwetter(){
     utilities.indicateStatus("updating weather warnings from DWD-API");
     const requestURL = "https://maps.dwd.de/geoserver/dwd/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dwd%3AWarnungen_Landkreise&outputFormat=application%2Fjson";
-    console.log("loading Unwetter")
+    console.log("loading Unwetter");
     request(requestURL, function(error, response, body) {
       if(error){
         console.log(error);
