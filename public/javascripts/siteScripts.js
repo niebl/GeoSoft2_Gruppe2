@@ -19,6 +19,7 @@ var nearestTweetRadius;
 var updateCheckInterval;
 var statusCheckInterval;
 var warningUpdateInterval;
+var oneHourRadarUpdateInterval;
 
 main();
 
@@ -29,6 +30,7 @@ function main(err){
   updateCheckInterval= 10000;
   statusCheckInterval= 2000;
   warningUpdateInterval = 300000;
+  oneHourRadarUpdateInterval = 300000;
 
   //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
   older_than = Date.now() - 300000;
@@ -48,7 +50,15 @@ function main(err){
       events : eventfilter
     }),
     warningUpdateInterval
-  )
+  );
+  get1hRadar();
+  setInterval(
+    get1hRadar({
+      bbox : bbox,
+      events : eventfilter
+    }),
+    oneHourRadarUpdateInterval
+  );
 
   ////////////////////////////////////////////////////////////////////////////////
   // site-events

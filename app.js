@@ -57,15 +57,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/geomergency', indexRouter);
 app.use('/geomergency/:coords', indexRouter);
-app.use('/users', usersRouter);
 
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use("/leafletdraw", express.static(__dirname + '/node_modules/leaflet-draw/dist'));
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
-app.use('/popper.js', express.static(__dirname + '/node_modules/popper.js/dist'))
-app.use('/turf', express.static(__dirname + '/node_modules/@turf/turf'))
+app.use('/popper.js', express.static(__dirname + '/node_modules/popper.js/dist'));
+app.use('/turf', express.static(__dirname + '/node_modules/@turf/turf'));
 
 // use scripts, styles in webserver
 app.use("/stylesheetpug", express.static(__dirname + '/public/stylesheets/style.css'));
@@ -86,6 +85,9 @@ app.use('/weather', weatherRouter);
 
 var rRouter = require("./routes/r");
 app.use('/r', rRouter);
+
+var radarRouter = require("./routes/radar");
+app.use('/radar', radarRouter);
 
 
 /**

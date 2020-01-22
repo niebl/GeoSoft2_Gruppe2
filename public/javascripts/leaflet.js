@@ -44,12 +44,13 @@ var drawnRect = new L.FeatureGroup();
 * create layer for counties
 *
 */
-var kreisLayer = L.featureGroup(false)
-
+var kreisLayer = L.featureGroup(false);
+var radar1hLayer =  L.featureGroup(false);
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
   "Tweets": tweetLayer,
   "District-Warnings": kreisLayer,
+  "1h Radar": radar1hLayer,
   "Selection": drawnRect
 };
 
@@ -68,7 +69,7 @@ var map = L.map('map', {
 //add zoom buttons:
 var zoomControls = L.control.zoom({
   position:'topright'
-}).addTo(map)
+}).addTo(map);
 
 //add drawControl
 var drawControl = new L.Control.Draw({
@@ -85,11 +86,11 @@ var drawControl = new L.Control.Draw({
     featureGroup: drawnRect
   },
   position:'topright'
-})
+});
 map.addControl(drawControl);
 
 map.on('draw:created', function(e){
-  drawnRect.clearLayers()
+  drawnRect.clearLayers();
   var layer = e.layer;
 
   //North, west, south, east coords
@@ -149,7 +150,7 @@ initialiseView();
 async function getWarnings(query){
   //clear kreisLayer
   kreisLayer.clearLayers();
-  
+
   //set up request URL
   var requestURL = "weather/warnings";
 
@@ -192,7 +193,64 @@ async function getWarnings(query){
     error: function(xhr, ajaxOptions, thrownError){
       console.log("error in getWarnings");
       console.log(xhr.status);
-      console.log(requestURL)
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function get1hRadar
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function get1hRadar(query){
+  //clear layer
+  radar1hLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "radar/get1hradar";
+
+  if(query != undefined){
+      //variable to let the URL builder know whether a parameter was already entered in the query
+    var noPriorParam = true;
+
+    if(query.bbox != undefined && query.bbox != []){
+      console.log(query.bbox);
+      requestURL = requestURL+`?bbox=${query.bbox}`;
+      noPriorParam = false;
+    }
+    if(query.events != [] && query.events != undefined){
+      if(noPriorParam){
+        requestURL = requestURL+`?`;
+      } else {
+        requestURL = requestURL+`&`;
+      }
+      requestURL = requestURL+`events=${query.events}`;
+      noPriorParam = false;
+    }
+  }
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      console.log("The radar data getting loaded");
+      console.log(data);
+      for(let feature of data){
+        radar1hLayer.addLayer(L.geoJson(feature,{
+          fillOpacity: 0.2,
+          color: 'red'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in get1hradar");
+      console.log(xhr.status);
+      console.log(requestURL);
       console.log(thrownError);
     }
   });
@@ -277,8 +335,8 @@ function onEachTweet(feature, layer){
   `;
   var popup = L.popup(
       {maxHeight:140}
-    ).setContent(tweetdiv)
-  layer.bindPopup(popup)
+    ).setContent(tweetdiv);
+  layer.bindPopup(popup);
 }
 
 /**
