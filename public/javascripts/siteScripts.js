@@ -155,12 +155,16 @@ async function main(err){
 
   //confirm Coords
   $('#confirmCoords').on('click', function(e){
-    bboxArray = [parseFloat($("input[name='bboxNorth']").val()),
-    parseFloat($("input[name='bboxWest']").val()),
-    parseFloat($("input[name='bboxSouth']").val()),
-    parseFloat($("input[name='bboxEast']").val())];
+    bboxArray = [
+      parseFloat($("input[name='bboxNorth']").val()),
+      parseFloat($("input[name='bboxWest']").val()),
+      parseFloat($("input[name='bboxSouth']").val()),
+      parseFloat($("input[name='bboxEast']").val())
+    ];
 
+    //refresh data
     removeTweetsOutOfSelection(bboxArray, include, exclude);
+    getWarnings({bbox : bbox, events: eventfilter})
 
     drawnRect.clearLayers();
 
@@ -169,8 +173,19 @@ async function main(err){
   });
   //clear coords
   $('#clearCoords').on('click', function(e){
+
+    //reset inputs
+    $("input[name='bboxNorth']").val('');
+    $("input[name='bboxWest']").val('');
+    $("input[name='bboxSouth']").val('');
+    $("input[name='bboxEast']").val('');
+
+
     drawnRect.clearLayers();
     bbox = defaultBbox;
+
+    //refresh data
+    getWarnings({bbox : bbox, events: eventfilter})
   });
 
   //FILTER words
@@ -179,6 +194,12 @@ async function main(err){
     exclude = $("input[name='excludeKeywords']").val().split(",");
 
     removeTweetsOutOfSelection(bboxArray, include, exclude);
+  });
+
+  //FILTER events
+  $('#confirmEventFilter').on('click', function(e){
+    eventfilter = $("input[name='eventFilter']").val().split(",");
+    getWarnings({bbox : bbox, events: eventfilter});
   });
 
   //set url-coordinates

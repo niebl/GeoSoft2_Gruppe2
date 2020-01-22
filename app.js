@@ -179,7 +179,7 @@ async function queryTweets(queries){
 function loadConfigs(path){
   try {
     //load and return the document in the path
-    const doc = yaml.safeLoad(fs.readFileSync(__dirname + path, 'utf-8'));
+    const doc = yaml.safeLoad(fs.readFileSync(path, 'utf-8'));
     return(doc);
   } catch (e){
     console.log(e);
@@ -210,8 +210,7 @@ app.use('/configs', (req,res)=>{
 })
 
 //set the configutrations
-setConfigs(loadConfigs('/config.yml'))
-console.log(configurations)
+setConfigs(loadConfigs(__dirname+'/config.yml'))
 
 ////////////////////////////////////////////////////////////////////////////////
 //Tweet api

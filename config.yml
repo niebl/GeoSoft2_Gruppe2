@@ -7,7 +7,11 @@ tweetParams:
   #track params can only be up to 60 bytes
   track: "klima, regen, sturm, unwetter, hilfe"
 
-#parameters relevant to the client side
+# weather scraper parameters
+weatherParams:
+  weatherUpdateInterval: 300000
+
+# parameters relevant to the client side
 clientParams:
   #intervals in which the client side refreshes certain data. in ms.
   intervals:

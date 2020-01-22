@@ -23,11 +23,15 @@ block sidebar
           hr
         div#Keywords
           p include keywords:
-          input#includeKeywords(name='includeKeywords').form-control-sm(placeholder="separated by comma").bboxForm
+          input#includeKeywords(name='includeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
           p exclude keywords:
-          input#excludeKeywords(name='excludeKeywords').form-control-sm(placeholder="separated by comma").bboxForm
+          input#excludeKeywords(name='excludeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
           button#confirmFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm filter    
           hr
+        div#events
+          p weather event filter
+          input#eventFilter(name='eventFilter',placeholder="separated by comma").form-control-sm.bboxForm
+          button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm filter
         //p browser controls. forms and such here
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
         button#browser-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle tweet-browser
