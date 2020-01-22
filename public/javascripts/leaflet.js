@@ -141,7 +141,7 @@ initialiseView();
 
 /**
 * @function getWarnings
-* @desc queries the weather/warnings endpoint for new district weather warnings and adds them to the map
+* @desc queries the /weather endpoint for new district weather warnings and adds them to the map
 * also clears the Kreiswarnings-layer first
 * @param query Object containing the query parameters
 * @author Felix
@@ -149,16 +149,15 @@ initialiseView();
 async function getWarnings(query){
   //clear kreisLayer
   kreisLayer.clearLayers();
-  
+
   //set up request URL
-  var requestURL = "weather/warnings";
+  var requestURL = "/weather";
 
   if(query != undefined){
       //variable to let the URL builder know whether a parameter was already entered in the query
     var noPriorParam = true;
 
     if(query.bbox != undefined && query.bbox != []){
-      console.log(query.bbox)
       requestURL = requestURL+`?bbox=${query.bbox}`;
       noPriorParam = false;
     }

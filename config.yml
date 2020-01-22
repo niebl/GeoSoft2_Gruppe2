@@ -1,0 +1,27 @@
+# tweet-scraper parameters
+tweetParams:
+  #bounding box of enclosed area.
+  # WGS84: "WEST,SOUTH,EAST,NORTH"
+
+  locations: "5.00,47.15,15.20,55.22"
+  #track params can only be up to 60 bytes
+  track: "klima, regen, sturm, unwetter, hilfe"
+
+#parameters relevant to the client side
+clientParams:
+  #intervals in which the client side refreshes certain data. in ms.
+  intervals:
+    tweetCheck: 10000
+    statusCheck: 2000
+    warningUpdate: 300000
+
+    #the amount of time the initial data-refreshes are to reach into the past.
+    tweetCheckOffset: 300000
+    statusCheckOffset: 10000
+
+  #the default bounding box in with the client side fetches the cached data.
+  # WGS84: [NORTH,WEST,SOUTH,EAST]
+  defaultbbox: [55.22,5.00,47.15,15.20]
+  defaultinclude: []
+  defaultexclude: []
+  nearestTweetRadius: 40

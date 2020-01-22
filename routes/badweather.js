@@ -68,7 +68,7 @@ router.get('/getBorders', (req, res) => {
   * @example http://localhost:3000/getUnwetter?event=GLATTEIS&name=Münster
   */
 
-  router.get("", async(req, res)=>{
+  router.get("/", async(req, res)=>{
     let out = [];
 
     var bbox = req.query.bbox;

@@ -11,10 +11,8 @@ var older_than;
 var older_thanCheck;
 var older_thanStatusCheck;
 
-/**
-* @var nearestTweetRadius.
-* the minimal distance a tweet is allowed to have to another in meters.
-*/
+
+//the minimal distance a map-tag is allowed to have to another in meters without being merged.
 var nearestTweetRadius;
 var updateCheckInterval;
 var statusCheckInterval;
@@ -22,33 +20,39 @@ var warningUpdateInterval;
 
 main();
 
-function main(err){
+async function main(err){
+  configs = await getConfigs();
+  console.log(configs);
 
-  nearestTweetRadius = 50;
+  if(!configs){
+    setStandardConfigs();
+  }else{
+    if(configs.defaultbbox != null){
+      defaultBbox = configs.defaultbbox.toString();
+      bbox = defaultBbox;
+      bboxArray = defaultBbox;
+    }
+    if(configs.defaultinclude != null){
+      include = configs.defaultinclude;
+    }
+    if(configs.defaultexclude != null){
+      exclude = configs.defaultexclude;
+    }
+    nearestTweetRadius = configs.nearestTweetRadius;
 
-  updateCheckInterval= 10000;
-  statusCheckInterval= 2000;
-  warningUpdateInterval = 300000;
+    updateCheckInterval = configs.intervals.tweetCheck;
+    statusCheckInterval = configs.intervals.statusCheck;
+    warningUpdateInterval = configs.intervals.warningUpdate;
 
-  //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
-  older_than = Date.now() - 300000;
-  older_thanCheck = older_than;
-  //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
-  older_thanStatusCheck = Date.now() - 10000;
+    //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
+    older_than = Date.now() - configs.intervals.tweetCheckOffset;
+    older_thanCheck = older_than;
+    //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
+    older_thanStatusCheck = Date.now() - configs.intervals.statusCheckOffset;
 
-  //begin the periodic update checks
-  checkTweetUpdates(updateCheckInterval);
-  checkStatusUpdates(statusCheckInterval);
-
-  //initialise the periodic update of the district weather warnings
-  getWarnings();
-  setInterval(
-    getWarnings({
-      bbox : bbox,
-      events : eventfilter
-    }),
-    warningUpdateInterval
-  )
+    //initialise all check intervals with the new values
+    initialiseIntervals();
+  }
 
   ////////////////////////////////////////////////////////////////////////////////
   // site-events
@@ -195,6 +199,67 @@ function main(err){
 ////////////////////////////////////////////////////////////////////////////////
 // functions
 ////////////////////////////////////////////////////////////////////////////////
+
+/**
+* @function getConfigs
+* function that gets the client side configs from the server at '/configs'
+*/
+async function getConfigs(){
+  var requestURL = "/configs"
+  output = await $.ajax({
+    url: requestURL,
+    success: function(data){
+      return data
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log(thrownError)
+      updateProgressIndicator(`<font color="red">failed to fetch client configs. falling back to defaults</font> see browser log for details`);
+      setStandardConfigs();
+    }
+  })
+  return output
+}
+
+/**
+* @function initialiseIntervals
+* @desc initialises periodic checks on updates with the intervals that are specified in the global variables
+*/
+function initialiseIntervals(){
+  //begin the periodic update checks
+  checkTweetUpdates(updateCheckInterval);
+  checkStatusUpdates(statusCheckInterval);
+
+  //initialise the periodic update of the district weather warnings
+  getWarnings();
+  setInterval(
+    getWarnings({
+      bbox : bbox,
+      events : eventfilter
+    }),
+    warningUpdateInterval
+  );
+}
+
+/**
+* @function setStandardConfigs
+* @desc fallback-function that gets called when getting the config parameters from the server failed
+*/
+function setStandardConfigs(){
+  nearestTweetRadius = 50;
+
+  updateCheckInterval= 10000;
+  statusCheckInterval= 2000;
+  warningUpdateInterval = 300000;
+
+  //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
+  older_than = Date.now() - 300000;
+  older_thanCheck = older_than;
+  //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
+  older_thanStatusCheck = Date.now() - 10000;
+
+  //initialise all check intervals with the new values
+  initialiseIntervals();
+}
 
 /**
 * @function updateProgressIndicator

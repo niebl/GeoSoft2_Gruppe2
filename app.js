@@ -17,11 +17,15 @@ var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
 var nodeHTMLParser = require('node-html-parser');
+var yaml = require('js-yaml');
+var fs = require('fs')
 
 const https = require('https');
 const turf = require('@turf/turf');
 
 var app = express();
+
+var configurations = {};
 
 
 // view engine setup
@@ -166,6 +170,48 @@ async function queryTweets(queries){
   );
   return output;
 }
+
+/**
+* @function loadConfigs
+* @desc reads the config.yaml and returns an object containing the values
+* @returns object, containting several attributes and values that represent configuration arguments
+*/
+function loadConfigs(path){
+  try {
+    //load and return the document in the path
+    const doc = yaml.safeLoad(fs.readFileSync(__dirname + path, 'utf-8'));
+    return(doc);
+  } catch (e){
+    console.log(e);
+    return false;
+  }
+}
+
+/**
+* @function setConfigs
+* @desc sets the server configutrations to what the parameters say
+* @param configs object containing configuration parameters
+*/
+function setConfigs(configs){
+  configurations = configs;
+}
+
+/**
+* @function sendClientConfigs
+* @desc function that returns the configutrations that are relevant to the client side of the application
+* @returns object, containting several attributes and values that represent configuration arguments
+*/
+function sendClientConfigs(){
+  return configurations.clientParams
+}
+
+app.use('/configs', (req,res)=>{
+  res.send(sendClientConfigs())
+})
+
+//set the configutrations
+setConfigs(loadConfigs('/config.yml'))
+console.log(configurations)
 
 ////////////////////////////////////////////////////////////////////////////////
 //Tweet api
@@ -399,8 +445,10 @@ async function tweetSearch(req,res){
 module.exports = app;
 
 //TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
-console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
-  if(tweet.coordinates != null){
+//initialise the tweet-scraper
+console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
+  function(tweet){
+    if(tweet.coordinates != null){
     // call getEmbeddedTweet() -> postTweetToMongo()
     getEmbeddedTweet(tweet);
   }
