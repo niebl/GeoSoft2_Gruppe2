@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 var request = require('request');
 var express = require('express');
 var mongoose = require('mongoose');
@@ -6,7 +6,7 @@ var router = express.Router();
 
 var Precipitation = require("../models/precipitation");
 
-router.get("/r", (req, res ) =>{
+router.get("/summary", async function(req, res ){
   var url = 'http://localhost:8000/data';
   var requestSettings = {
         url: url,

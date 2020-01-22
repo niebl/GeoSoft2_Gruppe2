@@ -242,14 +242,16 @@ async function get1hRadar(query){
         radar1hLayer.addLayer(L.geoJson(feature,{
           style: function(feature) {
         switch (feature.properties.level) {
-            case null: return {color: "transparent"}; 
-            case 0: return {color: "green"};
-            case 1:  return {color: "red"};
-            case 2:  return {color: "blue"};
-            case 3:  return {color: "yellow"};
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "#b3cde3"};
+            case 1:  return {fillColor: "#8c96c6"};
+            case 2:  return {fillColor: "#8856a7"};
+            case 3:  return {fillColor: "#810f7c"};
         }
     },
-          //fillOpacity: 0.4,
+          fillOpacity: 0.7,
+          color: "transparent",
+
           //color: 'green'
         })
       );

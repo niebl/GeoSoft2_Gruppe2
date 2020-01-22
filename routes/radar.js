@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 var request = require('request');
 var express = require('express');
 var mongoose = require('mongoose');
@@ -8,7 +8,7 @@ var Precipitation = require("../models/precipitation");
 
 
 
-router.get("/precipitation", (req, res ) =>{
+router.get("/precipitation1h", async function (req, res ){
   var url = 'http://localhost:8000/radarhourly';
   var requestSettings = {
         url: url,
@@ -48,10 +48,10 @@ router.get("/precipitation", (req, res ) =>{
   * @query polygon=<lng, lat> BBox
   * @query max=value max Prec threshold
   * @query min=value min prec threshold
-  * @example url/getBorders?coordinates=9,53&max=20
+  * @example url/radar/get1hradar?coordinates=9,53&max=20
   *
   */
-router.get("/get1hradar", (req, res) => {
+router.get("/get1hradar", async function(req, res){
   var regions ={type:"FeatureCollection", features:[]};
   var query = {};
   if(req.query.max){

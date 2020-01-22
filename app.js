@@ -13,7 +13,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
 var nodeHTMLParser = require('node-html-parser');
@@ -89,7 +88,8 @@ app.use('/r', rRouter);
 var radarRouter = require("./routes/radar");
 app.use('/radar', radarRouter);
 
-
+var summaryRouter = require("./routes/summary");
+app.use('/summary', summaryRouter);
 /**
   * sets the default location of a pair of a location
   * e.g. a default Map view postion
