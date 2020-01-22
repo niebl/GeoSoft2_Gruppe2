@@ -240,8 +240,17 @@ async function get1hRadar(query){
       console.log(data);
       for(let feature of data){
         radar1hLayer.addLayer(L.geoJson(feature,{
-          fillOpacity: 0.2,
-          color: 'red'
+          style: function(feature) {
+        switch (feature.properties.level) {
+            case null: return {color: "transparent"}; 
+            case 0: return {color: "green"};
+            case 1:  return {color: "red"};
+            case 2:  return {color: "blue"};
+            case 3:  return {color: "yellow"};
+        }
+    },
+          //fillOpacity: 0.4,
+          //color: 'green'
         })
       );
     }

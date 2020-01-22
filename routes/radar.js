@@ -23,7 +23,6 @@ router.get("/precipitation", (req, res ) =>{
 
         console.log(rbody.features);
         for(let feature of rbody.features){
-          console.log("FeaturE: "+ feature);
           var addRadar = new Precipitation({
             geojson:{
               type: feature.type,
@@ -96,7 +95,7 @@ router.get("/get1hradar", (req, res) => {
       for(var i= 0; i < result.length; i++){
           regions.features.push(result[i].geojson);
       }
-        res.json(regions);
+        res.json(regions.features);
     });
 });
 
