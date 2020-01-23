@@ -15,13 +15,13 @@ router.get("/summary", async function(req, res ){
     };
 
     request(requestSettings, function(error, response, body) {
-        //res.set('Content-Type', 'json');
+        res.set('Content-Type', 'image/png');
         res.send(body);
 
     });
 });
 
-router.get("/summary1", async function(req, res ){
+router.get("/wordlcoud", async function(req, res ){
   var url = 'http://localhost:8000/wordcloud';
   var requestSettings = {
         url: url,
