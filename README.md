@@ -1,4 +1,4 @@
-<a><img src="https://github.com/Dingensen/GeoSoft2_Gruppe2/blob/master/GEOmergency.png" width="96" height="65"> (width:96px, height:65px)</a>
+<a><img src="https://github.com/Dingensen/GeoSoft2_Gruppe2/blob/master/GEOmergency.png" width="200" height="140"></a>
 
 
 ## provisional tweet-API
