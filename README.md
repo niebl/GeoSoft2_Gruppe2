@@ -1,4 +1,5 @@
-<a><img src="https://github.com/Dingensen/GeoSoft2_Gruppe2/blob/master/GEOmergency.png" width="200" height="140"></a>
+# TweetYourBeacon
+<a><img src="https://github.com/Dingensen/GeoSoft2_Gruppe2/blob/master/GEOmergency.png" width="240" height="140"></a>
 
 
 ## provisional tweet-API
