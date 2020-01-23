@@ -11,8 +11,8 @@ Necessary software including links, in case they are not installed yet.
 
 For usage only:
 
--<a href ="https://nodejs.org/en/download/"> Node.js</a>
+* <a href ="https://nodejs.org/en/download/"> Node.js</a>
 
 For testing:
 
--<a href ="https://jmeter.apache.org/download_jmeter.cgi">JMeter</a>
+* <a href ="https://jmeter.apache.org/download_jmeter.cgi">JMeter</a>
