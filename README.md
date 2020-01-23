@@ -36,14 +36,14 @@ Open a second command line
 "your mongod.exe path" --dbpath="your project path"
 ```
 
-Open a third command line
+* Open a third command line
 > run mongo
 
 ```
 mongo
 ```
 
-Go back to the first command line
+* Go back to the first command line
 > create a package.json file, install all dependencies and run the application
 
 ```
@@ -62,10 +62,10 @@ localhost:3000/geomergency
 ### Testing
 Instructions to test the running application
 
-Once JMeter is installed, navigate to the bin folder of your jmeter path
+* Once JMeter is installed, navigate to the bin folder of your jmeter path
 and open the jmeter.bat file
 
-Then open the .jmx file, accessible in the project folder
+* Then open the .jmx file, accessible in the project folder
 
 
  
