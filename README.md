@@ -52,12 +52,16 @@ npm install
 npm start
 ```
 
-* For the final step open your browser
+* For the final step, open your browser
 > access the application
 
 ```
 localhost:3000/geomergency
 ```
+
+### Example
+Beispielbild der App
+
 
 ### Testing
 Instructions to test the running application
@@ -65,9 +69,15 @@ Instructions to test the running application
 * Once JMeter is installed, navigate to the bin folder of your JMeter path
 and open the jmeter.bat file
 
-* Then open the .jmx file, accessible in the project folder, within the JMeter application
+* Within the JMeter application and open the .jmx file, accessible in the project folder
 
 * Start the test and wait until it is finished or change the settings of the Thread Group as you like and start afterwards
 
 * Click on some of the attached listeners to see the test results 
+
+## Authors
+* Felix
+* Dorian
+* Marius
+* Rene
  
