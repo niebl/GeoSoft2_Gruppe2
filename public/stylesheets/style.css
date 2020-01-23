@@ -64,6 +64,13 @@
   transition: max-height .5s ease-out;
 }
 
+#browser-controls1.toggled{
+  margin-top: -24px;
+
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .5s ease-out;
+}
 
 #sidebarCollapse{
   font-size: 20px;

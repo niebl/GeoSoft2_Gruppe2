@@ -46,11 +46,14 @@ var drawnRect = new L.FeatureGroup();
 */
 var kreisLayer = L.featureGroup(false);
 var radar1hLayer =  L.featureGroup(false);
+var densityLayer =  L.featureGroup(false);
+
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
   "Tweets": tweetLayer,
   "District-Warnings": kreisLayer,
   "1h Radar": radar1hLayer,
+  "Tweet Density": densityLayer,
   "Selection": drawnRect
 };
 
@@ -260,6 +263,59 @@ async function get1hRadar(query){
     },
     error: function(xhr, ajaxOptions, thrownError){
       console.log("error in get1hradar");
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+
+/**
+* @function get1hRadar
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getDensity(query){
+  //clear layer
+  densityLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "summary/density";
+
+
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      console.log("The density is getting loaded");
+      console.log(data);
+      for(let feature of data){
+        densityLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.layer) {
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "transparent"};
+            case 1:  return {fillColor: "#ffffb2"};
+            case 2:  return {fillColor: "#fecc5c"};
+            case 3:  return {fillColor: "#fd8d3c"};
+            case 4:  return {fillColor: "#f03b20"};
+            case 5:  return {fillColor: "#bd0026"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in density");
       console.log(xhr.status);
       console.log(requestURL);
       console.log(thrownError);

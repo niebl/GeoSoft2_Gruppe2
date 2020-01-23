@@ -8,6 +8,7 @@ var Precipitation = require("../models/precipitation");
 
 
 
+
 router.get("/precipitation1h", async function (req, res ){
   var url = 'http://localhost:8000/radarhourly';
   var requestSettings = {
@@ -15,7 +16,9 @@ router.get("/precipitation1h", async function (req, res ){
         method: 'GET',
         encoding: null
     };
-
+    Precipitation.deleteMany({}, (err, result) => {
+      console.log("deleted");
+    });
     request(requestSettings, function(error, response, body) {
 
         var rbody= (JSON.parse(JSON.parse(body)));
@@ -98,7 +101,5 @@ router.get("/get1hradar", async function(req, res){
         res.json(regions.features);
     });
 });
-
-
 
 module.exports = router;

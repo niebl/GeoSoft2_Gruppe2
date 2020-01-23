@@ -52,6 +52,7 @@ function main(err){
     warningUpdateInterval
   );
   get1hRadar();
+  getDensity();
   setInterval(
     get1hRadar({
       bbox : bbox,
@@ -76,6 +77,11 @@ function main(err){
     $("#tweet-browser").toggleClass("toggled");
   });
 
+  $("#parameter-toggle1").click(function(e){
+    e.preventDefault();
+    $("#browser-controls1").toggleClass("toggled");
+  });
+
   //click of UPDATE MAP button
   $("#update-map").click(function(){
     updateMapTweets();
@@ -87,6 +93,10 @@ function main(err){
     setTimeout(function(){ map.invalidateSize();}, 400);
   });
 
+  // summary Statistics:
+  $("#density").click(function(){
+    getDensity();
+  });
   //go to tweet
   $("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
     //get the attributes from the parent element of the button
