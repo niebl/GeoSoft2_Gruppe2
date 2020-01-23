@@ -16,3 +16,15 @@ For usage only:
 For testing:
 
 * <a href ="https://jmeter.apache.org/download_jmeter.cgi">JMeter</a>
+
+### Installing
+Step by step instructions to get the application started
+
+Open the command line
+> navigate to the folder where the repository is downloaded into
+
+```
+cd "your path"
+```
+
+
