@@ -51,3 +51,21 @@ npm init    //press Enter until the file is created
 npm install
 npm start
 ```
+
+For the final step open your browser
+> access the application
+
+```
+localhost:3000/geomergency
+```
+
+### Testing
+Instructions to test the running application
+
+Once JMeter is installed, navigate to the bin folder of your jmeter path
+and open the jmeter.bat file
+
+Then open the .jmx file, accessible in the project folder
+
+
+ 
