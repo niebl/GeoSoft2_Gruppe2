@@ -3,7 +3,9 @@
 # TweetYourBeacon
 Server-based application used to get an overview of extreme weather events in Germany, including context-relevant posts by Twitter users in affected areas.
 
-## provisional tweet-API
-requests to localhost:3000/tweets will return a JSON of an example tweets
-using the parameter fields the tweet-JSON can be restricted to certain fields.
-example: localhost:3000/tweets?fields=id,text
+## Getting started
+These instructions will guide you to get the application running on your local machine.
+
+### Prerequisites 
+Necessary software including links, in case they are not installed yet.
+><a href ="https://nodejs.org/en/download/"> Node.js</a>
