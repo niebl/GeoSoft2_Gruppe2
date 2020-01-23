@@ -8,8 +8,11 @@ These instructions will guide you to get the application running on your local m
 
 ### Prerequisites 
 Necessary software including links, in case they are not installed yet.
+
 For usage only:
+
 -<a href ="https://nodejs.org/en/download/"> Node.js</a>
 
 For testing:
+
 -<a href ="https://jmeter.apache.org/download_jmeter.cgi">JMeter</a>
