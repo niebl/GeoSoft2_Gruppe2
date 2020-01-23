@@ -1,5 +1,5 @@
-# GeoSoft2_Gruppe2
-Github repo of Gruppe 2, Geosoftware 2
+<a><img src="https://github.com/Dingensen/GeoSoft2_Gruppe2/blob/master/GEOmergency.png"</a>
+
 
 ## provisional tweet-API
 requests to localhost:3000/tweets will return a JSON of an example tweets
