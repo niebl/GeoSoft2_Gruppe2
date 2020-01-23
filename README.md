@@ -21,7 +21,7 @@ For testing:
 ### Installing
 Step by step instructions to get the application started
 
-Open the command line
+* Open the command line
 > navigate to the folder where the repository/project is downloaded into and install the dependencies
 
 ```
@@ -29,7 +29,7 @@ cd "your project path"
 npm install
 ```
 
-Open a second command line
+* Open a second command line
 > set the path of your mongod.exe and set your project folder as the database path
 
 ```
@@ -52,7 +52,7 @@ npm install
 npm start
 ```
 
-For the final step open your browser
+* For the final step open your browser
 > access the application
 
 ```
@@ -62,10 +62,12 @@ localhost:3000/geomergency
 ### Testing
 Instructions to test the running application
 
-* Once JMeter is installed, navigate to the bin folder of your jmeter path
+* Once JMeter is installed, navigate to the bin folder of your JMeter path
 and open the jmeter.bat file
 
-* Then open the .jmx file, accessible in the project folder
+* Then open the .jmx file, accessible in the project folder, within the JMeter application
 
+* Start the test and wait until it is finished or change the settings of the Thread Group as you like and start afterwards
 
+* Click on some of the attached listeners to see the test results 
  
