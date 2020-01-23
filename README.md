@@ -12,6 +12,7 @@ Necessary software including links, in case they are not installed yet.
 For usage only:
 
 * <a href ="https://nodejs.org/en/download/"> Node.js</a>
+* <a href ="https://www.mongodb.com/download-center/community"> MongoDB</a>
 
 For testing:
 
@@ -21,10 +22,32 @@ For testing:
 Step by step instructions to get the application started
 
 Open the command line
-> navigate to the folder where the repository is downloaded into
+> navigate to the folder where the repository/project is downloaded into and install the dependencies
 
 ```
-cd "your path"
+cd "your project path"
+npm install
 ```
 
+Open a second command line
+> set the path of your mongod.exe and set your project folder as the database path
 
+```
+"your mongod.exe path" --dbpath="your project path"
+```
+
+Open a third command line
+> run mongo
+
+```
+mongo
+```
+
+Go back to the first command line
+> create a package.json file, install all dependencies and run the application
+
+```
+npm init    //press Enter until the file is created
+npm install
+npm start
+```
