@@ -33,6 +33,7 @@ module.exports = {
     });
 
     stream.on('error', function(error) {
+      console.log("OOOPSIE WOOOOOOPSIE I DID A FUCKY WUCKY")
       console.log(error);
       utilities.indicateStatus(error)
     });

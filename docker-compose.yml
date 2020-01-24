@@ -3,6 +3,7 @@ services:
   app:
     container_name: geomergency-app
     restart: always
+    image: geomergency-app
     build: .
     ports:
       - '3000:3000'
@@ -14,5 +15,5 @@ services:
     image: mongo
     ports:
       - '27017:27017'
-    volumes:
-      - ./data:/data
+    # volumes:
+    #   - ./data:/data

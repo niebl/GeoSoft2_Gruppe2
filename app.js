@@ -1,5 +1,6 @@
 /*jshint esversion: 8 */
 const token = require('./tokens.js');
+var address = "mongo"
 
 //load the additional script collections for the server
 var twitterApiExt = require('./twitApiExt.js');
@@ -41,7 +42,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // mongoose setup
-mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true, useUnifiedTopology: true}, function(err){
+mongoose.connect(`mongodb://${address}:27017/geomergency`, {useNewUrlParser: true, useUnifiedTopology: true}, function(err){
   if (err) {
     console.log("mongoDB connect failed");
     console.log(err);
@@ -225,7 +226,7 @@ app.get('/tweets', async (req, res) => {
 /**
 * @function tweetSearch middleware function
 * @desc callback function that looks at the arguments passed in the tweet API request and returns the according response.
-* example http://localhost:3000/tweets?fields=id,text
+* example http://mongo:3000/tweets?fields=id,text
 * params: bbox: The bounding Box of the geographical area to fetch tweets from
 *         include: The strings that are to be included in the returned tweets
 *         exclude: The strings that aren't to be included in the returned tweets
@@ -445,6 +446,7 @@ module.exports = app;
 
 //TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
 //initialise the tweet-scraper
+console.log(configurations.tweetParams)
 console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
   function(tweet){
     if(tweet.coordinates != null){
@@ -507,7 +509,7 @@ function postTweetToMongo(tweet){
 async function getEmbeddedTweet(tweet){
   var output;
   var requestURL = "http://publish.twitter.com/oembed?url=https://twitter.com/t/status/";
-  //let requestURL = "https://localhost:3000/embedTweet?id="
+  //let requestURL = "https://mongo:3000/embedTweet?id="
   requestURL = requestURL.concat(tweet.id_str);
 
   var requestSettings = {
