@@ -109,7 +109,9 @@ map.on('draw:created', function(e){
   //remove the tweets that aren'T within the area
   removeTweetsOutOfSelection(bbox, include, exclude);
   //refresh the weather warnings
-  getWarnings({bbox : bbox, events: eventfilter})
+  getWarnings({bbox : bbox, events: eventFilter})
+  //communicate new bbox with server side
+  indicateStatus(bbox.toString(), "selectedbbox")
 });
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);

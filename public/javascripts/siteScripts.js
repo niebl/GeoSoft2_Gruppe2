@@ -166,6 +166,9 @@ async function main(err){
     removeTweetsOutOfSelection(bboxArray, include, exclude);
     getWarnings({bbox : bbox, events: eventFilter})
 
+    //communicate new bbox with server side
+    indicateStatus(bbox.toString(), "selectedbbox")
+
     drawnRect.clearLayers();
 
     var rectBounds = [[bbox[0],bbox[1]],[bbox[2],bbox[3]]];
@@ -186,6 +189,8 @@ async function main(err){
 
     //refresh data
     getWarnings({bbox : bbox, events: eventFilter})
+    //communicate new bbox with server side
+    indicateStatus("-180,85,+180,-85", "selectedbbox")
   });
 
   //FILTER words
@@ -520,4 +525,31 @@ function updateTweetNotifs(arguments){
 */
 function setWindowCoordinates(coords){
   window.history.replaceState(false, "Geomergency", `/geomergency/${coords.lat},${coords.lon},${coords.zoom}`);
+}
+
+/**
+* @function indicateStatus
+* @desc sends a POST request to the status API so processes can indicate status.
+* is used for certain cases of client-to-server communication
+* @param text String, the message of the status
+* @param messageType String, the type of message of the status
+*/
+async function indicateStatus(text,messageType){
+  //prepare form
+  var requestURL = "http://localhost:3000/statuses";
+  var form = {
+    message: text,
+    created_at: Date.now(),
+    messageType: messageType
+  }
+
+  //post form to status endpoint
+  $.post(requestURL,
+    form,
+    function(data, status){
+      if(status != "success"){
+        console.log("error in posting message: ",status)
+      }
+    }
+  )
 }

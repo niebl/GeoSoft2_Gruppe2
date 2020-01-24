@@ -549,6 +549,8 @@ async function getProcesses(req,res){
   //access provided parameters
   var older_than = req.query.older_than;
   var remove = req.query.remove;
+  var messageType = req.query.messageType;
+  // var visible = req.query.visible;
 
   //if param empty, assign default values
   if(remove == undefined){
@@ -557,6 +559,10 @@ async function getProcesses(req,res){
   if(older_than == undefined || older_than == ""){
     older_than = 0;
   }
+  if(!(messageType == undefined || messageType == "")){
+    messageType = messageType;
+  } else {messageType = "processIndication"}
+
 
   //check validity of parameters and convert them from strings
   try{
@@ -575,13 +581,16 @@ async function getProcesses(req,res){
 
   //get the Status messages
   outJSON.messages = await queryStatuses({
-    created_at: {$gt: older_than}
+    created_at: {$gt: older_than},
+    messageType: messageType
   }, res);
 
   //remove the status messages from DB if specified
   if(remove){
     rmStatuses({
-      created_at: {$gt: older_than}
+      created_at: {$gt: older_than},
+      messageType: messageType
+      // visible: visible
     }, res);
   }
 
@@ -602,8 +611,12 @@ async function queryStatuses(queries, res){
   output = await Status.find(
     queries,
 
-    //exclude __V and _id
-    {__v:0, _id:0}
+    //exclude visible, messageType, __V and _id
+    {
+      __v:0,
+      _id:0,
+      messageType:0
+    }
   );
 
   console.log(output)
@@ -642,6 +655,11 @@ async function rmStatuses(queries, res){
 async function postProcesses(req,res){
   var created_at = req.body.created_at;
   var message = req.body.message;
+  var messageType;
+
+  if(req.body.messageType != undefined){
+    messageType = req.body.messageType;
+  } else {messageType = "processIndication"}
 
   //check if all attributes are there
   if(message == undefined || message == "" || created_at == undefined || created_at == ""){
@@ -651,7 +669,9 @@ async function postProcesses(req,res){
     //add the status to the designated Mongo collection
     Status.create({
       created_at : created_at,
-      message : message
+      message : message,
+      // visible : visible,
+      messageType : messageType
     },
     function(err, tweet){
       if(err){

@@ -15,7 +15,6 @@ This endpoint is used by the client side to display the processes that are curre
  |  GET | `/statuses` |
  |  POST| `/statuses` |
 
-
  ### Endpoints
 
 * #### GET `/statuses`
