@@ -297,12 +297,13 @@ function updateProgressIndicator(message, currentTime){
 }
 
 /**
-* @function makeQueryString
+* @function makeTweetQueryString
 * @desc function that returns a usable query string to search for tweets with given parameters. Uses global variables
 * @returns String, that is used as parameter for getTweets
+* @param older_than UNIX timestamp of highest allowed age a tweet can have
 * @see getTweets
 */
-function makeQueryString(){
+function makeTweetQueryString(older_than){
   let queryString = `bbox=${bbox}&older_than=${older_than}`;
   if(!(include.length == 0 || include == undefined || include[0] == "")){
     queryString = queryString+`&include=${include}`;
@@ -320,7 +321,7 @@ function makeQueryString(){
 */
 async function updateMapTweets(){
   var tweetPromise = new Promise(async function(resolve, reject){
-    var tweets = await getTweets(makeQueryString());
+    var tweets = await getTweets(makeTweetQueryString(older_than));
     resolve(tweets.tweets);
   });
 
@@ -376,41 +377,6 @@ async function getTweets(params){
 }
 
 /**
-* @function checkTweetUpdates
-* @desc periodically queries internal tweet API to see whether new tweets have been posted since the last update.
-* notifies the user on screen
-* @param interval the amount of time to pass between each check in ms
-*/
-async function checkTweetUpdates(interval){
-  setInterval(async function(){
-    var tweetPromise = new Promise(async function(resolve, reject){
-      //indicate event
-      updateProgressIndicator("checking for new tweets");
-      var tweets = await getTweets(makeQueryString()+"&fields=created_at");
-      resolve(tweets.tweets);
-    });
-
-    tweetPromise.then(function(tweets){
-      let numberNewTweets = tweets.length;
-      updateTweetNotifs({increment: numberNewTweets});
-
-      //indicate event
-      if(numberNewTweets > 0){
-        updateProgressIndicator(`<font color="yellow">+${numberNewTweets}</font>, new tweets available`);
-      }
-
-      //update the timestamp
-      older_thanCheck = Date.now();
-
-      //terminate
-      return true
-    });
-  },
-  interval
-);
-}
-
-/**
 * @function checkStatusUpdates
 * @desc periodically queries internal status API to see what is currently running.
 * Posts new messages to the status indicator.
@@ -444,10 +410,10 @@ async function checkStatusUpdates(interval){
 
 /**
 * @function getMessages
-* @desc queries internal API for tweets within given bounding box
+* @desc queries internal API for status messages within given bounding box
 * @param params string of parameters for the API query.
 * @see ApiSpecs
-* @returns Object containing array of information about Tweets
+* @returns Object containing array of information about statuses
 */
 async function getMessages(params){
   let output;
@@ -465,6 +431,41 @@ async function getMessages(params){
     }
   });
   return output;
+}
+
+/**
+* @function checkTweetUpdates
+* @desc periodically queries internal tweet API to see whether new tweets have been posted since the last update.
+* notifies the user on screen
+* @param interval the amount of time to pass between each check in ms
+*/
+async function checkTweetUpdates(interval){
+  setInterval(async function(){
+    var tweetPromise = new Promise(async function(resolve, reject){
+      //indicate event
+      updateProgressIndicator("checking for new tweets");
+      var tweets = await getTweets(makeTweetQueryString(older_thanCheck)+"&fields=created_at");
+      resolve(tweets.tweets);
+    });
+
+    tweetPromise.then(function(tweets){
+      let numberNewTweets = tweets.length;
+      updateTweetNotifs({increment: numberNewTweets});
+
+      //indicate event
+      if(numberNewTweets > 0){
+        updateProgressIndicator(`<font color="yellow">+${numberNewTweets}</font>, new tweets available`);
+      }
+
+      //update the timestamp
+      older_thanCheck = Date.now();
+
+      //terminate
+      return true
+    });
+  },
+  interval
+);
 }
 
 /**
