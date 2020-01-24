@@ -5,7 +5,7 @@ var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
 var include = [];
 var exclude = [];
-var eventfilter = [];
+var eventFilter = [];
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
@@ -155,12 +155,16 @@ async function main(err){
 
   //confirm Coords
   $('#confirmCoords').on('click', function(e){
-    bboxArray = [parseFloat($("input[name='bboxNorth']").val()),
-    parseFloat($("input[name='bboxWest']").val()),
-    parseFloat($("input[name='bboxSouth']").val()),
-    parseFloat($("input[name='bboxEast']").val())];
+    bboxArray = [
+      parseFloat($("input[name='bboxNorth']").val()),
+      parseFloat($("input[name='bboxWest']").val()),
+      parseFloat($("input[name='bboxSouth']").val()),
+      parseFloat($("input[name='bboxEast']").val())
+    ];
 
+    //refresh data
     removeTweetsOutOfSelection(bboxArray, include, exclude);
+    getWarnings({bbox : bbox, events: eventFilter})
 
     drawnRect.clearLayers();
 
@@ -169,8 +173,19 @@ async function main(err){
   });
   //clear coords
   $('#clearCoords').on('click', function(e){
+
+    //reset inputs
+    $("input[name='bboxNorth']").val('');
+    $("input[name='bboxWest']").val('');
+    $("input[name='bboxSouth']").val('');
+    $("input[name='bboxEast']").val('');
+
+
     drawnRect.clearLayers();
     bbox = defaultBbox;
+
+    //refresh data
+    getWarnings({bbox : bbox, events: eventFilter})
   });
 
   //FILTER words
@@ -179,6 +194,17 @@ async function main(err){
     exclude = $("input[name='excludeKeywords']").val().split(",");
 
     removeTweetsOutOfSelection(bboxArray, include, exclude);
+  });
+
+  //FILTER events
+  $('#confirmEventFilter').on('click', function(e){
+    eventFilter = $("input[name='eventFilter']").val().split(",");
+    getWarnings({bbox : bbox, events: eventFilter});
+  });
+  //reset event filter
+  $('#resetEventFilter').on('click', function(e){
+    eventFilter = [];
+    getWarnings({bbox : bbox, events: eventFilter});
   });
 
   //set url-coordinates
@@ -234,7 +260,7 @@ function initialiseIntervals(){
   setInterval(
     getWarnings({
       bbox : bbox,
-      events : eventfilter
+      events : eventFilter
     }),
     warningUpdateInterval
   );
@@ -276,12 +302,13 @@ function updateProgressIndicator(message, currentTime){
 }
 
 /**
-* @function makeQueryString
+* @function makeTweetQueryString
 * @desc function that returns a usable query string to search for tweets with given parameters. Uses global variables
 * @returns String, that is used as parameter for getTweets
+* @param older_than UNIX timestamp of highest allowed age a tweet can have
 * @see getTweets
 */
-function makeQueryString(){
+function makeTweetQueryString(older_than){
   let queryString = `bbox=${bbox}&older_than=${older_than}`;
   if(!(include.length == 0 || include == undefined || include[0] == "")){
     queryString = queryString+`&include=${include}`;
@@ -299,7 +326,7 @@ function makeQueryString(){
 */
 async function updateMapTweets(){
   var tweetPromise = new Promise(async function(resolve, reject){
-    var tweets = await getTweets(makeQueryString());
+    var tweets = await getTweets(makeTweetQueryString(older_than));
     resolve(tweets.tweets);
   });
 
@@ -355,41 +382,6 @@ async function getTweets(params){
 }
 
 /**
-* @function checkTweetUpdates
-* @desc periodically queries internal tweet API to see whether new tweets have been posted since the last update.
-* notifies the user on screen
-* @param interval the amount of time to pass between each check in ms
-*/
-async function checkTweetUpdates(interval){
-  setInterval(async function(){
-    var tweetPromise = new Promise(async function(resolve, reject){
-      //indicate event
-      updateProgressIndicator("checking for new tweets");
-      var tweets = await getTweets(makeQueryString()+"&fields=created_at");
-      resolve(tweets.tweets);
-    });
-
-    tweetPromise.then(function(tweets){
-      let numberNewTweets = tweets.length;
-      updateTweetNotifs({increment: numberNewTweets});
-
-      //indicate event
-      if(numberNewTweets > 0){
-        updateProgressIndicator(`<font color="yellow">+${numberNewTweets}</font>, new tweets available`);
-      }
-
-      //update the timestamp
-      older_thanCheck = Date.now();
-
-      //terminate
-      return true
-    });
-  },
-  interval
-);
-}
-
-/**
 * @function checkStatusUpdates
 * @desc periodically queries internal status API to see what is currently running.
 * Posts new messages to the status indicator.
@@ -423,10 +415,10 @@ async function checkStatusUpdates(interval){
 
 /**
 * @function getMessages
-* @desc queries internal API for tweets within given bounding box
+* @desc queries internal API for status messages within given bounding box
 * @param params string of parameters for the API query.
 * @see ApiSpecs
-* @returns Object containing array of information about Tweets
+* @returns Object containing array of information about statuses
 */
 async function getMessages(params){
   let output;
@@ -444,6 +436,41 @@ async function getMessages(params){
     }
   });
   return output;
+}
+
+/**
+* @function checkTweetUpdates
+* @desc periodically queries internal tweet API to see whether new tweets have been posted since the last update.
+* notifies the user on screen
+* @param interval the amount of time to pass between each check in ms
+*/
+async function checkTweetUpdates(interval){
+  setInterval(async function(){
+    var tweetPromise = new Promise(async function(resolve, reject){
+      //indicate event
+      updateProgressIndicator("checking for new tweets");
+      var tweets = await getTweets(makeTweetQueryString(older_thanCheck)+"&fields=created_at");
+      resolve(tweets.tweets);
+    });
+
+    tweetPromise.then(function(tweets){
+      let numberNewTweets = tweets.length;
+      updateTweetNotifs({increment: numberNewTweets});
+
+      //indicate event
+      if(numberNewTweets > 0){
+        updateProgressIndicator(`<font color="yellow">+${numberNewTweets}</font>, new tweets available`);
+      }
+
+      //update the timestamp
+      older_thanCheck = Date.now();
+
+      //terminate
+      return true
+    });
+  },
+  interval
+);
 }
 
 /**
