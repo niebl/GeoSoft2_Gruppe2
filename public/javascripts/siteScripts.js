@@ -5,7 +5,7 @@ var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
 var include = [];
 var exclude = [];
-var eventfilter = [];
+var eventFilter = [];
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
@@ -164,7 +164,7 @@ async function main(err){
 
     //refresh data
     removeTweetsOutOfSelection(bboxArray, include, exclude);
-    getWarnings({bbox : bbox, events: eventfilter})
+    getWarnings({bbox : bbox, events: eventFilter})
 
     drawnRect.clearLayers();
 
@@ -185,7 +185,7 @@ async function main(err){
     bbox = defaultBbox;
 
     //refresh data
-    getWarnings({bbox : bbox, events: eventfilter})
+    getWarnings({bbox : bbox, events: eventFilter})
   });
 
   //FILTER words
@@ -198,8 +198,13 @@ async function main(err){
 
   //FILTER events
   $('#confirmEventFilter').on('click', function(e){
-    eventfilter = $("input[name='eventFilter']").val().split(",");
-    getWarnings({bbox : bbox, events: eventfilter});
+    eventFilter = $("input[name='eventFilter']").val().split(",");
+    getWarnings({bbox : bbox, events: eventFilter});
+  });
+  //reset event filter
+  $('#resetEventFilter').on('click', function(e){
+    eventFilter = [];
+    getWarnings({bbox : bbox, events: eventFilter});
   });
 
   //set url-coordinates
@@ -255,7 +260,7 @@ function initialiseIntervals(){
   setInterval(
     getWarnings({
       bbox : bbox,
-      events : eventfilter
+      events : eventFilter
     }),
     warningUpdateInterval
   );
