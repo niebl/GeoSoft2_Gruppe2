@@ -108,6 +108,8 @@ map.on('draw:created', function(e){
 
   //remove the tweets that aren'T within the area
   removeTweetsOutOfSelection(bbox, include, exclude);
+  //refresh the weather warnings
+  getWarnings({bbox : bbox, events: eventfilter})
 });
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -141,7 +143,7 @@ initialiseView();
 
 /**
 * @function getWarnings
-* @desc queries the weather/warnings endpoint for new district weather warnings and adds them to the map
+* @desc queries the /weather endpoint for new district weather warnings and adds them to the map
 * also clears the Kreiswarnings-layer first
 * @param query Object containing the query parameters
 * @author Felix
@@ -149,20 +151,19 @@ initialiseView();
 async function getWarnings(query){
   //clear kreisLayer
   kreisLayer.clearLayers();
-  
+
   //set up request URL
-  var requestURL = "weather/warnings";
+  var requestURL = "/weather";
 
   if(query != undefined){
       //variable to let the URL builder know whether a parameter was already entered in the query
     var noPriorParam = true;
 
     if(query.bbox != undefined && query.bbox != []){
-      console.log(query.bbox)
       requestURL = requestURL+`?bbox=${query.bbox}`;
       noPriorParam = false;
     }
-    if(query.events != [] && query.events != undefined){
+    if(query.events != [] && query.events != undefined && query.events.length != 0){
       if(noPriorParam){
         requestURL = requestURL+`?`;
       } else {
@@ -178,12 +179,22 @@ async function getWarnings(query){
     success: async function(data){
       //console.log(data)
       for(let feature of data){
+        //prepare the popup content
+        var popupContent = "<hr>"
+        for(var warning in feature.properties.EVENT){
+          popupContent = popupContent + `
+            <hr> <b>${feature.properties.HEADLINE[warning]}</b> <br>
+            ${feature.properties.DESCRIPTION[warning]} <br>
+          `
+        }
         kreisLayer.addLayer(L.geoJson(feature,{
+          opacity: 0.2,
           fillOpacity: 0.1,
           color: 'purple'
         }).bindPopup(
-          feature.properties.AREADESC+"<hr>" +
-          feature.properties.EVENT
+          //bind the popup to each weather event
+          `<h3>${feature.properties.AREADESC}</h3> <br> ${convertUNIXtoTime(feature.properties.created_at)}`
+          + popupContent + `<hr><small>${feature.properties.EC_LICENSE}</small>`
         )
       );
     }
@@ -536,4 +547,38 @@ function initialiseView(){
   }else{
     return false;
   }
+}
+
+/**
+* @function convertUNIXtoTime
+* takes a UNIX timestamp and returns a string of the datetime
+* @param timestamp
+* @returns string representing time and date
+* based on https://makitweb.com/convert-unix-timestamp-to-date-time-with-javascript/
+*/
+function convertUNIXtoTime(timestamp){
+  var date = new Date(timestamp)
+
+  // Year
+  var year = date.getFullYear();
+
+  // Month
+  var month = date.getMonth()+1;
+
+  // Day
+  var day = date.getDate();
+
+  // Hours
+  var hours = date.getHours();
+
+  // Minutes
+  var minutes = "0" + date.getMinutes();
+
+  // Seconds
+  var seconds = "0" + date.getSeconds();
+
+  // Display date time in MM-dd-yyyy h:m:s format
+  var dateTime = year+'-'+month+'-'+day+' '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+  return dateTime
 }
