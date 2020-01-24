@@ -97,6 +97,9 @@ function main(err){
   $("#density").click(function(){
     getDensity();
   });
+  $("#kest").click(function(){
+    $("#imagesummary").attr("src", "/summary/kest");
+  });
   //go to tweet
   $("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
     //get the attributes from the parent element of the button
@@ -337,7 +340,7 @@ async function checkTweetUpdates(interval){
       older_thanCheck = Date.now();
 
       //terminate
-      return true
+      return true;
     });
   },
   interval
@@ -369,7 +372,7 @@ async function checkStatusUpdates(interval){
       }
 
       //terminate
-      return true
+      return true;
     });
   },
   interval

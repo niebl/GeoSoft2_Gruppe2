@@ -272,7 +272,7 @@ async function get1hRadar(query){
 
 
 /**
-* @function get1hRadar
+* @function getDensity
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
