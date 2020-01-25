@@ -27,13 +27,22 @@ module.exports = {
   */
   tweetStreamExt : function(params, callback){
     var stream = this.client.stream('statuses/filter', params);
+    console.log(this.client.stream)
+    console.log(stream)
+    console.log(this.client)
+//    console.log(this.client.options.request_options)
     utilities.indicateStatus("starting twitter-API stream")
+    stream.on('start', function(){
+      console.log("initialising twitter stream")
+      utilities.indicateStatus("initialising twitter stream")
+    })
+
     stream.on('data', function(event){
       callback(event);
     });
 
     stream.on('error', function(error) {
-      console.log("OOOPSIE WOOOOOOPSIE I DID A FUCKY WUCKY")
+      console.log(token.twitter)
       console.log(error);
       utilities.indicateStatus(error)
     });

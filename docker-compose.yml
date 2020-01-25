@@ -2,7 +2,7 @@ version: '3'
 services:
   app:
     container_name: geomergency-app
-    restart: always
+    # restart: always
     image: geomergency-app
     build: .
     ports:
