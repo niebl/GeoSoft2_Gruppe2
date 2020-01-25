@@ -1,29 +1,27 @@
-# API specifications `weather`
+# API specifications
 
-specification formatting based on [idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html](https://idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html)
-
-The specification of the API that serves the cached data on weather warnings for German districts (Kreise), that are provided by the DWD.
+[Based on](https://idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html)
 
 ## Resource Descriptions
  ### Available Methods
-
-
 
  * The API to handle status indicator communication `/weather`:
 
 |**method**|**path**|
  |------|-----|
- |  GET | `/weather` |
+ |  GET | `/weather/warnings` |
 
+<hr>
 
- ### Endpoints
+## Endpoints and Methods
 
-* #### GET `/weather`
+* #### GET `/weather/warnings`
  returns shapes of German districts that have issued warnings of weather against them by the DWD.
  **Parameters**
  * `bbox` the geographical boundaries with which the resulting district borders can overlap. (WGS84)
- * `events` list of types of events to to filter results for.
+ * `events` list of types of events to include in the results.
 
+<hr>
 
 ## Parameters
 
@@ -32,7 +30,7 @@ The specification of the API that serves the cached data on weather warnings for
 
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
-|`/weather`| GET |retrieve the geojson of weather warnings for German districts|
+|`weather/warnings`| GET |Search for|
 
 #### General Search Parameters
 
@@ -45,17 +43,14 @@ The specification of the API that serves the cached data on weather warnings for
 
 ## examples
 
-### GET `/weather`
+### GET `/weather/warnings`
 #### request example
 `
-localhost:3000/weather?events=FROST
+localhost:3000/weather/warnings?events=FROST
 `
 
 ### response example
-response type: JSON
 ```JS
-Status: 200 OK
-
 [
   {
       "properties": {
@@ -95,8 +90,10 @@ Status: 200 OK
           10.7074,
           48.2296
       ],
+      "_id": "5e1f1b99db7edb4068c7082d",
       "type": "Feature",
-      "id": "Warnungen_Landkreise.fid--1cfd208f_16fa9819749_-484"
+      "id": "Warnungen_Landkreise.fid--1cfd208f_16fa9819749_-484",
+      "__v": 0
   },
 
   [ ... ]
