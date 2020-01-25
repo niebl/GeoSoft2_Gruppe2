@@ -215,25 +215,34 @@ async function get1hRadar(query){
 
   //set up request URL
   var requestURL = "radar/get1hradar";
-
+  console.log("min:  " + query.min);
+  console.log("max:  " + query.max);
   if(query != undefined){
       //variable to let the URL builder know whether a parameter was already entered in the query
     var noPriorParam = true;
 
-    if(query.bbox != undefined && query.bbox != []){
-      console.log(query.bbox);
-      requestURL = requestURL+`?bbox=${query.bbox}`;
+    if(query.min != undefined && query.min != []){
+      requestURL = requestURL+`?min=${query.min}`;
       noPriorParam = false;
     }
-    if(query.events != [] && query.events != undefined){
+    if(query.max != undefined && query.max != []){
       if(noPriorParam){
-        requestURL = requestURL+`?`;
-      } else {
-        requestURL = requestURL+`&`;
+        requestURL = requestURL+`?max=${query.max}`;
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+`&max=${query.max}`;
       }
-      requestURL = requestURL+`events=${query.events}`;
-      noPriorParam = false;
     }
+    if(query.bbox != undefined && query.bbox != []){
+      if(noPriorParam){
+        requestURL = requestURL+ '?';
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+'&';
+      }
+      requestURL = requestURL + `polygon=${query.bbox}`;
+    }
+    console.log(requestURL);
   }
 
   return await $.ajax({

@@ -3,6 +3,7 @@
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
+var radarbbox;
 var include = [];
 var exclude = [];
 var eventfilter = [];
@@ -10,6 +11,8 @@ var eventfilter = [];
 var older_than;
 var older_thanCheck;
 var older_thanStatusCheck;
+var min_precipitation;
+var max_precipitation;
 
 /**
 * @var nearestTweetRadius.
@@ -51,13 +54,13 @@ function main(err){
     }),
     warningUpdateInterval
   );
-  get1hRadar();
+  get1hRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
   getDensity();
   setInterval(
-    get1hRadar({
-      bbox : bbox,
-      events : eventfilter
-    }),
+    get1hRadar(),
     oneHourRadarUpdateInterval
   );
 
@@ -82,6 +85,11 @@ function main(err){
     $("#browser-controls1").toggleClass("toggled");
   });
 
+  $("#parameter-toggle2").click(function(e){
+    e.preventDefault();
+    $("#browser-controls2").toggleClass("toggled");
+  });
+
   //click of UPDATE MAP button
   $("#update-map").click(function(){
     updateMapTweets();
@@ -99,7 +107,35 @@ function main(err){
   });
   $("#kest").click(function(){
     $("#imagesummary").attr("src", "/summary/kest");
+    $("#linksummary").attr("href", "/summary/kest");
   });
+  $("#getPrec").click(function(){
+    get1hRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      bbox : radarbbox
+    });
+  });
+  $("#confirmCoords2").click(function(){
+    var north = $("#bboxNorth2").val();
+    var west = $("#bboxWest2").val();
+    var south = $("#bboxSouth2").val();
+    var east = $("#bboxEast2").val();
+    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
+    radarbbox = bboxURL;
+  });
+  $("#deleteCoords2").click(function(){
+    var north = $("#bboxNorth2").val();
+    var west = $("#bboxWest2").val();
+    var south = $("#bboxSouth2").val();
+    var east = $("#bboxEast2").val();
+    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
+    radarbbox = [];
+  });
+
+
+
+
   //go to tweet
   $("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
     //get the attributes from the parent element of the button
@@ -192,6 +228,17 @@ function main(err){
     bbox = defaultBbox;
   });
 
+  $('#saveLevels').on('click', function(e){
+    var min =  $('#LevelsPreMin').val();
+    var max =  $('#LevelsPreMax').val();
+    if(min <= max){
+      min_precipitation = min;
+      max_precipitation = max;
+      $('#PrecLevelError').text("Parameters setted");
+    } else{
+      $('#PrecLevelError').text("Invalid Parameters");
+    }
+  });
   //FILTER words
   $('#confirmFilter').on('click', function(e){
     include = $("input[name='includeKeywords']").val().split(",");

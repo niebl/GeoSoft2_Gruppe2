@@ -29,7 +29,32 @@ block sidebar
           input#excludeKeywords(name='excludeKeywords').form-control-sm(placeholder="separated by comma").bboxForm
           button#confirmFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm filter    
           hr
-      // from here on summary stats
+      // from here on Precipitation
+      div.list-group-item.list-group-item-action.bg-dark.toggle-bar
+        button#parameter-toggle2(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle Precipitation Filter
+      div#browser-controls2.list-group-item.list-group-item-action.bg-light.toggled
+        div#bboxCoordSelection2
+          p Bounding-Box border coordinates
+          div.form-group
+            input#bboxNorth2(name='bboxNorth',placeholder="North").form-control-sm.bboxForm
+            input#bboxWest2(name='bboxWest',placeholder="West").form-control-sm.bboxForm
+            input#bboxEast2(name='bboxEast',placeholder="East").form-control-sm.bboxForm
+            input#bboxSouth2(name='bboxSouth',placeholder="South").form-control-sm.bboxForm
+          button#confirmCoords2(type="button").btn.btn-secondary.btn-sm.sidebarButton Save Parameters
+          button#deleteCoords2(type="button").btn.btn-secondary.btn-sm.sidebarButton Delete Parameters
+          hr
+        div#LevelsPre
+          p Minimim Precipitation level
+          input#LevelsPreMin(name='preMin',type="number").form-control-sm(placeholder="0")
+          p Max Precipitation level
+          input#LevelsPreMax(name='PreMax', type="number").form-control-sm(placeholder="5")
+          hr
+          button#saveLevels(type="button").btn.btn-secondary.btn-sm.sidebarButton Save Paramters
+          div#PrecLevelError
+          hr
+        div#getPrec
+          button#getPrec(type="button").btn.btn-secondary.btn-sm.sidebarButton Get updated Precipitation
+      //From here on summary stats
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
         button#parameter-toggle1(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle Summary Statistics
       div#browser-controls1.list-group-item.list-group-item-action.bg-light.toggled
@@ -41,7 +66,8 @@ block sidebar
             button#lest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show L-Function
             button#fest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show F-Function
             button#gest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show G-Function
-          img#imagesummary.img-responsive
+          a#linksummary
+            img#imagesummary.img-responsive
           
         //p browser controls. forms and such here
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar

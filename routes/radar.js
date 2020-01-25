@@ -57,12 +57,13 @@ router.get("/precipitation1h", async function (req, res ){
 router.get("/get1hradar", async function(req, res){
   var regions ={type:"FeatureCollection", features:[]};
   var query = {};
-  if(req.query.max){
-    query['geojson.properties.prec'] = { $lte: req.query.max};
-  }
   if(req.query.min){
-    query['geojson.properties.prec'] = { $gte: req.query.min};
+    query['geojson.properties.level'] = { $gte: req.query.min};
   }
+  if(req.query.max){
+    query['geojson.properties.level'] = { $lte: req.query.max};
+  }
+
   if(req.query.coordinates){
     var coords = req.query.coordinates.split(",");
     query['geojson.geometry']=
@@ -78,7 +79,6 @@ router.get("/get1hradar", async function(req, res){
       var pair = [];
       pair.push(Number(Number(poly[j])));
       pair.push(Number(Number(poly[j +1])));
-      console.log(pair);
       polyarray.push(pair);
     }
     // to close Loop forpolygon
