@@ -29,6 +29,12 @@ block sidebar
           input#excludeKeywords(name='excludeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
           button#confirmFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
           hr
+        div#events
+          p weather event filter
+          input#eventFilter(name='eventFilter',placeholder="separated by comma").form-control-sm.bboxForm
+          button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
+          button#resetEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton reset
+
 
       // from here on Precipitation
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
@@ -46,9 +52,9 @@ block sidebar
           hr
         div#LevelsPre
           p Minimim Precipitation level
-          input#LevelsPreMin(name='preMin',type="number").form-control-sm(placeholder="0")
+          input#LevelsPreMin(type="number").form-control-sm
           p Max Precipitation level
-          input#LevelsPreMax(name='PreMax', type="number").form-control-sm(placeholder="5")
+          input#LevelsPreMax(type="number").form-control-sm
           hr
           button#saveLevels(type="button").btn.btn-secondary.btn-sm.sidebarButton Save Paramters
           div#PrecLevelError
@@ -69,14 +75,7 @@ block sidebar
             button#gest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show G-Function
           a#linksummary
             img#imagesummary.img-responsive
-          
-
-        div#events
-          p weather event filter
-          input#eventFilter(name='eventFilter',placeholder="separated by comma").form-control-sm.bboxForm
-          button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
-          button#resetEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton reset
-
+      
         //p browser controls. forms and such here
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
         button#browser-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle tweet-browser

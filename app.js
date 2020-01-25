@@ -563,7 +563,7 @@ async function getProcesses(req,res){
   }
   if(!(messageType == undefined || messageType == "")){
     messageType = messageType;
-  } else {messageType = "processIndication"}
+  } else {messageType = "processIndication"};
 
 
   //check validity of parameters and convert them from strings
