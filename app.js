@@ -16,11 +16,15 @@ var indexRouter = require('./routes/index');
 var mongoose = require('mongoose');
 var request = require('request');
 var nodeHTMLParser = require('node-html-parser');
+var yaml = require('js-yaml');
+var fs = require('fs')
 
 const https = require('https');
 const turf = require('@turf/turf');
 
 var app = express();
+
+var configurations = {};
 
 
 // view engine setup
@@ -156,6 +160,7 @@ async function queryTweets(queries){
   let output;
   await Tweet.find(
     queries,
+    {__v:0, _id:0},
     function(err,docs){
       if(err){
         console.log("~~~~~! error in mongoDB query !~~~~~");
@@ -168,13 +173,54 @@ async function queryTweets(queries){
   return output;
 }
 
+/**
+* @function loadConfigs
+* @desc reads the config.yaml and returns an object containing the values
+* @returns object, containting several attributes and values that represent configuration arguments
+*/
+function loadConfigs(path){
+  try {
+    //load and return the document in the path
+    const doc = yaml.safeLoad(fs.readFileSync(path, 'utf-8'));
+    return(doc);
+  } catch (e){
+    console.log(e);
+    return false;
+  }
+}
+
+/**
+* @function setConfigs
+* @desc sets the server configutrations to what the parameters say
+* @param configs object containing configuration parameters
+*/
+function setConfigs(configs){
+  configurations = configs;
+}
+
+/**
+* @function sendClientConfigs
+* @desc function that returns the configutrations that are relevant to the client side of the application
+* @returns object, containting several attributes and values that represent configuration arguments
+*/
+function sendClientConfigs(){
+  return configurations.clientParams
+}
+
+app.use('/configs', (req,res)=>{
+  res.send(sendClientConfigs())
+})
+
+//set the configutrations
+setConfigs(loadConfigs(__dirname+'/config.yml'))
+
 ////////////////////////////////////////////////////////////////////////////////
 //Tweet api
 ////////////////////////////////////////////////////////////////////////////////
 
 //~~~~~~~API-endpoints~~~~~~~
 //public DB search API
-app.get('/tweetAPI/search', async (req, res) => {
+app.get('/tweets', async (req, res) => {
   res.send(await tweetSearch(req, res));
 });
 
@@ -400,8 +446,10 @@ async function tweetSearch(req,res){
 module.exports = app;
 
 //TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
-console.log(twitterApiExt.tweetStreamExt(twitterApiExt.testparams.params3, function(tweet){
-  if(tweet.coordinates != null){
+//initialise the tweet-scraper
+console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
+  function(tweet){
+    if(tweet.coordinates != null){
     // call getEmbeddedTweet() -> postTweetToMongo()
     getEmbeddedTweet(tweet);
   }
@@ -482,10 +530,10 @@ async function getEmbeddedTweet(tweet){
 //status-indication api
 ////////////////////////////////////////////////////////////////////////////////
 //endpoints
-app.get('/status/currentprocesses', async (req,res)=> {
+app.get('/statuses', async (req,res)=> {
   res.send(await getProcesses(req, res));
 });
-app.post('/status/newprocess', async (req,res)=> {
+app.post('/statuses', async (req,res)=> {
   res.send(await postProcesses(req, res));
 });
 
@@ -503,6 +551,8 @@ async function getProcesses(req,res){
   //access provided parameters
   var older_than = req.query.older_than;
   var remove = req.query.remove;
+  var messageType = req.query.messageType;
+  // var visible = req.query.visible;
 
   //if param empty, assign default values
   if(remove == undefined){
@@ -511,14 +561,20 @@ async function getProcesses(req,res){
   if(older_than == undefined || older_than == ""){
     older_than = 0;
   }
+  if(!(messageType == undefined || messageType == "")){
+    messageType = messageType;
+  } else {messageType = "processIndication"}
+
 
   //check validity of parameters and convert them from strings
   try{
     if(!(older_than == undefined || older_than == "")){
       older_than = parseInt(older_than);
     }
-    if(remove.toLowerCase() == "true" || remove.toLowerCase() == "false"){
-      remove = (remove.toLowerCase() == "true");
+    if(typeof remove != "boolean"){
+      if(remove.toLowerCase() == "true" || remove.toLowerCase() == "false"){
+        remove = (remove.toLowerCase() == "true");
+      }
     }
   }catch(err){
     res.status(400);
@@ -527,13 +583,16 @@ async function getProcesses(req,res){
 
   //get the Status messages
   outJSON.messages = await queryStatuses({
-    created_at: {$gt: older_than}
+    created_at: {$gt: older_than},
+    messageType: messageType
   }, res);
 
   //remove the status messages from DB if specified
   if(remove){
     rmStatuses({
-      created_at: {$gt: older_than}
+      created_at: {$gt: older_than},
+      messageType: messageType
+      // visible: visible
     }, res);
   }
 
@@ -551,17 +610,18 @@ async function getProcesses(req,res){
 async function queryStatuses(queries, res){
   let output;
   //look for statuses with the given parameters
-  await Status.find(
+  output = await Status.find(
     queries,
-    function(err, docs){
-      if(err){
-        res.status(500);
-        res.send("server error: couldn't query status messages");
-      } else {
-        output = docs;
-      }
+
+    //exclude visible, messageType, __V and _id
+    {
+      __v:0,
+      _id:0,
+      messageType:0
     }
   );
+
+  console.log(output)
   return output;
 }
 
@@ -597,6 +657,11 @@ async function rmStatuses(queries, res){
 async function postProcesses(req,res){
   var created_at = req.body.created_at;
   var message = req.body.message;
+  var messageType;
+
+  if(req.body.messageType != undefined){
+    messageType = req.body.messageType;
+  } else {messageType = "processIndication"}
 
   //check if all attributes are there
   if(message == undefined || message == "" || created_at == undefined || created_at == ""){
@@ -606,7 +671,9 @@ async function postProcesses(req,res){
     //add the status to the designated Mongo collection
     Status.create({
       created_at : created_at,
-      message : message
+      message : message,
+      // visible : visible,
+      messageType : messageType
     },
     function(err, tweet){
       if(err){
