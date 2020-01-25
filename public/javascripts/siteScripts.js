@@ -58,9 +58,17 @@ function main(err){
     min : min_precipitation,
     max : max_precipitation
   });
+  get5mRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
   getDensity();
   setInterval(
     get1hRadar(),
+    oneHourRadarUpdateInterval
+  );
+  setInterval(
+    get5mRadar(),
     oneHourRadarUpdateInterval
   );
 
@@ -111,6 +119,11 @@ function main(err){
   });
   $("#getPrec").click(function(){
     get1hRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      bbox : radarbbox
+    });
+    get5mRadar({
       min : min_precipitation,
       max : max_precipitation,
       bbox : radarbbox
