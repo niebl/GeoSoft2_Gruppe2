@@ -2,8 +2,7 @@
 
 specification formatting based on [idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html](https://idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html)
 
-specification of the API that handles messages of currently running processes and error statuses.
-This endpoint is used by the client side to display the processes that are currently running on the server side
+specification of the API that internally handles messages of currently running processes and error statuses.
 
 ## Resource Descriptions
  ### Available Methods
@@ -12,28 +11,31 @@ This endpoint is used by the client side to display the processes that are curre
 
 |**method**|**path**|
  |------|-----|
- |  GET | `/statuses` |
- |  POST| `/statuses` |
+ |  GET | `/status/currentprocesses` |
+ |  POST| `/status/newprocess` |
 
- ### Endpoints
+<hr>
 
-* #### GET `/statuses`
+## Endpoints and Methods
+
+* #### GET `/status/currentprocesses`
   Retreive information about current running processes on the server side  
   **Parameters**
   * `older_than` string, UNIX-timestamp indicating the maximum age of the processes
-  * `remove` boolean, if false indicated processes won't be cleared after call. defaults to true if empty
+  * `remove` boolean, if false indicated processes won't be cleared after call
 
-* #### POST `/statuses`
+* #### POST `/status/newprocess`
   Allows a server component to tell the API what it is currently doing
   **Parameters**
 
+<hr>
 
 ## Parameters
 ### __end-point: status__
 #### Request
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
-|`/statuses`| GET |Get the list of processes that are currently in progress, according to the status-API|
+|`statuses/currentprocesses`| GET |Get the list of processes that are currently in progress, according to the status-API|
 
 #### General Search Parameters
 
@@ -45,7 +47,7 @@ This endpoint is used by the client side to display the processes that are curre
 #### Request
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
-|`/statuses`| POST |Post a status indicator message to the Status API|  
+|`statuses/newprocess`| POST |Post a status indicator message to the Status API|  
 
 #### Body Parameters  
 Requires the body to be composed in x-www-form-urlencoded!
@@ -59,37 +61,34 @@ Requires the body to be composed in x-www-form-urlencoded!
 
 ## examples
 
-### GET `/statuses`
+### GET `/status/currentprocesses`
 #### request example
 `
-localhost:3000/statuses?remove=true&older_than=0
+localhost:3000/status/currentprocesses?remove=true&older_than=0
 `
 
-#### response example
-response type: JSON
+### response example
 ```JS
-Status: 200 OK
-
 [
     {
+        "_id": "5e11adf3af423d42300e8519",
         "created_at": 1578215915,
-        "message": "this is a message"
+        "message": "this is a message",
+        "__v": 0
     }
 ]
 ```
 
-### POST `/statuses`
+### POST `/status/newprocess`
 #### request example
 ```
-curl --location --request POST 'localhost:3000/statuses' \
+curl --location --request POST 'localhost:3000/status/newprocess' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'created_at=1578215915' \
 --data-urlencode 'message=this is a message'
 ```
 
-#### response example
+### response example
 ```
-Status: 200 OK
-
 Status successfully posted
 ```

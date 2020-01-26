@@ -2,16 +2,15 @@ var mongoose = require('mongoose');
 
 // Article Schema
 var precipitationSchema = mongoose.Schema({
-  geojson:{
+  geojson: {
     type: { type: String },
     properties: {
-      prec: Number
+      level: Number
     },
     geometry: {
       type: { type: String },
       coordinates: Array}
     }
-  }
-);
+  });
 
 var Precipitation = module.exports = mongoose.model('Precipitation', precipitationSchema);
