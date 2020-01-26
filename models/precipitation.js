@@ -2,13 +2,15 @@ var mongoose = require('mongoose');
 
 // Article Schema
 var precipitationSchema = mongoose.Schema({
-  type: { type: String },
-  properties: {
-    level: Number
-  },
-  geometry: {
+  geojson:{
     type: { type: String },
-    coordinates: Array}
+    properties: {
+      prec: Number
+    },
+    geometry: {
+      type: { type: String },
+      coordinates: Array}
+    }
   }
 );
 
