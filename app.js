@@ -614,6 +614,7 @@ async function postProcesses(req,res){
         res.send("error in posting status: ", err);
       }
     });
+
     //if it went well, tell them
     res.status(200);
     res.send(`Status successfully posted`);
