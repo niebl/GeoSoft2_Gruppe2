@@ -113,9 +113,30 @@ function main(err){
   $("#density").click(function(){
     getDensity();
   });
+  $("#ann").click(function(){
+    $("#imagesummary").attr("src", "/summary/ann");
+    $("#linksummary").attr("href", "/summary/ann");
+    $("#linksummary").attr("target", "_blank");
+  });
   $("#kest").click(function(){
     $("#imagesummary").attr("src", "/summary/kest");
     $("#linksummary").attr("href", "/summary/kest");
+    $("#linksummary").attr("target", "_blank");
+  });
+  $("#fest").click(function(){
+    $("#imagesummary").attr("src", "/summary/fest");
+    $("#linksummary").attr("href", "/summary/fest");
+    $("#linksummary").attr("target", "_blank");
+  });
+  $("#gest").click(function(){
+    $("#imagesummary").attr("src", "/summary/gest");
+    $("#linksummary").attr("href", "/summary/gest");
+    $("#linksummary").attr("target", "_blank");
+  });
+  $("#lest").click(function(){
+    $("#imagesummary").attr("src", "/summary/lest");
+    $("#linksummary").attr("href", "/summary/lest");
+    $("#linksummary").attr("target", "_blank");
   });
   $("#getPrec").click(function(){
     get1hRadar({

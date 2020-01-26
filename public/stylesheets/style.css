@@ -211,3 +211,8 @@ body {
 .invisible {
   visibility: hidden;
 }
+
+#imagesummary{
+  width: 300px;
+  height: 300px;
+}
