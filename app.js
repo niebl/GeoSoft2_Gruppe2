@@ -13,6 +13,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
+var exampleRouter = require('./routes/exampleIndex');
 var mongoose = require('mongoose');
 var request = require('request');
 var nodeHTMLParser = require('node-html-parser');
@@ -56,6 +57,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/geomergency', indexRouter);
 app.use('/geomergency/:coords', indexRouter);
+
+app.use('/geomergency/example', exampleRouter);
+app.use('/geomergency/example/:coords', exampleRouter);
 
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
