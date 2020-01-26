@@ -3,56 +3,74 @@
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
+var radarbbox;
 var include = [];
 var exclude = [];
-var eventFilter = [];
+var eventfilter = [];
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
 var older_thanStatusCheck;
+var min_precipitation;
+var max_precipitation;
 
-
-//the minimal distance a map-tag is allowed to have to another in meters without being merged.
+/**
+* @var nearestTweetRadius.
+* the minimal distance a tweet is allowed to have to another in meters.
+*/
 var nearestTweetRadius;
 var updateCheckInterval;
 var statusCheckInterval;
 var warningUpdateInterval;
+var oneHourRadarUpdateInterval;
 
 main();
 
-async function main(err){
-  configs = await getConfigs();
-  console.log(configs);
+function main(err){
 
-  if(!configs){
-    setStandardConfigs();
-  }else{
-    if(configs.defaultbbox != null){
-      defaultBbox = configs.defaultbbox.toString();
-      bbox = defaultBbox;
-      bboxArray = defaultBbox;
-    }
-    if(configs.defaultinclude != null){
-      include = configs.defaultinclude;
-    }
-    if(configs.defaultexclude != null){
-      exclude = configs.defaultexclude;
-    }
-    nearestTweetRadius = configs.nearestTweetRadius;
+  nearestTweetRadius = 50;
 
-    updateCheckInterval = configs.intervals.tweetCheck;
-    statusCheckInterval = configs.intervals.statusCheck;
-    warningUpdateInterval = configs.intervals.warningUpdate;
+  updateCheckInterval= 10000;
+  statusCheckInterval= 2000;
+  warningUpdateInterval = 300000;
+  oneHourRadarUpdateInterval = 300000;
 
-    //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
-    older_than = Date.now() - configs.intervals.tweetCheckOffset;
-    older_thanCheck = older_than;
-    //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
-    older_thanStatusCheck = Date.now() - configs.intervals.statusCheckOffset;
+  //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
+  older_than = Date.now() - 300000;
+  older_thanCheck = older_than;
+  //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
+  older_thanStatusCheck = Date.now() - 10000;
 
-    //initialise all check intervals with the new values
-    initialiseIntervals();
-  }
+  //begin the periodic update checks
+  checkTweetUpdates(updateCheckInterval);
+  checkStatusUpdates(statusCheckInterval);
+
+  //initialise the periodic update of the district weather warnings
+  getWarnings();
+  setInterval(
+    getWarnings({
+      bbox : bbox,
+      events : eventfilter
+    }),
+    warningUpdateInterval
+  );
+  get1hRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
+  get5mRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
+  getDensity();
+  setInterval(
+    get1hRadar(),
+    oneHourRadarUpdateInterval
+  );
+  setInterval(
+    get5mRadar(),
+    oneHourRadarUpdateInterval
+  );
 
   ////////////////////////////////////////////////////////////////////////////////
   // site-events
@@ -70,6 +88,16 @@ async function main(err){
     $("#tweet-browser").toggleClass("toggled");
   });
 
+  $("#parameter-toggle1").click(function(e){
+    e.preventDefault();
+    $("#browser-controls1").toggleClass("toggled");
+  });
+
+  $("#parameter-toggle2").click(function(e){
+    e.preventDefault();
+    $("#browser-controls2").toggleClass("toggled");
+  });
+
   //click of UPDATE MAP button
   $("#update-map").click(function(){
     updateMapTweets();
@@ -80,6 +108,46 @@ async function main(err){
     $("#wrapper").toggleClass("toggled");
     setTimeout(function(){ map.invalidateSize();}, 400);
   });
+
+  // summary Statistics:
+  $("#density").click(function(){
+    getDensity();
+  });
+  $("#kest").click(function(){
+    $("#imagesummary").attr("src", "/summary/kest");
+    $("#linksummary").attr("href", "/summary/kest");
+  });
+  $("#getPrec").click(function(){
+    get1hRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      bbox : radarbbox
+    });
+    get5mRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      bbox : radarbbox
+    });
+  });
+  $("#confirmCoords2").click(function(){
+    var north = $("#bboxNorth2").val();
+    var west = $("#bboxWest2").val();
+    var south = $("#bboxSouth2").val();
+    var east = $("#bboxEast2").val();
+    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
+    radarbbox = bboxURL;
+  });
+  $("#deleteCoords2").click(function(){
+    var north = $("#bboxNorth2").val();
+    var west = $("#bboxWest2").val();
+    var south = $("#bboxSouth2").val();
+    var east = $("#bboxEast2").val();
+    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
+    radarbbox = [];
+  });
+
+
+
 
   //go to tweet
   $("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
@@ -155,19 +223,12 @@ async function main(err){
 
   //confirm Coords
   $('#confirmCoords').on('click', function(e){
-    bboxArray = [
-      parseFloat($("input[name='bboxNorth']").val()),
-      parseFloat($("input[name='bboxWest']").val()),
-      parseFloat($("input[name='bboxSouth']").val()),
-      parseFloat($("input[name='bboxEast']").val())
-    ];
+    bboxArray = [parseFloat($("input[name='bboxNorth']").val()),
+    parseFloat($("input[name='bboxWest']").val()),
+    parseFloat($("input[name='bboxSouth']").val()),
+    parseFloat($("input[name='bboxEast']").val())];
 
-    //refresh data
     removeTweetsOutOfSelection(bboxArray, include, exclude);
-    getWarnings({bbox : bbox, events: eventFilter})
-
-    //communicate new bbox with server side
-    indicateStatus(bbox.toString(), "selectedbbox")
 
     drawnRect.clearLayers();
 
@@ -176,40 +237,27 @@ async function main(err){
   });
   //clear coords
   $('#clearCoords').on('click', function(e){
-
-    //reset inputs
-    $("input[name='bboxNorth']").val('');
-    $("input[name='bboxWest']").val('');
-    $("input[name='bboxSouth']").val('');
-    $("input[name='bboxEast']").val('');
-
-
     drawnRect.clearLayers();
     bbox = defaultBbox;
-
-    //refresh data
-    getWarnings({bbox : bbox, events: eventFilter})
-    //communicate new bbox with server side
-    indicateStatus("-180,85,+180,-85", "selectedbbox")
   });
 
+  $('#saveLevels').on('click', function(e){
+    var min =  $('#LevelsPreMin').val();
+    var max =  $('#LevelsPreMax').val();
+    if(min <= max){
+      min_precipitation = min;
+      max_precipitation = max;
+      $('#PrecLevelError').text("Parameters setted");
+    } else{
+      $('#PrecLevelError').text("Invalid Parameters");
+    }
+  });
   //FILTER words
   $('#confirmFilter').on('click', function(e){
     include = $("input[name='includeKeywords']").val().split(",");
     exclude = $("input[name='excludeKeywords']").val().split(",");
 
     removeTweetsOutOfSelection(bboxArray, include, exclude);
-  });
-
-  //FILTER events
-  $('#confirmEventFilter').on('click', function(e){
-    eventFilter = $("input[name='eventFilter']").val().split(",");
-    getWarnings({bbox : bbox, events: eventFilter});
-  });
-  //reset event filter
-  $('#resetEventFilter').on('click', function(e){
-    eventFilter = [];
-    getWarnings({bbox : bbox, events: eventFilter});
   });
 
   //set url-coordinates
@@ -232,67 +280,6 @@ async function main(err){
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
-* @function getConfigs
-* function that gets the client side configs from the server at '/configs'
-*/
-async function getConfigs(){
-  var requestURL = "/configs"
-  output = await $.ajax({
-    url: requestURL,
-    success: function(data){
-      return data
-    },
-    error: function(xhr, ajaxOptions, thrownError){
-      console.log(thrownError)
-      updateProgressIndicator(`<font color="red">failed to fetch client configs. falling back to defaults</font> see browser log for details`);
-      setStandardConfigs();
-    }
-  })
-  return output
-}
-
-/**
-* @function initialiseIntervals
-* @desc initialises periodic checks on updates with the intervals that are specified in the global variables
-*/
-function initialiseIntervals(){
-  //begin the periodic update checks
-  checkTweetUpdates(updateCheckInterval);
-  checkStatusUpdates(statusCheckInterval);
-
-  //initialise the periodic update of the district weather warnings
-  getWarnings();
-  setInterval(
-    getWarnings({
-      bbox : bbox,
-      events : eventFilter
-    }),
-    warningUpdateInterval
-  );
-}
-
-/**
-* @function setStandardConfigs
-* @desc fallback-function that gets called when getting the config parameters from the server failed
-*/
-function setStandardConfigs(){
-  nearestTweetRadius = 50;
-
-  updateCheckInterval= 10000;
-  statusCheckInterval= 2000;
-  warningUpdateInterval = 300000;
-
-  //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
-  older_than = Date.now() - 300000;
-  older_thanCheck = older_than;
-  //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
-  older_thanStatusCheck = Date.now() - 10000;
-
-  //initialise all check intervals with the new values
-  initialiseIntervals();
-}
-
-/**
 * @function updateProgressIndicator
 * function that updates the content of the progress indicator with a given string
 * @param message the string of a message to display.
@@ -307,13 +294,12 @@ function updateProgressIndicator(message, currentTime){
 }
 
 /**
-* @function makeTweetQueryString
+* @function makeQueryString
 * @desc function that returns a usable query string to search for tweets with given parameters. Uses global variables
 * @returns String, that is used as parameter for getTweets
-* @param older_than UNIX timestamp of highest allowed age a tweet can have
 * @see getTweets
 */
-function makeTweetQueryString(older_than){
+function makeQueryString(){
   let queryString = `bbox=${bbox}&older_than=${older_than}`;
   if(!(include.length == 0 || include == undefined || include[0] == "")){
     queryString = queryString+`&include=${include}`;
@@ -331,7 +317,7 @@ function makeTweetQueryString(older_than){
 */
 async function updateMapTweets(){
   var tweetPromise = new Promise(async function(resolve, reject){
-    var tweets = await getTweets(makeTweetQueryString(older_than));
+    var tweets = await getTweets(makeQueryString());
     resolve(tweets.tweets);
   });
 
@@ -369,7 +355,7 @@ async function updateMapTweets(){
 */
 async function getTweets(params){
   let output;
-  var requestURL = "/tweets?";
+  var requestURL = "/tweetAPI/search?";
   requestURL = requestURL + params;
 
   //console.log(requestURL)
@@ -384,6 +370,41 @@ async function getTweets(params){
     }
   });
   return output;
+}
+
+/**
+* @function checkTweetUpdates
+* @desc periodically queries internal tweet API to see whether new tweets have been posted since the last update.
+* notifies the user on screen
+* @param interval the amount of time to pass between each check in ms
+*/
+async function checkTweetUpdates(interval){
+  setInterval(async function(){
+    var tweetPromise = new Promise(async function(resolve, reject){
+      //indicate event
+      updateProgressIndicator("checking for new tweets");
+      var tweets = await getTweets(makeQueryString()+"&fields=created_at");
+      resolve(tweets.tweets);
+    });
+
+    tweetPromise.then(function(tweets){
+      let numberNewTweets = tweets.length;
+      updateTweetNotifs({increment: numberNewTweets});
+
+      //indicate event
+      if(numberNewTweets > 0){
+        updateProgressIndicator(`<font color="yellow">+${numberNewTweets}</font>, new tweets available`);
+      }
+
+      //update the timestamp
+      older_thanCheck = Date.now();
+
+      //terminate
+      return true;
+    });
+  },
+  interval
+);
 }
 
 /**
@@ -411,7 +432,7 @@ async function checkStatusUpdates(interval){
       }
 
       //terminate
-      return true
+      return true;
     });
   },
   interval
@@ -420,14 +441,14 @@ async function checkStatusUpdates(interval){
 
 /**
 * @function getMessages
-* @desc queries internal API for status messages within given bounding box
+* @desc queries internal API for tweets within given bounding box
 * @param params string of parameters for the API query.
 * @see ApiSpecs
-* @returns Object containing array of information about statuses
+* @returns Object containing array of information about Tweets
 */
 async function getMessages(params){
   let output;
-  var requestURL = "/statuses?";
+  var requestURL = "/status/currentprocesses?";
   requestURL = requestURL + params;
 
   await $.ajax({
@@ -441,41 +462,6 @@ async function getMessages(params){
     }
   });
   return output;
-}
-
-/**
-* @function checkTweetUpdates
-* @desc periodically queries internal tweet API to see whether new tweets have been posted since the last update.
-* notifies the user on screen
-* @param interval the amount of time to pass between each check in ms
-*/
-async function checkTweetUpdates(interval){
-  setInterval(async function(){
-    var tweetPromise = new Promise(async function(resolve, reject){
-      //indicate event
-      updateProgressIndicator("checking for new tweets");
-      var tweets = await getTweets(makeTweetQueryString(older_thanCheck)+"&fields=created_at");
-      resolve(tweets.tweets);
-    });
-
-    tweetPromise.then(function(tweets){
-      let numberNewTweets = tweets.length;
-      updateTweetNotifs({increment: numberNewTweets});
-
-      //indicate event
-      if(numberNewTweets > 0){
-        updateProgressIndicator(`<font color="yellow">+${numberNewTweets}</font>, new tweets available`);
-      }
-
-      //update the timestamp
-      older_thanCheck = Date.now();
-
-      //terminate
-      return true
-    });
-  },
-  interval
-);
 }
 
 /**
@@ -525,31 +511,4 @@ function updateTweetNotifs(arguments){
 */
 function setWindowCoordinates(coords){
   window.history.replaceState(false, "Geomergency", `/geomergency/${coords.lat},${coords.lon},${coords.zoom}`);
-}
-
-/**
-* @function indicateStatus
-* @desc sends a POST request to the status API so processes can indicate status.
-* is used for certain cases of client-to-server communication
-* @param text String, the message of the status
-* @param messageType String, the type of message of the status
-*/
-async function indicateStatus(text,messageType){
-  //prepare form
-  var requestURL = "http://localhost:3000/statuses";
-  var form = {
-    message: text,
-    created_at: Date.now(),
-    messageType: messageType
-  }
-
-  //post form to status endpoint
-  $.post(requestURL,
-    form,
-    function(data, status){
-      if(status != "success"){
-        console.log("error in posting message: ",status)
-      }
-    }
-  )
 }

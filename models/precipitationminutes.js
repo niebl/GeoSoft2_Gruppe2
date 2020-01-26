@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 // Article Schema
-var precipitationSchema = mongoose.Schema({
+var precipitationminutesSchema = mongoose.Schema({
   geojson: {
     type: { type: String },
     properties: {
@@ -13,4 +13,4 @@ var precipitationSchema = mongoose.Schema({
     }
   });
 
-var Precipitation = module.exports = mongoose.model('Precipitation', precipitationSchema);
+var Precipitationminutes = module.exports = mongoose.model('Precipitationminutes', precipitationminutesSchema);
