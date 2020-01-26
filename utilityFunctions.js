@@ -5,6 +5,8 @@
 **/
 
 var request = require('request');
+var yaml = require('js-yaml');
+var fs = require('fs');
 
 module.exports = {
   request: request,
@@ -16,7 +18,7 @@ module.exports = {
   */
   indicateStatus : async function(text){
     var output;
-    var requestURL = "http://localhost:3000/status/newprocess";
+    var requestURL = "http://localhost:3000/statuses";
     //let requestURL = "https://localhost:3000/embedTweet?id="
 
     request.post(requestURL, {form:
@@ -71,5 +73,39 @@ module.exports = {
       return err;
     };
     return bbox
+  },
+
+  /**
+  * @function loadConfigs
+  * @desc reads the config.yaml and returns an object containing the values
+  * @returns object, containting several attributes and values that represent configuration arguments
+  */
+  loadConfigs: function(path){
+    try {
+      //load and return the document in the path
+      const doc = yaml.safeLoad(fs.readFileSync(path, 'utf-8'));
+      return(doc);
+    } catch (e){
+      console.log(e);
+      return false;
+    }
+  },
+
+  /**
+  * @function setConfigs
+  * @desc sets the server configutrations to what the parameters say
+  * @param configs object containing configuration parameters
+  */
+  setConfigs: function(configs){
+    configurations = configs;
+  },
+
+  /**
+  * @function sendClientConfigs
+  * @desc function that returns the configutrations that are relevant to the client side of the application
+  * @returns object, containting several attributes and values that represent configuration arguments
+  */
+  sendClientConfigs: function(){
+    return configurations.clientParams
   }
 };
