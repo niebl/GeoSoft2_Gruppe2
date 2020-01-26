@@ -24,11 +24,16 @@ block sidebar
           hr
         div#Keywords
           p include keywords:
-          input#includeKeywordsB(name='includeKeywordsB').form-control-sm(placeholder="separated by comma").bboxForm
+          input#includeKeywords(name='includeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
           p exclude keywords:
-          input#excludeKeywordsB(name='excludeKeywordsB').form-control-sm(placeholder="separated by comma").bboxForm
-          button#confirmFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm filter    
+          input#excludeKeywords(name='excludeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
+          button#confirmFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
           hr
+        div#events
+          p weather event filter
+          input#eventFilter(name='eventFilter',placeholder="separated by comma").form-control-sm.bboxForm
+          button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
+          button#resetEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton reset
       // from here on Precipitation
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
         button#parameter-toggle2(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle Precipitation Filter
@@ -77,7 +82,7 @@ block sidebar
 
     
     div#impressum.list-group-item.list-group-item-action.bg-light
-      p Geomergency 2019
+      p Geomergency 2020
         
             
   

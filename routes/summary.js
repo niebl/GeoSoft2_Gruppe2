@@ -56,7 +56,7 @@ router.get("/density", async function(req, res ){
 
   var requestSettings = {
         url: url,
-        body: '{"url":"http://localhost:3000/tweetAPI/search?bbox=55.299,3.95,47.076,16.655"}',
+        body: '{"url":"http://localhost:3000/tweets?bbox=55.299,3.95,47.076,16.655"}',
         method: 'GET',
         encoding: null
     };
@@ -90,7 +90,7 @@ router.get("/kest", async function(req, res ){
 
   var requestSettings = {
         url: url,
-        body: '{"url":"http://localhost:3000/tweetAPI/search?bbox=55.299,3.95,47.076,16.655"}',
+        body: '{"url":"http://localhost:3000/tweets?bbox=55.299,3.95,47.076,16.655"}',
         method: 'GET',
         encoding: null
     };

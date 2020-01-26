@@ -1,27 +1,29 @@
-# API specifications
+# API specifications `weather`
 
-[Based on](https://idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html)
+specification formatting based on [idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html](https://idratherbewriting.com/learnapidoc/docapis_resource_descriptions.html)
+
+The specification of the API that serves the cached data on weather warnings for German districts (Kreise), that are provided by the DWD.
 
 ## Resource Descriptions
  ### Available Methods
+
+
 
  * The API to handle status indicator communication `/weather`:
 
 |**method**|**path**|
  |------|-----|
- |  GET | `/weather/warnings` |
+ |  GET | `/weather` |
 
-<hr>
 
-## Endpoints and Methods
+ ### Endpoints
 
-* #### GET `/weather/warnings`
+* #### GET `/weather`
  returns shapes of German districts that have issued warnings of weather against them by the DWD.
  **Parameters**
  * `bbox` the geographical boundaries with which the resulting district borders can overlap. (WGS84)
- * `events` list of types of events to include in the results.
+ * `events` list of types of events to to filter results for.
 
-<hr>
 
 ## Parameters
 
@@ -30,7 +32,7 @@
 
 | **Name** | **Method** | **Description**|
 |----------|------------|----------------|
-|`weather/warnings`| GET |Search for|
+|`/weather`| GET |retrieve the geojson of weather warnings for German districts|
 
 #### General Search Parameters
 
@@ -43,14 +45,17 @@
 
 ## examples
 
-### GET `/weather/warnings`
+### GET `/weather`
 #### request example
 `
-localhost:3000/weather/warnings?events=FROST
+localhost:3000/weather?events=FROST
 `
 
 ### response example
+response type: JSON
 ```JS
+Status: 200 OK
+
 [
   {
       "properties": {
@@ -90,10 +95,8 @@ localhost:3000/weather/warnings?events=FROST
           10.7074,
           48.2296
       ],
-      "_id": "5e1f1b99db7edb4068c7082d",
       "type": "Feature",
-      "id": "Warnungen_Landkreise.fid--1cfd208f_16fa9819749_-484",
-      "__v": 0
+      "id": "Warnungen_Landkreise.fid--1cfd208f_16fa9819749_-484"
   },
 
   [ ... ]

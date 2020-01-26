@@ -11,6 +11,7 @@ var precipitationSchema = mongoose.Schema({
       type: { type: String },
       coordinates: Array}
     }
-  });
+  }
+);
 
 var Precipitation = module.exports = mongoose.model('Precipitation', precipitationSchema);
