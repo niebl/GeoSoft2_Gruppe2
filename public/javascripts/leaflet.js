@@ -387,7 +387,9 @@ async function getDensity(query){
   //set up request URL
   var requestURL = "/summary/density";
 
-
+  if(query.sigma != undefined && query.sigma != []){
+    requestURL = requestURL+`?sigma=${query.sigma}`;
+  }
 
   return await $.ajax({
     url: requestURL,

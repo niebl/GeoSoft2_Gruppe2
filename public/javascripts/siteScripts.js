@@ -115,11 +115,53 @@ async function main(err){
 
   // summary Statistics:
   $("#density").click(function(){
-    getDensity();
+    var sigma = $("#densitysigma").val();
+    console.log("Siga Value: " + sigma)
+    getDensity({
+      sigma: sigma
+    });
+  });
+  $("#ann").click(function(){
+    $("#imagesummary").attr("src", "/summary/ann");
+    $("#imagesummary").attr("width", "300px");
+    $("#imagesummary").attr("height", "300px");
+    $("#linksummary").attr("href", "/summary/ann");
+    $("#linksummary").attr("target", "_blank");
   });
   $("#kest").click(function(){
     $("#imagesummary").attr("src", "/summary/kest");
+    $("#imagesummary").attr("width", "300px");
+    $("#imagesummary").attr("height", "300px");
     $("#linksummary").attr("href", "/summary/kest");
+    $("#linksummary").attr("target", "_blank");
+  });
+  $("#fest").click(function(){
+    $("#imagesummary").attr("src", "/summary/fest");
+    $("#imagesummary").attr("width", "300px");
+    $("#imagesummary").attr("height", "300px");
+    $("#linksummary").attr("href", "/summary/fest");
+    $("#linksummary").attr("target", "_blank");
+  });
+  $("#gest").click(function(){
+    $("#imagesummary").attr("src", "/summary/gest");
+    $("#imagesummary").attr("width", "300px");
+    $("#imagesummary").attr("height", "300px");
+    $("#linksummary").attr("href", "/summary/gest");
+    $("#linksummary").attr("target", "_blank");
+  });
+  $("#lest").click(function(){
+    $("#imagesummary").attr("src", "/summary/lest");
+    $("#imagesummary").attr("width", "300px");
+    $("#imagesummary").attr("height", "300px");
+    $("#linksummary").attr("href", "/summary/lest");
+    $("#linksummary").attr("target", "_blank");
+  });
+  $("#wordcloud").click(function(){
+    $("#imagesummary").attr("src", "/summary/wordcloud");
+    $("#imagesummary").attr("width", "300px");
+    $("#imagesummary").attr("height", "300px");
+    $("#linksummary").attr("href", "/summary/wordcloud");
+    $("#linksummary").attr("target", "_blank");
   });
   $("#getPrec").click(function(){
     get1hRadar({
