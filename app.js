@@ -63,8 +63,8 @@ app.use('/', indexRouter);
 app.use('/geomergency', indexRouter);
 app.use('/geomergency/:coords', indexRouter);
 
-app.use('/geomergency/example', exampleRouter);
-app.use('/geomergency/example/:coords', exampleRouter);
+app.use('/example', exampleRouter);
+app.use('/example/:coords', exampleRouter);
 
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));

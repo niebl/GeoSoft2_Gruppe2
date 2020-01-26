@@ -3,7 +3,7 @@ var router = express.Router();
 var utilities = require('../utilityFunctions.js');
 
 /* GET home page. */
-router.get('/geomergency/example/:coords', function(req, res, next) {
+router.get('/:coords', function(req, res, next) {
   var coords = req.params.coords;
   var error;
 
@@ -43,8 +43,7 @@ router.get('/geomergency/example/:coords', function(req, res, next) {
 
 });
 
-router.get('/geomergency/example', function(req, res, next){
-
+router.get('/', function(req, res, next){
   res.render('exampleIndex');
 
 });
