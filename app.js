@@ -372,7 +372,7 @@ async function tweetSearch(req,res){
   }
 
   //QUERY exclude
-  if(exclude != undefined){
+  if(exclude != undefined && outJSON.tweets != undefined){
     //loop through each substring and make sure they're in none of the tweets
     for(let substring of exclude){
       //    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
@@ -621,7 +621,6 @@ async function queryStatuses(queries, res){
     }
   );
 
-  console.log(output)
   return output;
 }
 

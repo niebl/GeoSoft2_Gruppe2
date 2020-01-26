@@ -294,7 +294,6 @@ async function get1hRadar(query){
   });
 }
 
-
 /**
 * @function get5mRadar
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
@@ -372,7 +371,6 @@ async function get5mRadar(query){
   });
 }
 
-
 /**
 * @function getDensity
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
@@ -385,15 +383,26 @@ async function getDensity(query){
   densityLayer.clearLayers();
 
   //set up request URL
-  var requestURL = "/summary/density";
+  var requestURL = "/summary/density?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`
+  }
 
-
+  updateProgressIndicator("refreshing tweet-density heatmap...");
 
   return await $.ajax({
     url: requestURL,
     success: async function(data){
-      console.log("The density is getting loaded");
-      console.log(data);
+      updateProgressIndicator("tweet-density heatmap refreshed");
       for(let feature of data){
         densityLayer.addLayer(L.geoJson(feature,{
           style: function(feature) {
@@ -417,7 +426,7 @@ async function getDensity(query){
 
     },
     error: function(xhr, ajaxOptions, thrownError){
-      console.log("error in density");
+      updateProgressIndicator('<font color="red">failed refreshing tweet-density heatmap</font>');
       console.log(xhr.status);
       console.log(requestURL);
       console.log(thrownError);

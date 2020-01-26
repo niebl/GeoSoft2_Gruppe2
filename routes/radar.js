@@ -96,6 +96,7 @@ router.get("/get1hradar", async function(req, res){
       if(err){
         console.log(err);
       }
+      console.log(result)
 
       for(var i= 0; i < result.length; i++){
           regions.features.push(result[i].geojson);

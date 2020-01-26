@@ -3,7 +3,7 @@
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
-var radarbbox;
+
 var include = [];
 var exclude = [];
 var eventfilter = [];
@@ -11,6 +11,8 @@ var eventfilter = [];
 var older_than;
 var older_thanCheck;
 var older_thanStatusCheck;
+var initTimeHeatmap = Date.now() - 300000;
+
 var min_precipitation;
 var max_precipitation;
 
@@ -66,7 +68,7 @@ async function main(err){
     min : min_precipitation,
     max : max_precipitation
   });
-  getDensity();
+  getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
   setInterval(
     get1hRadar(),
     oneHourRadarUpdateInterval
@@ -115,7 +117,7 @@ async function main(err){
 
   // summary Statistics:
   $("#density").click(function(){
-    getDensity();
+    getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
   });
   $("#kest").click(function(){
     $("#imagesummary").attr("src", "/summary/kest");
@@ -125,29 +127,13 @@ async function main(err){
     get1hRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : radarbbox
+      bbox : bbox
     });
     get5mRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : radarbbox
+      bbox : bbox
     });
-  });
-  $("#confirmCoords2").click(function(){
-    var north = $("#bboxNorth2").val();
-    var west = $("#bboxWest2").val();
-    var south = $("#bboxSouth2").val();
-    var east = $("#bboxEast2").val();
-    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
-    radarbbox = bboxURL;
-  });
-  $("#deleteCoords2").click(function(){
-    var north = $("#bboxNorth2").val();
-    var west = $("#bboxWest2").val();
-    var south = $("#bboxSouth2").val();
-    var east = $("#bboxEast2").val();
-    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
-    radarbbox = [];
   });
 
 

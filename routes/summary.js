@@ -9,7 +9,7 @@ router.get("/summary", async function(req, res ){
   var url = 'http://localhost:8000/data';
   var requestSettings = {
         url: url,
-        body: '{"url":"http://localhost:3000/tweetAPI/search?bbox=55.299,3.95,47.076,16.655"}',
+        body: '{"url":"http://localhost:3000/tweets?bbox=55.299,3.95,47.076,16.655"}',
         method: 'GET',
         encoding: null
     };
@@ -54,9 +54,21 @@ router.get("/density", async function(req, res ){
     url = 'http://localhost:8000/wordcloud?minfreq=' + req.query.minfreq ;
   }
 
+  let tweetRequestUrl = `http://localhost:3000/tweets?`
+  if(req.query.bbox){
+    tweetRequestUrl = tweetRequestUrl+`bbox=${req.query.bbox}&`
+  }
+  if(req.query.older_than){
+    tweetRequestUrl = tweetRequestUrl+`older_than=${req.query.older_than}&`
+  }
+  //TODO: include, exclude
+
+
+  console.log(tweetRequestUrl)
+
   var requestSettings = {
         url: url,
-        body: '{"url":"http://localhost:3000/tweets?bbox=55.299,3.95,47.076,16.655"}',
+        body: `{"url": "${tweetRequestUrl}"}`,
         method: 'GET',
         encoding: null
     };
