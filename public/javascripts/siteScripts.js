@@ -3,13 +3,16 @@
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
+var radarbbox;
 var include = [];
 var exclude = [];
-var eventFilter = [];
+var eventfilter = [];
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
 var older_thanStatusCheck;
+var min_precipitation;
+var max_precipitation;
 
 
 //the minimal distance a map-tag is allowed to have to another in meters without being merged.
@@ -17,6 +20,7 @@ var nearestTweetRadius;
 var updateCheckInterval;
 var statusCheckInterval;
 var warningUpdateInterval;
+var oneHourRadarUpdateInterval;
 
 main();
 
@@ -49,10 +53,28 @@ async function main(err){
     older_thanCheck = older_than;
     //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
     older_thanStatusCheck = Date.now() - configs.intervals.statusCheckOffset;
+  oneHourRadarUpdateInterval = 300000;
 
     //initialise all check intervals with the new values
     initialiseIntervals();
   }
+  get1hRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
+  get5mRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
+  getDensity();
+  setInterval(
+    get1hRadar(),
+    oneHourRadarUpdateInterval
+  );
+  setInterval(
+    get5mRadar(),
+    oneHourRadarUpdateInterval
+  );
 
   ////////////////////////////////////////////////////////////////////////////////
   // site-events
@@ -70,6 +92,16 @@ async function main(err){
     $("#tweet-browser").toggleClass("toggled");
   });
 
+  $("#parameter-toggle1").click(function(e){
+    e.preventDefault();
+    $("#browser-controls1").toggleClass("toggled");
+  });
+
+  $("#parameter-toggle2").click(function(e){
+    e.preventDefault();
+    $("#browser-controls2").toggleClass("toggled");
+  });
+
   //click of UPDATE MAP button
   $("#update-map").click(function(){
     updateMapTweets();
@@ -80,6 +112,46 @@ async function main(err){
     $("#wrapper").toggleClass("toggled");
     setTimeout(function(){ map.invalidateSize();}, 400);
   });
+
+  // summary Statistics:
+  $("#density").click(function(){
+    getDensity();
+  });
+  $("#kest").click(function(){
+    $("#imagesummary").attr("src", "/summary/kest");
+    $("#linksummary").attr("href", "/summary/kest");
+  });
+  $("#getPrec").click(function(){
+    get1hRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      bbox : radarbbox
+    });
+    get5mRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      bbox : radarbbox
+    });
+  });
+  $("#confirmCoords2").click(function(){
+    var north = $("#bboxNorth2").val();
+    var west = $("#bboxWest2").val();
+    var south = $("#bboxSouth2").val();
+    var east = $("#bboxEast2").val();
+    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
+    radarbbox = bboxURL;
+  });
+  $("#deleteCoords2").click(function(){
+    var north = $("#bboxNorth2").val();
+    var west = $("#bboxWest2").val();
+    var south = $("#bboxSouth2").val();
+    var east = $("#bboxEast2").val();
+    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
+    radarbbox = [];
+  });
+
+
+
 
   //go to tweet
   $("#tweet-browser, #map").on('click', '.gotoTweet', function(e){
@@ -193,6 +265,17 @@ async function main(err){
     indicateStatus("-180,85,+180,-85", "selectedbbox")
   });
 
+  $('#saveLevels').on('click', function(e){
+    var min =  $('#LevelsPreMin').val();
+    var max =  $('#LevelsPreMax').val();
+    if(min <= max){
+      min_precipitation = min;
+      max_precipitation = max;
+      $('#PrecLevelError').text("Parameters setted");
+    } else{
+      $('#PrecLevelError').text("Invalid Parameters");
+    }
+  });
   //FILTER words
   $('#confirmFilter').on('click', function(e){
     include = $("input[name='includeKeywords']").val().split(",");
@@ -411,7 +494,7 @@ async function checkStatusUpdates(interval){
       }
 
       //terminate
-      return true
+      return true;
     });
   },
   interval

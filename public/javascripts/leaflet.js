@@ -44,12 +44,18 @@ var drawnRect = new L.FeatureGroup();
 * create layer for counties
 *
 */
-var kreisLayer = L.featureGroup(false)
+var kreisLayer = L.featureGroup(false);
+var radar1hLayer =  L.featureGroup(false);
+var radar5mLayer =  L.featureGroup(false);
+var densityLayer =  L.featureGroup(false);
 
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
   "Tweets": tweetLayer,
   "District-Warnings": kreisLayer,
+  "1h Radar": radar1hLayer,
+  "Minute Radar": radar5mLayer,
+  "Tweet Density": densityLayer,
   "Selection": drawnRect
 };
 
@@ -68,7 +74,7 @@ var map = L.map('map', {
 //add zoom buttons:
 var zoomControls = L.control.zoom({
   position:'topright'
-}).addTo(map)
+}).addTo(map);
 
 //add drawControl
 var drawControl = new L.Control.Draw({
@@ -85,11 +91,11 @@ var drawControl = new L.Control.Draw({
     featureGroup: drawnRect
   },
   position:'topright'
-})
+});
 map.addControl(drawControl);
 
 map.on('draw:created', function(e){
-  drawnRect.clearLayers()
+  drawnRect.clearLayers();
   var layer = e.layer;
 
   //North, west, south, east coords
@@ -205,7 +211,215 @@ async function getWarnings(query){
     error: function(xhr, ajaxOptions, thrownError){
       console.log("error in getWarnings");
       console.log(xhr.status);
-      console.log(requestURL)
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function get1hRadar
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function get1hRadar(query){
+  //clear layer
+  radar1hLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "radar/get1hradar";
+  console.log("min:  " + query.min);
+  console.log("max:  " + query.max);
+  if(query != undefined){
+      //variable to let the URL builder know whether a parameter was already entered in the query
+    var noPriorParam = true;
+
+    if(query.min != undefined && query.min != []){
+      requestURL = requestURL+`?min=${query.min}`;
+      noPriorParam = false;
+    }
+    if(query.max != undefined && query.max != []){
+      if(noPriorParam){
+        requestURL = requestURL+`?max=${query.max}`;
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+`&max=${query.max}`;
+      }
+    }
+    if(query.bbox != undefined && query.bbox != []){
+      if(noPriorParam){
+        requestURL = requestURL+ '?';
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+'&';
+      }
+      requestURL = requestURL + `polygon=${query.bbox}`;
+    }
+    console.log(requestURL);
+  }
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      console.log("The radar data getting loaded");
+      console.log(data);
+      for(let feature of data){
+        radar1hLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.level) {
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "#b3cde3"};
+            case 1:  return {fillColor: "#8c96c6"};
+            case 2:  return {fillColor: "#8856a7"};
+            case 3:  return {fillColor: "#810f7c"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in get1hradar");
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+
+/**
+* @function get5mRadar
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function get5mRadar(query){
+  //clear layer
+  radar5mLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "radar/get5mradar";
+  console.log("min:  " + query.min);
+  console.log("max:  " + query.max);
+  if(query != undefined){
+      //variable to let the URL builder know whether a parameter was already entered in the query
+    var noPriorParam = true;
+
+    if(query.min != undefined && query.min != []){
+      requestURL = requestURL+`?min=${query.min}`;
+      noPriorParam = false;
+    }
+    if(query.max != undefined && query.max != []){
+      if(noPriorParam){
+        requestURL = requestURL+`?max=${query.max}`;
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+`&max=${query.max}`;
+      }
+    }
+    if(query.bbox != undefined && query.bbox != []){
+      if(noPriorParam){
+        requestURL = requestURL+ '?';
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+'&';
+      }
+      requestURL = requestURL + `polygon=${query.bbox}`;
+    }
+    console.log(requestURL);
+  }
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      console.log("The radar data getting loaded");
+      console.log(data);
+      for(let feature of data){
+        radar5mLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.level) {
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "#b3cde3"};
+            case 1:  return {fillColor: "#8c96c6"};
+            case 2:  return {fillColor: "#8856a7"};
+            case 3:  return {fillColor: "#810f7c"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in get5mradar");
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+
+/**
+* @function getDensity
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getDensity(query){
+  //clear layer
+  densityLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "summary/density";
+
+
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      console.log("The density is getting loaded");
+      console.log(data);
+      for(let feature of data){
+        densityLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.layer) {
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "transparent"};
+            case 1:  return {fillColor: "#ffffb2"};
+            case 2:  return {fillColor: "#fecc5c"};
+            case 3:  return {fillColor: "#fd8d3c"};
+            case 4:  return {fillColor: "#f03b20"};
+            case 5:  return {fillColor: "#bd0026"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in density");
+      console.log(xhr.status);
+      console.log(requestURL);
       console.log(thrownError);
     }
   });
@@ -290,8 +504,8 @@ function onEachTweet(feature, layer){
   `;
   var popup = L.popup(
       {maxHeight:140}
-    ).setContent(tweetdiv)
-  layer.bindPopup(popup)
+    ).setContent(tweetdiv);
+  layer.bindPopup(popup);
 }
 
 /**

@@ -91,7 +91,11 @@ app.use('/weather', weatherRouter);
 var rRouter = require("./routes/r");
 app.use('/r', rRouter);
 
+var radarRouter = require("./routes/radar");
+app.use('/radar', radarRouter);
 
+var summaryRouter = require("./routes/summary");
+app.use('/summary', summaryRouter);
 /**
   * sets the default location of a pair of a location
   * e.g. a default Map view postion
