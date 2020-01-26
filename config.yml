@@ -11,6 +11,9 @@ tweetParams:
 weatherParams:
   weatherUpdateInterval: 300000
 
+statisc:
+  sigma: "123"
+
 # parameters relevant to the client side
 clientParams:
   #intervals in which the client side refreshes certain data. in ms.

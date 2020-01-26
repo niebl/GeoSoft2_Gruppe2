@@ -16,8 +16,7 @@ module.exports = {
   */
   indicateStatus : async function(text){
     var output;
-    var requestURL = "http://localhost:3000/status/newprocess";
-    //let requestURL = "https://localhost:3000/embedTweet?id="
+    var requestURL = "http://localhost:3000/statuses";
 
     request.post(requestURL, {form:
       {

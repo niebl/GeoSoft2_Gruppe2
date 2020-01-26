@@ -13,7 +13,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
 var nodeHTMLParser = require('node-html-parser');
@@ -61,7 +60,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/geomergency', indexRouter);
 app.use('/geomergency/:coords', indexRouter);
-app.use('/users', usersRouter);
 
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
@@ -683,6 +681,7 @@ async function postProcesses(req,res){
         res.send("error in posting status: ", err);
       }
     });
+
     //if it went well, tell them
     res.status(200);
     res.send(`Status successfully posted`);

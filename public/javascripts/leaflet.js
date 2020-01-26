@@ -229,7 +229,7 @@ async function get1hRadar(query){
   radar1hLayer.clearLayers();
 
   //set up request URL
-  var requestURL = "radar/get1hradar";
+  var requestURL = "/radar/get1hradar";
   console.log("min:  " + query.min);
   console.log("max:  " + query.max);
   if(query != undefined){
@@ -307,7 +307,7 @@ async function get5mRadar(query){
   radar5mLayer.clearLayers();
 
   //set up request URL
-  var requestURL = "radar/get5mradar";
+  var requestURL = "/radar/get5mradar";
   console.log("min:  " + query.min);
   console.log("max:  " + query.max);
   if(query != undefined){
@@ -385,7 +385,7 @@ async function getDensity(query){
   densityLayer.clearLayers();
 
   //set up request URL
-  var requestURL = "summary/density";
+  var requestURL = "/summary/density";
 
 
 

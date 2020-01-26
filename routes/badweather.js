@@ -194,30 +194,6 @@ router.get('/getBorders', (req, res) => {
     return true;
   }
 
-<<<<<<< HEAD
-/**
-* @function loadUnwetter
-* function that loads new weather-alert-data into the database if called
-* devnote: still very high runtime. might not be of high priority since it's not called often, but improvement is encouraged
-* @author Dorian, FELIX
-* //TODO: manche Kreise (Freiburg, Kreis Augsburg, Stadt münchen, etc) bekommen keine Warnungen. Grund: if(warning.regionName.includes(kreis.properties.GEN)) nicht genau genug
-*/
-function loadUnwetter(){
-  utilities.indicateStatus("updating weather warnings from DWD-API");
-  const requestURL = "https://maps.dwd.de/geoserver/dwd/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dwd%3AWarnungen_Landkreise&outputFormat=application%2Fjson";
-  console.log("loading Unwetter")
-  request(requestURL, function(error, response, body) {
-    if(error){
-      console.log(error);
-      utilities.indicateStatus(`<font color="red">error in connecting to DWD-API of weather warnings: ${error}</font>`);
-      return;
-    }
-
-    //clear the database of previous entries
-    UnwetterKreis.deleteMany({}, function(err, result){
-      if(err){
-        utilities.indicateStatus(`<font color="red">error in refreshing Unwetter ${err}</font>`);
-=======
   /**
   * @function loadUnwetter
   * function that loads new weather-alert-data into the database if called
@@ -228,12 +204,11 @@ function loadUnwetter(){
   function loadUnwetter(){
     utilities.indicateStatus("updating weather warnings from DWD-API");
     const requestURL = "https://maps.dwd.de/geoserver/dwd/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dwd%3AWarnungen_Landkreise&outputFormat=application%2Fjson";
-    console.log("loading Unwetter");
+    console.log("loading Unwetter")
     request(requestURL, function(error, response, body) {
       if(error){
         console.log(error);
         utilities.indicateStatus(`<font color="red">error in connecting to DWD-API of weather warnings: ${error}</font>`);
->>>>>>> rplumber
         return;
       }
 
@@ -243,66 +218,74 @@ function loadUnwetter(){
           utilities.indicateStatus(`<font color="red">error in refreshing Unwetter ${err}</font>`);
           return;
         }
-        //parse the results of the query
-        var responseJSON = body;
-        responseJSON = JSON.parse(responseJSON);
 
-        //create an array of all the warnings
-        warnings = responseJSON.features;
+        //clear the database of previous entries
+        UnwetterKreis.deleteMany({}, function(err, result){
+          if(err){
+            utilities.indicateStatus(`<font color="red">error in refreshing Unwetter ${err}</font>`);
+            return;
+          }
+          //parse the results of the query
+          var responseJSON = body;
+          responseJSON = JSON.parse(responseJSON);
 
-        //establish array for mongoose objects to be stored in before being saved
-        let existingDistricts = [null];
-        let warnkreise = [null];
+          //create an array of all the warnings
+          warnings = responseJSON.features;
 
-        for(let kreis of warnings){
-          if(kreis.type == "Feature"){
-            //loop through existing warnings to see if any already exist
-            let districtfound = false;
-            for(let i = 0; i < existingDistricts.length; i++){
-              if(kreis.properties.AREADESC == existingDistricts[i]){
-                districtfound = true;
-                //TODO: append more info
-                warnkreise[i].properties.EVENT.push(kreis.properties.EVENT);
+          //establish array for mongoose objects to be stored in before being saved
+          let existingDistricts = [null];
+          let warnkreise = [null];
+
+          for(let kreis of warnings){
+            if(kreis.type == "Feature"){
+              //loop through existing warnings to see if any already exist
+              let districtfound = false;
+              for(let i = 0; i < existingDistricts.length; i++){
+                if(kreis.properties.AREADESC == existingDistricts[i]){
+                  districtfound = true;
+                  //TODO: append more info
+                  warnkreise[i].properties.EVENT.push(kreis.properties.EVENT);
+                }
+              }
+              if(!districtfound){
+                //the warning doesn't exist yet on the list, add it
+                let newKreisWarnung = new UnwetterKreis({
+                  type: kreis.type,
+                  id: kreis.id,
+                  bbox: kreis.bbox,
+                  geometry: {
+                    type: kreis.geometry.type,
+                    coordinates: kreis.geometry.coordinates
+                  },
+                  properties:  {
+                    AREADESC: kreis.properties.AREADESC,
+                    EVENT: kreis.properties.EVENT,
+                    ECGROUP: kreis.properties.ECGROUP,
+                    URGENCY: kreis.properties.URGENCY,
+                    SENT: kreis.properties.SENT,
+                    ONSET: kreis.properties.ONSET,
+                    EXPIRED: kreis.properties.EXPIRED,
+                    HEADLINE: kreis.properties.HEADLINE,
+                    DESCRIPTION: kreis.properties.DESCRIPTION,
+                    PARAMETERNAME: kreis.properties.PARAMETERNAME,
+                    PARAMETERVALUE: kreis.properties.PARAMETERVALUE
+                  }
+                });
+                warnkreise.push(newKreisWarnung);
+                existingDistricts.push(kreis.properties.AREADESC);
+                newKreisWarnung = undefined;
               }
             }
-            if(!districtfound){
-              //the warning doesn't exist yet on the list, add it
-              let newKreisWarnung = new UnwetterKreis({
-                type: kreis.type,
-                id: kreis.id,
-                bbox: kreis.bbox,
-                geometry: {
-                  type: kreis.geometry.type,
-                  coordinates: kreis.geometry.coordinates
-                },
-                properties:  {
-                  AREADESC: kreis.properties.AREADESC,
-                  EVENT: kreis.properties.EVENT,
-                  ECGROUP: kreis.properties.ECGROUP,
-                  URGENCY: kreis.properties.URGENCY,
-                  SENT: kreis.properties.SENT,
-                  ONSET: kreis.properties.ONSET,
-                  EXPIRED: kreis.properties.EXPIRED,
-                  HEADLINE: kreis.properties.HEADLINE,
-                  DESCRIPTION: kreis.properties.DESCRIPTION,
-                  PARAMETERNAME: kreis.properties.PARAMETERNAME,
-                  PARAMETERVALUE: kreis.properties.PARAMETERVALUE
-                }
-              });
-              warnkreise.push(newKreisWarnung);
-              existingDistricts.push(kreis.properties.AREADESC);
-              newKreisWarnung = undefined;
+          }
+          //finally, save the warnings to the db
+          for(let kreisWarnung of warnkreise){
+            if(kreisWarnung != null){
+              kreisWarnung.save();
             }
           }
-        }
-        //finally, save the warnings to the db
-        for(let kreisWarnung of warnkreise){
-          if(kreisWarnung != null){
-            kreisWarnung.save();
-          }
-        }
-        console.log("weather update successful");
-        utilities.indicateStatus("weather-warning update successful");
+          console.log("weather update successful");
+          utilities.indicateStatus("weather-warning update successful");
+        });
       });
     });
   }
