@@ -6,19 +6,17 @@ var unwetterKreisSchema = mongoose.Schema({
   id: {type: String, unique: true},
   bbox: Array,
   properties: {
-    created_at: {type: Number},
     AREADESC: {type: String},
     EVENT: [String],
-    EC_GROUP: [String],
-    EC_LICENSE: {type: String},
+    ECGROUP: {type: String},
     URGENCY: {type: String},
     SENT: {type: String},
     ONSET: {type: String},
     EXPIRED: {type: String},
-    HEADLINE: [String],
-    DESCRIPTION: [String],
-    PARAMETERNAME: [String],
-    PARAMETERVALUE: [String]
+    HEADLINE: {type: String},
+    DESCRIPTION: {type: String},
+    PARAMETERNAME: {type: String},
+    PARAMETERVALUE: {type: String}
   },
   geometry: {
      type: { type: String },

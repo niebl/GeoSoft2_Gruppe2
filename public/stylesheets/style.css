@@ -29,6 +29,21 @@
   float: right;
 }
 
+#bboxNorth2{
+  display: table;
+  margin: 0 auto;
+}
+#bboxSouth2{
+  display: table;
+  margin: 0 auto;
+}
+#bboxWest2{
+  float: left;
+}
+#bboxEast2{
+  float: right;
+}
+
 .toggle-bar{
   position:absolute;
   z-index: 1;
@@ -64,6 +79,20 @@
   transition: max-height .5s ease-out;
 }
 
+#browser-controls1.toggled{
+  margin-top: -24px;
+
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .5s ease-out;
+}
+#browser-controls2.toggled{
+  margin-top: -24px;
+
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .5s ease-out;
+}
 
 #sidebarCollapse{
   font-size: 20px;
