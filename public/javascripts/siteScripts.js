@@ -90,11 +90,27 @@ async function main(err){
 
   // summary Statistics:
   $("#density").click(function(){
-    getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+    var sigma =   $("densitysigma").val();
+    getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, sigma : sigma});
   });
   $("#kest").click(function(){
-    $("#imagesummary").attr("src", "/summary/kest");
-    $("#linksummary").attr("href", "/summary/kest");
+    getKest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#fest").click(function(){
+    getFest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#lest").click(function(){
+    getLest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#gest").click(function(){
+    getGest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+
+  $("#wordcloud").click(function(){
+    getWordcloud({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#fest").click(function(){
+    getFest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
   });
   $("#getPrec").click(function(){
     get1hRadar({

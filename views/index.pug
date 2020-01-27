@@ -53,9 +53,16 @@ block sidebar
         button#parameter-toggle1(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle Summary Statistics
       div#browser-controls1.list-group-item.list-group-item-action.bg-light.toggled
         div#bboxCoordSelection1
-          p Statistics
+          p Density of Tweets
           div.btn-group-vertical
+            p Sigma for density (Value between 0.001 and 99)
+            input#densitysigma(type="number",placeholder="0.2", min="0.00001" max="100" step="any").form-control-sm.bboxForm
             button#density(type="button").btn.btn-secondary.btn-sm.sidebarButton Refresh Density of Tweets
+          p Function for Tweets
+          div.btn-group-vertical
+            button#wordcloud(type="button").btn.btn-secondary.btn-sm.sidebarButton Generate Wordcloud
+            button#timehist(type="button").btn.btn-secondary.btn-sm.sidebarButton Tweets over Time
+            button#ann(type="button").btn.btn-secondary.btn-sm.sidebarButton Show Average Nearest Neighbour
             button#kest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show K-Function
             button#lest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show L-Function
             button#fest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show F-Function
