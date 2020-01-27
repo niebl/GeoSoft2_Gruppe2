@@ -5,6 +5,8 @@
 **/
 
 var request = require('request');
+var yaml = require('js-yaml');
+var fs = require('fs')
 
 module.exports = {
   request: request,
@@ -24,6 +26,7 @@ module.exports = {
         created_at: Date.now()
       }
   });},
+
   /**
   * @function parseBBOX
   * @desc function that takes a string of 4 coordinates and parses it into an Array
@@ -70,5 +73,21 @@ module.exports = {
       return err;
     };
     return bbox
+  },
+
+  /**
+  * @function loadConfigs
+  * @desc reads the config.yaml and returns an object containing the values
+  * @returns object, containting several attributes and values that represent configuration arguments
+  */
+  loadConfigs: function(path){
+    try {
+      //load and return the document in the path
+      const doc = yaml.safeLoad(fs.readFileSync(path, 'utf-8'));
+      return(doc);
+    } catch (e){
+      console.log(e);
+      return false;
+    }
   }
 };

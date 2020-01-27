@@ -1,12 +1,18 @@
 # tweet-scraper parameters
 
+# TEMPLATE FILE
+#  copy this file, name it "config.yaml" and insert the given keys into the given parameters.
+#  double check that "config.yaml" is in .gitignore and .dockerignore
+#  DO NOT PUBLISH ANY TOKENS ON GITHUB
+#  if you do, please notify us before resetting the tokens.
+
 # twitter tokens
 tokens:
   twitter:
-    consumer_key: "M2ZROT74Nu4TNBPUQLVtaRbsm"
-    consumer_secret: "Bx7iLqgbjSvxCI8kOK6CdTgGvoaUJpzV7GCuiXffPT306HF4AF"
-    access_token_key: "1198826533047197696-zRftsydr4rF93pJSBalRg05AEE88Ao"
-    access_token_secret: "LleRa86TeSWdAOJiy0leKsRMGla5OGwV2hdiaZnB1v9Ux"
+    consumer_key: "KEY HERE"
+    consumer_secret: "KEY HERE"
+    access_token_key: "KEY HERE"
+    access_token_secret: "KEY HERE"
 
 #the standard parameters for the stream, the server is caching it's tweets from
 tweetParams:

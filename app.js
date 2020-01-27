@@ -173,24 +173,10 @@ async function queryTweets(queries){
   return output
 }
 
-/**
-* @function loadConfigs
-* @desc reads the config.yaml and returns an object containing the values
-* @returns object, containting several attributes and values that represent configuration arguments
-*/
-function loadConfigs(path){
-  try {
-    //load and return the document in the path
-    const doc = yaml.safeLoad(fs.readFileSync(path, 'utf-8'));
-    return(doc);
-  } catch (e){
-    console.log(e);
-    return false;
-  }
-}
+
 
 //set the configutrations
-configurations = loadConfigs(__dirname+'/config.yml');
+configurations = utilities.loadConfigs(__dirname+'/config.yml');
 
 ////////////////////////////////////////////////////////////////////////////////
 //Tweet api
