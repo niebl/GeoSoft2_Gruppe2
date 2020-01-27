@@ -28,22 +28,10 @@ main();
 
 async function main(err){
   configs = await getConfigs();
-  console.log(configs);
 
   if(!configs){
     setStandardConfigs();
   }else{
-    if(configs.defaultbbox != null){
-      defaultBbox = configs.defaultbbox.toString();
-      bbox = defaultBbox;
-      bboxArray = defaultBbox;
-    }
-    if(configs.defaultinclude != null){
-      include = configs.defaultinclude;
-    }
-    if(configs.defaultexclude != null){
-      exclude = configs.defaultexclude;
-    }
     nearestTweetRadius = configs.nearestTweetRadius;
 
     updateCheckInterval = configs.intervals.tweetCheck;
@@ -55,7 +43,7 @@ async function main(err){
     older_thanCheck = older_than;
     //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
     older_thanStatusCheck = Date.now() - configs.intervals.statusCheckOffset;
-  oneHourRadarUpdateInterval = 300000;
+    oneHourRadarUpdateInterval = 300000;
 
     //initialise all check intervals with the new values
     initialiseIntervals();
@@ -345,6 +333,9 @@ function initialiseIntervals(){
 * @desc fallback-function that gets called when getting the config parameters from the server failed
 */
 function setStandardConfigs(){
+  include = ["wetter","regen","unwetter"]
+  exclude = []
+
   nearestTweetRadius = 50;
 
   updateCheckInterval= 10000;
@@ -356,6 +347,8 @@ function setStandardConfigs(){
   older_thanCheck = older_than;
   //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
   older_thanStatusCheck = Date.now() - 10000;
+
+  oneHourRadarUpdateInterval = 300000;
 
   //initialise all check intervals with the new values
   initialiseIntervals();

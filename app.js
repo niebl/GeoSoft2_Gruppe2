@@ -189,30 +189,8 @@ function loadConfigs(path){
   }
 }
 
-/**
-* @function setConfigs
-* @desc sets the server configutrations to what the parameters say
-* @param configs object containing configuration parameters
-*/
-function setConfigs(configs){
-  configurations = configs;
-}
-
-/**
-* @function sendClientConfigs
-* @desc function that returns the configutrations that are relevant to the client side of the application
-* @returns object, containting several attributes and values that represent configuration arguments
-*/
-function sendClientConfigs(){
-  return configurations.clientParams
-}
-
-app.use('/configs', (req,res)=>{
-  res.send(sendClientConfigs())
-})
-
 //set the configutrations
-setConfigs(loadConfigs(__dirname+'/config.yml'))
+configurations = loadConfigs(__dirname+'/config.yml');
 
 ////////////////////////////////////////////////////////////////////////////////
 //Tweet api
