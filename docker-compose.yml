@@ -11,9 +11,10 @@ services:
 
     ports:
       - '3000:3000'
+    # https://stackoverflow.com/questions/29238608/docker-compose-circular-container-linking
     links:
       - mongo
-      - plumber
+      
     volumes:
       - ./configs:/usr/src/app/configs
   mongo:
