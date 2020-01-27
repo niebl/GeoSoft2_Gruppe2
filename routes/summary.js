@@ -61,6 +61,12 @@ router.get("/density", async function(req, res ){
   if(req.query.older_than){
     tweetRequestUrl = tweetRequestUrl+`older_than=${req.query.older_than}&`
   }
+  if(req.query.include){
+    tweetRequestUrl = tweetRequestUrl+`include=${req.query.include}&`
+  }
+  if(req.query.exclude){
+    tweetRequestUrl = tweetRequestUrl+`exclude=${req.query.exclude}&`
+  }
   //TODO: include, exclude
 
 
