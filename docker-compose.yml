@@ -23,3 +23,13 @@ services:
       - '27017:27017'
     # volumes:
     #   - ./data:/data
+  plumber:
+    container_name: geomergency-plumber
+
+    image: geomergency-plumber
+    build: .
+
+    ports:
+      - '8000:8000'
+    links:
+      - app

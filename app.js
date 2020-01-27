@@ -642,6 +642,7 @@ async function postProcesses(req,res){
   if(message == undefined || message == "" || created_at == undefined || created_at == ""){
     res.status(400);
     res.send(`invalid attributes: created_at: ${created_at}, message: ${message}`);
+    //return;
   } else {
     //add the status to the designated Mongo collection
     Status.create({
@@ -652,13 +653,14 @@ async function postProcesses(req,res){
     },
     function(err, tweet){
       if(err){
-        res.status(400);
-        res.send("error in posting status: ", err);
+        res.status(400).send("error in posting status: ", err);
+        //return;
       }
     });
 
     //if it went well, tell them
     res.status(200);
     res.send(`Status successfully posted`);
+    //return;
   }
 }

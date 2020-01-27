@@ -3,10 +3,10 @@
 # twitter tokens
 tokens:
   twitter:
-    consumer_key: "M2ZROT74Nu4TNBPUQLVtaRbsm"
-    consumer_secret: "Bx7iLqgbjSvxCI8kOK6CdTgGvoaUJpzV7GCuiXffPT306HF4AF"
-    access_token_key: "1198826533047197696-zRftsydr4rF93pJSBalRg05AEE88Ao"
-    access_token_secret: "LleRa86TeSWdAOJiy0leKsRMGla5OGwV2hdiaZnB1v9Ux"
+    consumer_key: "4FXYaDQiY6u5EEIqlbb4FdTlR"
+    consumer_secret: "rVvzBLL7mSBwTP7SSKKtMpkuzExy7I9037OosXsZOmzHxVguiU"
+    access_token_key: "1198826533047197696-CJSpltnafg959W7oxhfqe6KF1MBhc3"
+    access_token_secret: "QJzaoy7aHJY8Zt0CIKk6JD6lNN4aLmusz26rVL4IROaUh"
 
 #the standard parameters for the stream, the server is caching it's tweets from
 tweetParams:

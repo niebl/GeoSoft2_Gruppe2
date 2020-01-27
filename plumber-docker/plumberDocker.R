@@ -1,4 +1,30 @@
 # plumber.R
+
+# install.packages(c(
+#    "plumber"
+#   ,"grid"
+#   ,"spatstat"
+#   ,"rdwd"
+#   ,"stars"
+#   ,"utils"
+#   ,"base"
+#   ,"sf"
+#   ,"RCurl"
+#   ,"rgdal"
+#   ,"sp"
+#   ,"raster"
+#   ,"geojsonsf"
+#   ,"jsonlite"
+#   ,"maptools"
+#   ,"dwdradar"
+#   ,"tm"
+#   ,"wordcloud"
+#   ,"fasterize"
+#   ,"httr"
+#   ,"geojsonR"
+#   ,"ggplot2"
+#  ))
+
 library(plumber)
 
 #libraries which are necessary
@@ -6,25 +32,32 @@ library(plumber)
 library(grid)
 library(spatstat)
 library(rdwd)
-library(stars)
+#library(stars)
 library(utils)
 library(base)
-library(sf)
+#library(sf)
 library(RCurl)
-library(rgdal)
+#library(rgdal)
 library(sp)
 library(raster)
 library(geojsonsf)
 library(jsonlite)
 library(maptools)
 library(dwdradar)
-library(tm)
+#library(tm)
 library(wordcloud)
 library(fasterize)
 library(httr)
 library(geojsonR)
 library(ggplot2)
 
+#* note
+#* @png
+#* @get /test
+function(req){
+  rand <- rnorm(100)
+  hist(rand)
+}
 
 # testing httr
 #* note
@@ -32,7 +65,7 @@ library(ggplot2)
 #* @get /api
 function(req){
   #link for dwd wetterdaten
-  resp <- GET("http://localhost:3000/tweetAPI/search?bbox=55.299,3.95,47.076,16.655")
+  resp <- GET("http://app:3000/tweets?bbox=55.299,3.95,47.076,16.655")
   jsonRespText <- httr::content(resp, as= "text")
   tweetframe <- as.data.frame(fromJSON(jsonRespText))
   View(tweetframe)
@@ -101,7 +134,7 @@ function(req, min=1){
 function(req, minfreq=1){
   min <- as.numeric(minfreq)
 
-  resp <- GET("http://localhost:3000/tweetAPI/search?bbox=55.299,3.95,47.076,16.655")
+  resp <- GET("http://app:3000/tweets?bbox=55.299,3.95,47.076,16.655")
   jsonRespText <- httr::content(resp, as= "text")
   tweetframe <- as.data.frame(fromJSON(jsonRespText))
   tweettxt <- tweetframe$tweets.text
@@ -245,7 +278,7 @@ function(req, sigma=0.1, west = 2.00348, east= 15.79388, south = 46.88463, north
   north <- as.numeric(north)
   
   #getting twitter data
-  #resp <- GET("http://localhost:3000/tweetAPI/search?bbox=55.299,3.95,47.076,16.655")
+  #resp <- GET("http://app:3000/tweets?bbox=55.299,3.95,47.076,16.655")
   #jsonRespText <- httr::content(resp, as= "text")
   #tweetframe <- as.data.frame(fromJSON(jsonRespText))
   
