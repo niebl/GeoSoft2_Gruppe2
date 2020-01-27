@@ -54,9 +54,21 @@ router.get("/density", async function(req, res ){
   if(req.query.sigma){
     url = url+"?sigma=" + req.query.sigma;
   }
+  var tweeturl = "http://localhost:3000/tweets?bbox=55.299,3.95,47.076,16.655";
+  if(req.query.bbox){
+    tweeturl= "http://localhost:3000/tweets?bbox=" + req.query.bbox;
+    if(req.query.sigma){
+      var coords = req.query.bbox.split(",");
+      url = url+"&north=" + coords[0]+ "&east=" + coords[1]+ "&south=" + coords[2] + "&west=" + coords[3];
+    }else{
+      var coords1 = req.query.bbox.split(",");
+      url = url+"?north=" + coords1[0] + "&east=" + coords1[1]+ "&south=" + coords1[2] + "&west=" + coords1[3];
+    }
+  }
+  console.log("Density URL:  " + url);
   var requestSettings = {
         url: url,
-        body: '{"url":"http://localhost:3000/tweets?bbox=55.299,3.95,47.076,16.655"}',
+        body: '{"url": "' +  tweeturl + '"}',
         method: 'GET',
         encoding: null
     };
@@ -71,6 +83,7 @@ router.get("/density", async function(req, res ){
           res.send(rbody.features);
         }catch(err){
           console.error(err);
+          res.status(500).send('Bad Request');
         }
       }
     });

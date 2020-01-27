@@ -115,10 +115,11 @@ async function main(err){
 
   // summary Statistics:
   $("#density").click(function(){
+    var zbbox = "" + bboxArray[0] + "," + bboxArray[1] + "," + bboxArray[2] + "," + bboxArray[3];
     var sigma = $("#densitysigma").val();
-    console.log("Siga Value: " + sigma)
     getDensity({
-      sigma: sigma
+      sigma: sigma,
+      bbox: bbox
     });
   });
   $("#ann").click(function(){

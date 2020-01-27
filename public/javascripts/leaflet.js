@@ -389,7 +389,15 @@ async function getDensity(query){
 
   if(query.sigma != undefined && query.sigma != []){
     requestURL = requestURL+`?sigma=${query.sigma}`;
+    if(query.bbox != undefined && query.bbox != []){
+
+      requestURL = requestURL+`&bbox=${query.bbox}`;
+
+    }
+  }else if (query.bbox != undefined && query.bbox != []) {
+    requestURL = requestURL+`?bbox=${query.bbox}`;
   }
+      console.log("url density: " + requestURL);
 
   return await $.ajax({
     url: requestURL,
