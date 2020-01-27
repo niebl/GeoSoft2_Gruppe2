@@ -27,27 +27,12 @@ var oneHourRadarUpdateInterval;
 main();
 
 async function main(err){
-  configs = await getConfigs();
+  //set the standard configurations of interval refreshes, bounding boxes, filters, etc
+  setStandardConfigs();
 
-  if(!configs){
-    setStandardConfigs();
-  }else{
-    nearestTweetRadius = configs.nearestTweetRadius;
+  //TODO: update site-filter inputs with standard values on launch
 
-    updateCheckInterval = configs.intervals.tweetCheck;
-    statusCheckInterval = configs.intervals.statusCheck;
-    warningUpdateInterval = configs.intervals.warningUpdate;
-
-    //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
-    older_than = Date.now() - configs.intervals.tweetCheckOffset;
-    older_thanCheck = older_than;
-    //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
-    older_thanStatusCheck = Date.now() - configs.intervals.statusCheckOffset;
-    oneHourRadarUpdateInterval = 300000;
-
-    //initialise all check intervals with the new values
-    initialiseIntervals();
-  }
+  //load first data and initialise interval loops
   get1hRadar({
     min : min_precipitation,
     max : max_precipitation
@@ -152,7 +137,6 @@ async function main(err){
         tweetLayer._layers[marker].openPopup();
       }
     }
-    //todo: open the popup
   });
   //remove the tweet from map
   $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
@@ -289,26 +273,6 @@ async function main(err){
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
-* @function getConfigs
-* function that gets the client side configs from the server at '/configs'
-*/
-async function getConfigs(){
-  var requestURL = "/configs"
-  output = await $.ajax({
-    url: requestURL,
-    success: function(data){
-      return data
-    },
-    error: function(xhr, ajaxOptions, thrownError){
-      console.log(thrownError)
-      updateProgressIndicator(`<font color="red">failed to fetch client configs. falling back to defaults</font> see browser log for details`);
-      setStandardConfigs();
-    }
-  })
-  return output
-}
-
-/**
 * @function initialiseIntervals
 * @desc initialises periodic checks on updates with the intervals that are specified in the global variables
 */
@@ -333,7 +297,7 @@ function initialiseIntervals(){
 * @desc fallback-function that gets called when getting the config parameters from the server failed
 */
 function setStandardConfigs(){
-  include = ["wetter","regen","unwetter"]
+  include = []
   exclude = []
 
   nearestTweetRadius = 50;
