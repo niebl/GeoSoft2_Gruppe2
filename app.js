@@ -14,7 +14,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var mongoose = require('mongoose');
 var request = require('request');
 var nodeHTMLParser = require('node-html-parser');
@@ -62,7 +61,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/geomergency', indexRouter);
 app.use('/geomergency/:coords', indexRouter);
-app.use('/users', usersRouter);
 
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
@@ -92,7 +90,11 @@ app.use('/weather', weatherRouter);
 var rRouter = require("./routes/r");
 app.use('/r', rRouter);
 
+var radarRouter = require("./routes/radar");
+app.use('/radar', radarRouter);
 
+var summaryRouter = require("./routes/summary");
+app.use('/summary', summaryRouter);
 /**
   * sets the default location of a pair of a location
   * e.g. a default Map view postion
@@ -156,62 +158,26 @@ async function getTweetsInRect(rectangular){
 * @return mongoose docs
 */
 async function queryTweets(queries){
-  let output;
-  await Tweet.find(
+  let output = await Tweet.find(
     queries,
     {__v:0, _id:0},
     function(err,docs){
       if(err){
         console.log("~~~~~! error in mongoDB query !~~~~~");
         console.log(error);
+        throw error;
       } else {
-      output = docs;
+      return docs;
       }
     }
   );
-  return output;
+  return output
 }
 
-/**
-* @function loadConfigs
-* @desc reads the config.yaml and returns an object containing the values
-* @returns object, containting several attributes and values that represent configuration arguments
-*/
-function loadConfigs(path){
-  try {
-    //load and return the document in the path
-    const doc = yaml.safeLoad(fs.readFileSync(path, 'utf-8'));
-    return(doc);
-  } catch (e){
-    console.log(e);
-    return false;
-  }
-}
 
-/**
-* @function setConfigs
-* @desc sets the server configutrations to what the parameters say
-* @param configs object containing configuration parameters
-*/
-function setConfigs(configs){
-  configurations = configs;
-}
-
-/**
-* @function sendClientConfigs
-* @desc function that returns the configutrations that are relevant to the client side of the application
-* @returns object, containting several attributes and values that represent configuration arguments
-*/
-function sendClientConfigs(){
-  return configurations.clientParams
-}
-
-app.use('/configs', (req,res)=>{
-  res.send(sendClientConfigs())
-})
 
 //set the configutrations
-setConfigs(loadConfigs(__dirname+'/config.yml'))
+configurations = utilities.loadConfigs(__dirname+'/config.yml');
 
 ////////////////////////////////////////////////////////////////////////////////
 //Tweet api
@@ -304,139 +270,148 @@ async function tweetSearch(req,res){
     res.send("bbox coordinates are not geographically valid")
   };
 
-  //QUERY older_than
-  //if no or incorrect time data is given, set to unix timestamp 0
-  if (older_than == undefined || isNaN(older_than)){
-    older_than = 0;
-  }
+  //use the filters on the data
+  try{
+    //QUERY older_than
+    //if no or incorrect time data is given, set to unix timestamp 0
+    if (older_than == undefined || isNaN(older_than)){
+      older_than = 0;
+    }
 
-  //call to function that will look for tweets on TweetDB within bounding box.
-  //outJSON.tweets = await getTweetsInRect(bbox)
-  outJSON.tweets = await queryTweets({
-    'geojson.geometry.coordinates': {
-      $geoWithin: {
-        $box : [
-          [bbox[1],bbox[2]], //West-Sount
-          [bbox[3],bbox[0]] //East-North
-        ]
-      }
-    },
-    created_at: {$gt: older_than}
-  })
-
-
-  //QUERY include
-  if(include != undefined){
-    //loop through each substring that has to be included
-    for(let i = 0; i < include.length; i++){
-      let userRegEx = new RegExp(include[i]);
-      //check for substrings existence in each tweet
-      for(let tweet of outJSON.tweets){
-        if(
-          tweet.text.includes(include[i])
-          ||tweet.text.match(userRegEx) !==null
-        ){
-          //lastly, make sure the tweet hasn't already been matched by previous substrings to prevent duplicates
-          /**
-          * @function containsPreviousSubstring
-          * @desc helping function that checks whether a previous substring is contained within the examined tweet
-          * only works within tweetSearch.
-          * @see tweetSearch
-          * @returns boolean
-          */
-          let containsPreviousSubstring = function(){
-            for(let j=0;j<i;j++){
-              let userRegExJ = new RegExp(include[j]);
-              if(
-                tweet.text.includes(include[j])
-                ||tweet.text.match(userRegExJ) !==null
-              ){
-              return true;}
-              else {
-                return false;
-              }
-            }
-          };
-          //still making sure the tweet hasn't been matched with previous substrings...
-          if(i==0){newOutJSON.tweets.push(tweet);
-          }else if(!containsPreviousSubstring()){
-            newOutJSON.tweets.push(tweet);
-          }
+    //call to function that will look for tweets on TweetDB within bounding box.
+    //outJSON.tweets = await getTweetsInRect(bbox)
+    outJSON.tweets = await queryTweets({
+      'geojson.geometry.coordinates': {
+        $geoWithin: {
+          $box : [
+            [bbox[1],bbox[2]], //West-Sount
+            [bbox[3],bbox[0]] //East-North
+          ]
         }
-      }
-    }
-    //make newOutJSON the new outJSON, reset the former
-    outJSON = newOutJSON;
-    newOutJSON = {"tweets":[]};
-  }
-
-  //QUERY exclude
-  if(exclude != undefined){
-    //loop through each substring and make sure they're in none of the tweets
-    for(let substring of exclude){
-      //    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
-      for(let i= outJSON.tweets.length-1; i >= 0; i--){
-        //console.log(outJSON.tweets[i].text)
-        if(
-          outJSON.tweets[i].text.includes(substring)
-          //||(outJSON.tweets[i].text.match(userRegEx) !==null )
-        ){outJSON.tweets.splice(i,1);}
-      }
-    }
-  }
-
-  //QUERY latest
-  //if latest is requested, return only latest tweet meeting given parameters
-  if(latest != undefined){
-    if(latest.toUpperCase() === "TRUE"){
-      //in the beginning was Jan 01 1970
-      let latestTime = new Date("Thu Jan 01 00:00:00 +0000 1970");
+      },
+      created_at: {$gt: older_than}
+    });
 
 
-      for(let tweet of outJSON.tweets){
-        //if there is a younger one than the previous, make that the new latest
-        if(new Date(tweet.created_at) > latestTime){
-          latestTime = tweet.created_at;
-          newOutJSON.tweets = [];
-          newOutJSON.tweets.push(tweet);
+    //QUERY include
+    if(include != undefined){
+      //loop through each substring that has to be included
+      for(let i = 0; i < include.length; i++){
+        //check for substrings existence in each tweet
+        for(let tweet of outJSON.tweets){
+          if(
+            tweet.text.includes(include[i])
+            // ||
+            // tweet.text.toLowerCase().includes(include[i].toLowerCase())
+          ){
+            //lastly, make sure the tweet hasn't already been matched by previous substrings to prevent duplicates
+            /**
+            * @function containsPreviousSubstring
+            * @desc helping function that checks whether a previous substring is contained within the examined tweet
+            * only works within tweetSearch.
+            * @see tweetSearch
+            * @returns boolean
+            */
+            let containsPreviousSubstring = function(){
+              for(let j=0;j<i;j++){
+                if(
+                  tweet.text.includes(include[j])
+                  // ||
+                  // tweet.text.toLowerCase().includes(include[j].toLowerCase())
+                ){
+                return true;}
+                else {
+                  return false;
+                }
+              }
+            };
+            //still making sure the tweet hasn't been matched with previous substrings...
+            if(i==0){newOutJSON.tweets.push(tweet);
+            }else if(!containsPreviousSubstring()){
+              newOutJSON.tweets.push(tweet);
+            }
+          }
         }
       }
       //make newOutJSON the new outJSON, reset the former
       outJSON = newOutJSON;
       newOutJSON = {"tweets":[]};
     }
-  }
 
-  //QUERY fields
-  //if field params are passed, return requested fields only
-  if(fields != undefined){
-    fields = fields.split(",");
-
-    //check if requested fields exist
-    for (let field of fields){
-      if(!(
-      field == "geojson" ||
-      field == "_id" ||
-      field == "id_str" ||
-      field == "text" ||
-      field == "created_at"
-      )){
-        res.status(400)
-        res.send("requested field "+field+" does not exist")
+    //QUERY exclude
+    if(exclude != undefined && outJSON.tweets != undefined){
+      //loop through each substring and make sure they're in none of the tweets
+      for(let substring of exclude){
+        //    exclude = exclude.match(/(["'])(?:(?=(\\?))\2.)*?\1/g);
+        for(let i= outJSON.tweets.length-1; i >= 0; i--){
+          //console.log(outJSON.tweets[i].text)
+          if(
+            outJSON.tweets[i].text.includes(substring)
+            // ||
+            // tweet.text.toLowerCase().includes(include[j].toLowerCase())
+          ){
+              outJSON.tweets.splice(i,1);
+            }
+        }
       }
     }
 
-    let fieldtweets = {"tweets" : []};
-    //traverse every tweet in the given list
-    for (let entry of outJSON.tweets){
-      //for every tweet, pick only the fields that are specified
-      let tweet = {};
+    //QUERY latest
+    //if latest is requested, return only latest tweet meeting given parameters
+    if(latest != undefined){
+      if(latest.toUpperCase() === "TRUE"){
+        //in the beginning was Jan 01 1970
+        let latestTime = new Date("Thu Jan 01 00:00:00 +0000 1970");
+
+
+        for(let tweet of outJSON.tweets){
+          //if there is a younger one than the previous, make that the new latest
+          if(new Date(tweet.created_at) > latestTime){
+            latestTime = tweet.created_at;
+            newOutJSON.tweets = [];
+            newOutJSON.tweets.push(tweet);
+          }
+        }
+        //make newOutJSON the new outJSON, reset the former
+        outJSON = newOutJSON;
+        newOutJSON = {"tweets":[]};
+      }
+    }
+
+    //QUERY fields
+    //if field params are passed, return requested fields only
+    if(fields != undefined){
+      fields = fields.split(",");
+
+      //check if requested fields exist
       for (let field of fields){
-        tweet[field] = entry[field];
+        if(!(
+        field == "geojson" ||
+        field == "_id" ||
+        field == "id_str" ||
+        field == "text" ||
+        field == "created_at"
+        )){
+          res.status(400)
+          res.send("requested field "+field+" does not exist")
+        }
       }
-      fieldtweets.tweets.push(tweet);
+
+      let fieldtweets = {"tweets" : []};
+      //traverse every tweet in the given list
+      for (let entry of outJSON.tweets){
+        //for every tweet, pick only the fields that are specified
+        let tweet = {};
+        for (let field of fields){
+          tweet[field] = entry[field];
+        }
+        fieldtweets.tweets.push(tweet);
+      }
+      outJSON = fieldtweets;
     }
-    outJSON = fieldtweets;
+  }catch(error){
+    res.status(500)
+    res.send(`filter of tweet data failed <br> ${error}`)
   }
 
   return outJSON;
@@ -621,7 +596,6 @@ async function queryStatuses(queries, res){
     }
   );
 
-  console.log(output)
   return output;
 }
 
@@ -681,6 +655,7 @@ async function postProcesses(req,res){
         res.send("error in posting status: ", err);
       }
     });
+
     //if it went well, tell them
     res.status(200);
     res.send(`Status successfully posted`);

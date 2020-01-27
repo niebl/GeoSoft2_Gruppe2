@@ -8,6 +8,7 @@ block sidebar
       div#sidebarOptions.list-group-item.list-group-item-action.bg-light
         button#updateURLCoords(type="button").btn.btn-secondary.btn-sm.sidebarButton update URL coordinates
         //p some buttons
+      
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
         button#parameter-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle parameter-options
       div#browser-controls.list-group-item.list-group-item-action.bg-light.toggled
@@ -33,11 +34,42 @@ block sidebar
           input#eventFilter(name='eventFilter',placeholder="separated by comma").form-control-sm.bboxForm
           button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
           button#resetEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton reset
+          hr
+        div#LevelsPre
+          p Minimim Precipitation level
+          input#LevelsPreMin(type="number").form-control-sm
+          p Max Precipitation level
+          input#LevelsPreMax(type="number").form-control-sm
+          hr
+          button#saveLevels(type="button").btn.btn-secondary.btn-sm.sidebarButton Save Paramters
+          div#PrecLevelError
+          hr
+        div#getPrec
+          button#getPrec(type="button").btn.btn-secondary.btn-sm.sidebarButton Get updated Precipitation
+      // from here on Precipitation
+
+      //From here on summary stats
+      div.list-group-item.list-group-item-action.bg-dark.toggle-bar
+        button#parameter-toggle1(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle Summary Statistics
+      div#browser-controls1.list-group-item.list-group-item-action.bg-light.toggled
+        div#bboxCoordSelection1
+          p Statistics
+          div.btn-group-vertical
+            button#density(type="button").btn.btn-secondary.btn-sm.sidebarButton Refresh Density of Tweets
+            button#kest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show K-Function
+            button#lest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show L-Function
+            button#fest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show F-Function
+            button#gest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show G-Function
+          a#linksummary
+            img#imagesummary.img-responsive
+          
         //p browser controls. forms and such here
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
         button#browser-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle tweet-browser
       div#tweet-browser.list-group-item.list-group-item-action.bg-light.toggled
         //this is where a scrollable list of tweets on the map appears
+
+    
     div#impressum.list-group-item.list-group-item-action.bg-light
       p Geomergency 2019
         

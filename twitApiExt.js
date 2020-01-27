@@ -1,8 +1,12 @@
 /*jshint esversion: 6 */
-const token = require('./tokens.js');
 //use twitter package. src: https://github.com/jdub/node-twitter
 const Twitter = require('twitter');
+
 var utilities = require('./utilityFunctions.js');
+const configurations = utilities.loadConfigs(__dirname+'/config.yml');
+const token = configurations.tokens;
+
+console.log(token)
 
 module.exports = {
 

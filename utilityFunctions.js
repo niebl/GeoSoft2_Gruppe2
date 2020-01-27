@@ -6,7 +6,7 @@
 
 var request = require('request');
 var yaml = require('js-yaml');
-var fs = require('fs');
+var fs = require('fs')
 
 module.exports = {
   request: request,
@@ -19,7 +19,6 @@ module.exports = {
   indicateStatus : async function(text){
     var output;
     var requestURL = "http://localhost:3000/statuses";
-    //let requestURL = "https://localhost:3000/embedTweet?id="
 
     request.post(requestURL, {form:
       {
@@ -27,6 +26,7 @@ module.exports = {
         created_at: Date.now()
       }
   });},
+
   /**
   * @function parseBBOX
   * @desc function that takes a string of 4 coordinates and parses it into an Array
@@ -89,23 +89,5 @@ module.exports = {
       console.log(e);
       return false;
     }
-  },
-
-  /**
-  * @function setConfigs
-  * @desc sets the server configutrations to what the parameters say
-  * @param configs object containing configuration parameters
-  */
-  setConfigs: function(configs){
-    configurations = configs;
-  },
-
-  /**
-  * @function sendClientConfigs
-  * @desc function that returns the configutrations that are relevant to the client side of the application
-  * @returns object, containting several attributes and values that represent configuration arguments
-  */
-  sendClientConfigs: function(){
-    return configurations.clientParams
   }
 };

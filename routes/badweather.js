@@ -4,11 +4,11 @@ var express = require('express');
 var router = express.Router();
 const turf = require('@turf/turf');
 var yaml = require('js-yaml');
-var fs = require('fs')
+var fs = require('fs');
 
 const kreisgrenzen = require('../public/jsons/landkreiseSimp');
 
-var utilities = require('../utilityFunctions.js');
+const utilities = require('../utilityFunctions.js');
 var configurations = {};
 
 var Kreis = require("../models/kreis");
@@ -19,7 +19,8 @@ var weatherUpdateInterval = 300000;
 
 function main(){
   //import the configurations from the yaml
-  setConfigs(loadConfigs(__dirname + '/../config.yml'))
+  //TODO: FIXME configs werden nicht geladen
+  configurations = loadConfigs(__dirname + '/../config.yml')
 
   //set new weather update interval if it was user-given
   if(configurations.weatherParams.weatherUpdateInterval != undefined){
@@ -361,10 +362,6 @@ function loadConfigs(path){
     console.log(e);
     return false;
   }
-}
-
-function setConfigs(configs){
-  configurations = configs;
 }
 
 module.exports = router;
