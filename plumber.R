@@ -380,11 +380,22 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383)
   north <- as.numeric(north)
   
   
+  # Get Data from URL
   json = req$postBody
-  mydf <- fromJSON(json)
- 
-  lng <- mydf$coords$lng
-  lat <- mydf$coords$lat
+  json_data <- fromJSON(json)
+  
+  resp <- GET(json_data$url)
+  jsonRespText <- httr::content(resp, as= "text")
+  tweetframe <- as.data.frame(fromJSON(jsonRespText))
+  #tweetcoords <- tweetframe[,1][,1][,1]
+  tweetcoords <- tweetframe$tweets.geojson$geometry$coordinates
+  tweetcoords <- (data.frame(t(sapply(tweetcoords,c))))
+  
+  #tweetframe$tweets.geojson.geometry.coordinates
+  View(tweetcoords)
+  lng <-  tweetcoords$X1
+  lat <-  tweetcoords$X2
+  
   
   
   #From Coordinates to Meters of observation Point
@@ -431,10 +442,22 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383)
   north <- as.numeric(north)
   
   
+  # Get Data from URL
   json = req$postBody
-  mydf <- fromJSON(json)
-  lng <- mydf$coords$lng
-  lat <- mydf$coords$lat
+  json_data <- fromJSON(json)
+  
+  resp <- GET(json_data$url)
+  jsonRespText <- httr::content(resp, as= "text")
+  tweetframe <- as.data.frame(fromJSON(jsonRespText))
+  #tweetcoords <- tweetframe[,1][,1][,1]
+  tweetcoords <- tweetframe$tweets.geojson$geometry$coordinates
+  tweetcoords <- (data.frame(t(sapply(tweetcoords,c))))
+  
+  #tweetframe$tweets.geojson.geometry.coordinates
+  View(tweetcoords)
+  lng <-  tweetcoords$X1
+  lat <-  tweetcoords$X2
+  
   
   
   #From Coordinates to Meters of observation Point
@@ -461,7 +484,8 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383)
   pointskm <- rescale(points, 1000, "km")
   
   Ffunc <- Fest(pointskm)
-  plot(Ffunc, main=NULL)
+  plot(Ffunc, main=NULL, las=1)
+  
 }
 
 # Gest Nearest Neighbour
@@ -480,10 +504,22 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383)
   north <- as.numeric(north)
   
   
+  # Get Data from URL
   json = req$postBody
-  mydf <- fromJSON(json)
-  lng <- mydf$coords$lng
-  lat <- mydf$coords$lat
+  json_data <- fromJSON(json)
+  
+  resp <- GET(json_data$url)
+  jsonRespText <- httr::content(resp, as= "text")
+  tweetframe <- as.data.frame(fromJSON(jsonRespText))
+  #tweetcoords <- tweetframe[,1][,1][,1]
+  tweetcoords <- tweetframe$tweets.geojson$geometry$coordinates
+  tweetcoords <- (data.frame(t(sapply(tweetcoords,c))))
+  
+  #tweetframe$tweets.geojson.geometry.coordinates
+  View(tweetcoords)
+  lng <-  tweetcoords$X1
+  lat <-  tweetcoords$X2
+  
   
   
   #From Coordinates to Meters of observation Point
@@ -510,8 +546,8 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383)
   pointskm <- rescale(points, 1000, "km")
   
   Gfunc <- Gest(pointskm)
-  #plot(Gfunc, main=NULL)
-  plot(nndist(pointskm))
+  plot(Gfunc, main=NULL, las=1)
+  
 }
 
 # average Nearest Neighbour
@@ -519,15 +555,26 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383)
 #* @param neighbours
 #* @png (width = 500, height = 500)
 #* @get /ann
-function(req, neighbours = 2){
+function(req, neighbours = 50){
 
-  neighbours <- as.numeric(neighbours)
   
+  
+  # Get Data from URL
   json = req$postBody
-  mydf <- fromJSON(json)
-  mydf$coords$lng
-  lng <- mydf$coords$lng
-  lat <- mydf$coords$lat
+  json_data <- fromJSON(json)
+  
+  resp <- GET(json_data$url)
+  jsonRespText <- httr::content(resp, as= "text")
+  tweetframe <- as.data.frame(fromJSON(jsonRespText))
+  #tweetcoords <- tweetframe[,1][,1][,1]
+  tweetcoords <- tweetframe$tweets.geojson$geometry$coordinates
+  tweetcoords <- (data.frame(t(sapply(tweetcoords,c))))
+  
+  #tweetframe$tweets.geojson.geometry.coordinates
+  View(tweetcoords)
+  lng <-  tweetcoords$X1
+  lat <-  tweetcoords$X2
+  
   
   
   #From Coordinates to Meters of observation Point
@@ -555,7 +602,8 @@ function(req, neighbours = 2){
   
   # calculate ann in km
   ANN <- apply(nndist(pointskm, k=1:neighbours),2,FUN=mean)
-  plot(ANN ~ eval(1:neighbours), type="b", main=NULL, las=1, yaxs="r")
+  View(ANN)
+  plot(ANN, type="b", main=NULL, las=1, yaxs="r")
 }
 
 # Ueberpruefen nach Koordinaten System
@@ -568,9 +616,9 @@ function(req, neighbours = 2){
 #* @param south The SouthBound
 #* @param north The NorthBound
 #* @param minPrec The minimum value for Preciption
-#* @png (width = 500, height = 500)
+#* @json
 #* @get /radar
-function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383, minPrec=0){
+function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383, minPrec=0, operation="feature"){
   
   # values in query are strings so we need them as.numerics
   west <- as.numeric(west)
@@ -584,11 +632,13 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   #getFile from the last 5 min preciption data
   rw_urls <- indexFTP(base=rw_base, dir=tempdir(), folder="", quiet=TRUE)
   rw_file <- dataDWD(rw_urls[length(rw_urls)], base=rw_base, joinbf=TRUE, dir=tempdir(), read=FALSE, quiet=TRUE, dbin=TRUE, dfargs=list(mode="wb"))
-  
+  View(rw_urls)
   # data & reproject
   rw_orig <- dwdradar::readRadarFile(rw_file)
   rw_proj <- projectRasterDWD(raster::raster(rw_orig$dat), extent="radolan", quiet=TRUE)
   rw_proj <- flip(rw_proj, direction="y")
+  
+  #crs(rw_proj) <- "EPSG:3857"
   
   
   # replace < 0 and 0 with NA, so they're no part of the final product
@@ -597,7 +647,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   
   
   # unit: 1/100 mm/5min#, thus *100 *2 for mm/10min (breaks /100 *2)
-  reclass = c(-Inf, 0, 0, 0,0.0,1, 0.01,0.034,2, 0.034,0.166,3, 0.166,10000,4)
+  reclass = c(-Inf, 0, 0, 0,0.01,1, 0.01,0.034,2, 0.034,0.166,3, 0.166,Inf,4)
   
   # reclassify
   rw_proj_class = reclassify(rw_proj, reclass)
@@ -610,25 +660,40 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   rw_proj_class <- crop(rw_proj_class, e)
   # <--
   
-  cstars <- st_as_stars(rw_proj_class)
-  # transfer raster to feature class
-  sf_data <- st_as_sf(cstars,as_points=FALSE, merge=TRUE, na.rm = FALSE)
-  # set reference system
-  new = st_crs(4326)
+  result <- "invalid Operation"
   
-  # transform to reference system
-  sf_data2 <- st_transform(sf_data, new)
+  if(operation == "meanraster"){
+    result <- cellStats(rw_proj, mean)
+  }
+  if(operation == "minraster"){
+    result <- cellStats(rw_proj, min)
+  }
+  if(operation == "maxraster"){
+    result <- cellStats(rw_proj, max)
+  }
+  if(operation == "sumraster"){
+    result <- cellStats(rw_proj, sum)
+  }
   
-  # change Feature format to geojson
-  geo <- sf_geojson(sf_data2)
-  geo
+  if(operation == "countcells"){
+    result <- freq(rw_proj_class)
+  }
   
-  # currently in for looking has to be deleted later
-  # --> Delete Late
-  
-  plot(sf_data2)
-  addBorders()
-  # <--
+  if(operation == "feature"){
+    cstars <- st_as_stars(rw_proj_class)
+    # transfer raster to feature class
+    sf_data <- st_as_sf(cstars,as_points=FALSE, merge=TRUE, na.rm = FALSE)
+    # set reference system
+    new = st_crs(3857)
+    
+    # transform to reference system
+    sf_data2 <- st_transform(sf_data, new)
+    
+    # change Feature format to geojson
+    geo <- sf_geojson(sf_data)
+    result <- geo
+  }
+  result
 }
 
 
@@ -670,7 +735,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   rw_proj[rw_proj < minPrec] <- NA
   
   # unit: 1/100 mm/5min#, thus *100 *2 for mm/10min (breaks /100 *2)
-  reclass = c(-Inf, 0, 0, 0,0.1,1, 0.01,0.034,2, 0.034,0.166,3, 0.166,10000,4)
+  reclass = c(-Inf, 0, 0, 0,0.01,1, 0.01,0.034,2, 0.034,0.166,3, 0.166,Inf,4)
   
   # reclassify
   rw_proj_class = reclassify(rw_proj, reclass)
