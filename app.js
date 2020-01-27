@@ -325,19 +325,19 @@ async function tweetSearch(req,res){
         }
       },
       created_at: {$gt: older_than}
-    })
+    });
 
 
     //QUERY include
     if(include != undefined){
       //loop through each substring that has to be included
       for(let i = 0; i < include.length; i++){
-        let userRegEx = new RegExp(include[i]);
         //check for substrings existence in each tweet
         for(let tweet of outJSON.tweets){
           if(
             tweet.text.includes(include[i])
-            ||tweet.text.match(userRegEx) !==null
+            // ||
+            // tweet.text.toLowerCase().includes(include[i].toLowerCase())
           ){
             //lastly, make sure the tweet hasn't already been matched by previous substrings to prevent duplicates
             /**
@@ -349,10 +349,10 @@ async function tweetSearch(req,res){
             */
             let containsPreviousSubstring = function(){
               for(let j=0;j<i;j++){
-                let userRegExJ = new RegExp(include[j]);
                 if(
                   tweet.text.includes(include[j])
-                  ||tweet.text.match(userRegExJ) !==null
+                  // ||
+                  // tweet.text.toLowerCase().includes(include[j].toLowerCase())
                 ){
                 return true;}
                 else {
@@ -382,8 +382,11 @@ async function tweetSearch(req,res){
           //console.log(outJSON.tweets[i].text)
           if(
             outJSON.tweets[i].text.includes(substring)
-            //||(outJSON.tweets[i].text.match(userRegEx) !==null )
-          ){outJSON.tweets.splice(i,1);}
+            // ||
+            // tweet.text.toLowerCase().includes(include[j].toLowerCase())
+          ){
+              outJSON.tweets.splice(i,1);
+            }
         }
       }
     }
