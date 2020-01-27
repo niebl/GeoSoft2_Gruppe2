@@ -20,7 +20,7 @@ var weatherUpdateInterval = 300000;
 function main(){
   //import the configurations from the yaml
   //TODO: FIXME configs werden nicht geladen
-  configurations = loadConfigs(__dirname + '/../config.yml')
+  configurations = loadConfigs(__dirname + '/../configs/config.yml')
 
   //set new weather update interval if it was user-given
   if(configurations.weatherParams.weatherUpdateInterval != undefined){

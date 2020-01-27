@@ -1,5 +1,6 @@
 /*jshint esversion: 8 */
-const token = require('./tokens.js');
+
+// const token = require('./tokens.js');
 var address = "mongo"
 
 //load the additional script collections for the server
@@ -177,7 +178,7 @@ async function queryTweets(queries){
 
 
 //set the configutrations
-configurations = utilities.loadConfigs(__dirname+'/config.yml');
+configurations = utilities.loadConfigs(__dirname+'/configs/config.yml');
 
 ////////////////////////////////////////////////////////////////////////////////
 //Tweet api

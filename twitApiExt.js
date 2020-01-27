@@ -3,7 +3,7 @@
 const Twitter = require('twitter');
 
 var utilities = require('./utilityFunctions.js');
-const configurations = utilities.loadConfigs(__dirname+'/config.yml');
+const configurations = utilities.loadConfigs(__dirname+'/configs/config.yml');
 const token = configurations.tokens;
 
 console.log(token)

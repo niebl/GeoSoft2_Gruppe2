@@ -6,15 +6,15 @@ services:
     image: geomergency-app
     build: .
 
-    stdin_open: true
-    tty: true
+    # stdin_open: true
+    # tty: true
 
     ports:
       - '3000:3000'
     links:
       - mongo
     volumes:
-      - ./configs:/usr/src/app
+      - ./configs:/usr/src/app/configs
   mongo:
     container_name: geomergency-mongo
     restart: always

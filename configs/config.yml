@@ -1,4 +1,14 @@
 # tweet-scraper parameters
+
+# twitter tokens
+tokens:
+  twitter:
+    consumer_key: "M2ZROT74Nu4TNBPUQLVtaRbsm"
+    consumer_secret: "Bx7iLqgbjSvxCI8kOK6CdTgGvoaUJpzV7GCuiXffPT306HF4AF"
+    access_token_key: "1198826533047197696-zRftsydr4rF93pJSBalRg05AEE88Ao"
+    access_token_secret: "LleRa86TeSWdAOJiy0leKsRMGla5OGwV2hdiaZnB1v9Ux"
+
+#the standard parameters for the stream, the server is caching it's tweets from
 tweetParams:
   #bounding box of enclosed area.
   # WGS84: "WEST,SOUTH,EAST,NORTH"
@@ -10,22 +20,3 @@ tweetParams:
 # weather scraper parameters
 weatherParams:
   weatherUpdateInterval: 300000
-
-# parameters relevant to the client side
-clientParams:
-  #intervals in which the client side refreshes certain data. in ms.
-  intervals:
-    tweetCheck: 10000
-    statusCheck: 2000
-    warningUpdate: 300000
-
-    #the amount of time the initial data-refreshes are to reach into the past.
-    tweetCheckOffset: 300000
-    statusCheckOffset: 10000
-
-  #the default bounding box in with the client side fetches the cached data.
-  # WGS84: [NORTH,WEST,SOUTH,EAST]
-  defaultbbox: [55.22,5.00,47.15,15.20]
-  defaultinclude: []
-  defaultexclude: []
-  nearestTweetRadius: 40
