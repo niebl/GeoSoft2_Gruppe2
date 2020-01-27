@@ -568,7 +568,7 @@ function(req, neighbours = 2){
 #* @param south The SouthBound
 #* @param north The NorthBound
 #* @param minPrec The minimum value for Preciption
-#* @png (width = 500, height = 500)
+#* json
 #* @get /radar
 function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383, minPrec=0){
   
@@ -621,13 +621,13 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   
   # change Feature format to geojson
   geo <- sf_geojson(sf_data2)
-  geo
+  result <- geo
   
   # currently in for looking has to be deleted later
   # --> Delete Late
-  
-  plot(sf_data2)
-  addBorders()
+  result
+  #plot(rw_proj_class)
+  #addBorders()
   # <--
 }
 
@@ -644,7 +644,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
 #* @param minPrec The minimum value for Preciption
 #* @param operation Defines the Operation to do like statistics etc
 # available stats are: features(Geojson) countcells(in km²), meanraster(average value)
-# @png (width = 500, height = 500)
+#* json
 #* @get /radarhourly
 function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383, minPrec=0, operation="feature"){
   
@@ -717,6 +717,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
     result <- geo
   }
   result
+  #plot(rw_proj_class)
 }
 
 

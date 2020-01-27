@@ -682,13 +682,11 @@ async function postProcesses(req,res){
     },
     function(err, tweet){
       if(err){
-        res.status(400);
-        res.send("error in posting status: ", err);
+        res.status(400).send("error in posting status: ", err);
       }
     });
 
     //if it went well, tell them
-    res.status(200);
-    res.send(`Status successfully posted`);
+    res.status(200).send(`Status successfully posted`);
   }
 }

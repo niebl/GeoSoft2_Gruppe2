@@ -25,5 +25,18 @@
     "pug": "^2.0.4",
     "request": "^2.88.0",
     "twitter": "^1.7.1"
-  }
+  },
+  "description": "<a><img src=\"https://github.com/Dingensen/GeoSoft2_Gruppe2/blob/master/GEOmergency.png\" width=\"260\" height=\"160\"></a>",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dingensen/GeoSoft2_Gruppe2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dingensen/GeoSoft2_Gruppe2/issues"
+  },
+  "homepage": "https://github.com/Dingensen/GeoSoft2_Gruppe2#readme"
 }
