@@ -13,6 +13,7 @@ services:
       - '3000:3000'
     links:
       - mongo
+      - plumber
     volumes:
       - ./configs:/usr/src/app/configs
   mongo:

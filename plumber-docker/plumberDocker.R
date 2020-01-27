@@ -59,49 +59,16 @@ function(req){
   hist(rand)
 }
 
-# testing httr
-#* note
-#* @json
-#* @get /api
-function(req){
-  #link for dwd wetterdaten
-  resp <- GET("http://app:3000/tweets?bbox=55.299,3.95,47.076,16.655")
-  jsonRespText <- httr::content(resp, as= "text")
-  tweetframe <- as.data.frame(fromJSON(jsonRespText))
-  View(tweetframe)
-  tweettxt <- tweetframe$tweets.text
-  tweettxt = substr(tweettxt,1,nchar(tweettxt)- 17)
-  #print(jsonRespText)
-}
-
-# testing httr
-#* note
-#* @json
-#* @get /data22
-function(req){
-  #link for dwd wetterdaten
-  json = req$postBody
-  json_data <- fromJSON(json)
-  View(json_data)
-  print(json_data$url)
-  json_data
-  #frameurl <- as.data.frame(fromJSON(json))
-  #View(frameurl$url[[1]])
-  #print(frameurl$url[[1]]$Levels)
-  #frameurl$url[[1]]
-  #print(jsonRespText)
-}
 # Not ready yet
 #* Getting a Word map by json
 #* @png (width = 500, height = 500)
 #* @param min Minimun Frequency of words
-#* @get /data
-
+#* @get /wordcloud
 function(req, min=1){
   min <- as.numeric(min)
   json = req$postBody
   json_data <- fromJSON(json)
-
+  
   print(json_data$url)
   resp <- GET(json_data$url)
   jsonRespText <- httr::content(resp, as= "text")
@@ -130,10 +97,10 @@ function(req, min=1){
 #* Getting a Word map by json
 #* @png (width = 500, height = 500)
 #* @param minfreq Minimun Frequency of words
-#* @get /wordcloud
+#* @get /data
 function(req, minfreq=1){
   min <- as.numeric(minfreq)
-
+  
   resp <- GET("http://app:3000/tweets?bbox=55.299,3.95,47.076,16.655")
   jsonRespText <- httr::content(resp, as= "text")
   tweetframe <- as.data.frame(fromJSON(jsonRespText))
@@ -143,8 +110,8 @@ function(req, minfreq=1){
   body <- Corpus(VectorSource(tweettxt))
   ### Text as Matrix for plotting ???
   dtm <- DocumentTermMatrix(body,control = list(removePunctuation = TRUE,
-                                                 removeNumbers = TRUE,
-                                                 stopwords = TRUE))
+                                                removeNumbers = TRUE,
+                                                stopwords = TRUE))
   DoMa <- as.matrix(dtm)
   DoMa <- t(DoMa)
   ## All words to lower case 
@@ -163,20 +130,20 @@ function(req, minfreq=1){
 #* @param minfreq The minimum frequency of words in tweets
 #* @get /freq
 function(req, min=5){
- min <- as.numeric(min)
- # todo!
- #getting the text of all tweets together
- resp <- GET("https://cat-fact.herokuapp.com/facts")
- jsonRespText <- httr::content(resp, as= "text")
- winners <- as.data.frame(fromJSON(jsonRespText))
- 
- # Text as corpus somehow needed for somethings espacially from tm
- body <- Corpus(VectorSource(winners$all.text))
- # Text as Matrix for plotting ???
- dtm <- DocumentTermMatrix(body,control = list(removePunctuation = TRUE,
-                                               removeNumbers = TRUE,
-                                               stopwords = TRUE))
- findFreqTerms(dtm, min)
+  min <- as.numeric(min)
+  # todo!
+  #getting the text of all tweets together
+  resp <- GET("https://cat-fact.herokuapp.com/facts")
+  jsonRespText <- httr::content(resp, as= "text")
+  winners <- as.data.frame(fromJSON(jsonRespText))
+  
+  # Text as corpus somehow needed for somethings espacially from tm
+  body <- Corpus(VectorSource(winners$all.text))
+  # Text as Matrix for plotting ???
+  dtm <- DocumentTermMatrix(body,control = list(removePunctuation = TRUE,
+                                                removeNumbers = TRUE,
+                                                stopwords = TRUE))
+  findFreqTerms(dtm, min)
 }
 
 
@@ -221,9 +188,13 @@ function(req, correlation=0.5, word=""){
 #* @png (width = 500, height = 500)
 #* @get /timeline
 function(req){
-  json = req$postBody
-  vect <- fromJSON(json)
-  dates <- vect$dates
+  resp <- GET("http://app:3000/tweets?bbox=55.299,3.95,47.076,16.655")
+  jsonRespText <- httr::content(resp, as= "text")
+  winners <- as.data.frame(fromJSON(jsonRespText))
+  
+  View(winners)
+  dates <- winners$tweets.created_at
+  print(as.date(dates))
   show(as.POSIXct(dates))
   #data$x3 <- as.integer(data$x3) 
   hist(as.POSIXct(dates), breaks="hours", freq=TRUE, xlab="Time", main="Frequency of Tweets")
@@ -269,7 +240,8 @@ function(req, xbreak=2, ybreak=2){
 #* @param south The SouthBound
 #* @param north The NorthBound
 #* @get /density
-function(req, sigma=0.1, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383){
+function(req, sigma = 0.2, west =15.2, east= 5.0, south = 47.15, north= 55.22){
+  print(sigma)
   sigma <- as.numeric(sigma)
   #Parameters from string to numeric type
   west <- as.numeric(west)
@@ -293,22 +265,24 @@ function(req, sigma=0.1, west = 2.00348, east= 15.79388, south = 46.88463, north
   #tweetcoords <- tweetframe[,1][,1][,1]
   tweetcoords <- tweetframe$tweets.geojson$geometry$coordinates
   tweetcoords <- (data.frame(t(sapply(tweetcoords,c))))
-
-    #tweetframe$tweets.geojson.geometry.coordinates
- 
+  
+  #tweetframe$tweets.geojson.geometry.coordinates
+  
   x <-  tweetcoords$X1
   y <-  tweetcoords$X2
   df <- data.frame(x, y)
+  
   dm <- data.matrix(df)
-  obswindow <- owin(xrange = c(west, east), yrange = c(south, north))
+  
+  obswindow <- owin(xrange = c(east, west), yrange = c(south, north))
   point <- ppp(dm[,1], dm[,2], obswindow)
   ds <- density(point, sigma=sigma)
   xy <-raster(ds)
   crs(xy) <- "+proj=longlat +datum=WGS84 +no_defs"
-  #cc <- aggregate(xy, 2)
+  
+  # xy <- disaggregate(xy,fact= 31)
   # Delete Values<0
   xy[xy < 0] <- NA
-  
   # Reclassify
   highestValue <- maxValue(xy)
   xy <- reclassify(xy, c(-Inf, highestValue*0.03, 0,
@@ -393,7 +367,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383)
   
   Kfunc <- Kest(pointskm)
   plot(Kfunc, main=NULL, las=1)
-
+  
 }
 
 
@@ -589,7 +563,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383)
 #* @png (width = 500, height = 500)
 #* @get /ann
 function(req, neighbours = 50){
-
+  
   
   
   # Get Data from URL
@@ -668,6 +642,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   View(rw_urls)
   # data & reproject
   rw_orig <- dwdradar::readRadarFile(rw_file)
+  rw_orig$dat[200:300, 200:400] <- 0.1
   rw_proj <- projectRasterDWD(raster::raster(rw_orig$dat), extent="radolan", quiet=TRUE)
   rw_proj <- flip(rw_proj, direction="y")
   
@@ -877,7 +852,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
     result <- "invalid Operation"
     
     if(operation == "meanraster"){
-       precvec <- append(precvec, cellStats(rw_proj, mean))
+      precvec <- append(precvec, cellStats(rw_proj, mean))
     }
     if(operation == "minraster"){
       precvec <- append(precvec, cellStats(rw_proj, min))

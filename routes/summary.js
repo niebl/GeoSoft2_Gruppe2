@@ -6,7 +6,7 @@ var router = express.Router();
 
 //this is  a test function
 router.get("/summary", async function(req, res ){
-  var url = 'http://localhost:8000/data';
+  var url = 'http://plumber:8000/data';
   var requestSettings = {
         url: url,
         body: '{"url":"http://localhost:3000/tweets?bbox=55.299,3.95,47.076,16.655"}',
@@ -22,10 +22,10 @@ router.get("/summary", async function(req, res ){
 });
 
 router.get("/wordcloud", async function(req, res ){
-  var url = 'http://localhost:8000/wordcloud';
+  var url = 'http://plumber:8000/wordcloud';
   console.log(req.query.minfreq);
   if(req.query.minfreq){
-    url = 'http://localhost:8000/wordcloud?minfreq=' + req.query.minfreq ;
+    url = 'http://plumber:8000/wordcloud?minfreq=' + req.query.minfreq ;
   }
 
   var requestSettings = {
@@ -48,10 +48,10 @@ router.get("/wordcloud", async function(req, res ){
 * @return density json
 */
 router.get("/density", async function(req, res ){
-  var url = 'http://localhost:8000/density';
+  var url = 'http://plumber:8000/density';
   console.log(req.query.minfreq);
   if(req.query.minfreq){
-    url = 'http://localhost:8000/wordcloud?minfreq=' + req.query.minfreq ;
+    url = 'http://plumber:8000/wordcloud?minfreq=' + req.query.minfreq ;
   }
 
   let tweetRequestUrl = `http://localhost:3000/tweets?`
@@ -100,10 +100,10 @@ router.get("/density", async function(req, res ){
 * @return kest plot
 */
 router.get("/kest", async function(req, res ){
-  var url = 'http://localhost:8000/kest';
+  var url = 'http://plumber:8000/kest';
   console.log(req.query.minfreq);
   if(req.query.minfreq){
-    url = 'http://localhost:8000/wordcloud?minfreq=' + req.query.minfreq ;
+    url = 'http://plumber:8000/wordcloud?minfreq=' + req.query.minfreq ;
   }
 
   var requestSettings = {
