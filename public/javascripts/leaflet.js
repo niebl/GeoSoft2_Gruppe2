@@ -257,7 +257,7 @@ async function get1hRadar(query){
       }else{
         requestURL = requestURL+'&';
       }
-      requestURL = requestURL + `polygon=${query.bbox}`;
+      requestURL = requestURL + `bbox=${query.bbox}`;
     }
     console.log(requestURL);
   }
@@ -330,12 +330,12 @@ async function get5mRadar(query){
     }
     if(query.bbox != undefined && query.bbox != []){
       if(noPriorParam){
-        requestURL = requestURL+ '?';
+        requestURL = requestURL+ '?' + `bbox=${query.bbox}`;
         noPriorParam = false;
       }else{
         requestURL = requestURL+'&';
       }
-      requestURL = requestURL + `polygon=${query.bbox}`;
+      requestURL = requestURL + `bbox=${query.bbox}`;
     }
     console.log(requestURL);
   }

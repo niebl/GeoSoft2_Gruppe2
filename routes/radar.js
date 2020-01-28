@@ -3,7 +3,7 @@ var request = require('request');
 var express = require('express');
 var mongoose = require('mongoose');
 var router = express.Router();
-
+const utilities = require('../utilityFunctions.js');
 var Precipitation = require("../models/precipitation");
 var Precipitationminutes = require("../models/precipitationminutes");
 
@@ -18,7 +18,8 @@ setInterval(
   300000
 );
 //
-function oneHourRadar(){
+async function oneHourRadar(){
+  utilities.indicateStatus(`Started downloading new 1h precipitation data`);
   var url = 'http://localhost:8000/radarhourly';
   var requestSettings = {
         url: url,
@@ -49,7 +50,7 @@ function oneHourRadar(){
           addRadar.save();
         }
     });
-    console.log("Succesfully loaded");
+    utilities.indicateStatus(`Successfully downloaded new 1h precipitation data`);
 }
 
 
@@ -80,7 +81,7 @@ function oneHourRadar(){
         type: "Point",
         coordinates: coords}}};
     }
-    if(req.query.polygon){
+    if(req.query.polygon1){
       var poly = req.query.polygon.split(",");
       var polyarray = [];
       for(var j =0; j < poly.length; j = j +2){
@@ -96,7 +97,24 @@ function oneHourRadar(){
         type: "Polygon",
         coordinates: [polyarray]}}};
     }
-      //find featrues by name
+    if(req.query.bbox){
+      var poly1 = req.query.bbox.split(",");
+      console.log(poly1);
+      var polyarray1 = [];
+        var nw = [Number(poly1[0]), Number(poly1[1])] ;
+        var sw = [Number(poly1[2]), Number(poly1[1])] ;
+        var se = [Number(poly1[2]), Number(poly1[3])] ;
+        var ne = [Number(poly1[0]), Number(poly1[3])] ;
+        polyarray1.push(nw, sw, se, ne, nw);
+      console.log(polyarray1)
+
+      // to close Loop forpolygon
+      query['geojson.geometry']=
+       {$geoWithin: {$geometry: {
+        type: "Polygon",
+        coordinates: [polyarray1]}}};
+    }
+      console.log("query " + query);
       Precipitation.find(query, function(err, result){
         if(err){
           console.log(err);
@@ -112,8 +130,9 @@ function oneHourRadar(){
 // 5min radar
 //
 //
-function fiveMinRadar(){
+async function fiveMinRadar(){
   var url = 'http://localhost:8000/radar';
+  utilities.indicateStatus(`Started downloading new 5m Precipitation data`);
   var requestSettings = {
         url: url,
         method: 'GET',
@@ -143,6 +162,7 @@ function fiveMinRadar(){
           });
           addRadar.save();
         }
+        utilities.indicateStatus(`Successfully downloaded new 5m precipitation data`);
         console.log('Radar of germany  in 5 min intervalls added into db');
     });
 }
@@ -174,7 +194,7 @@ router.get("/get5mradar", async function(req, res){
       type: "Point",
       coordinates: coords}}};
   }
-  if(req.query.polygon){
+  if(req.query.polygon1){
     var poly = req.query.polygon.split(",");
     var polyarray = [];
     for(var j =0; j < poly.length; j = j +2){
@@ -189,6 +209,22 @@ router.get("/get5mradar", async function(req, res){
      {$geoWithin: {$geometry: {
       type: "Polygon",
       coordinates: [polyarray]}}};
+  }
+
+  if(req.query.bbox){
+    var poly1 = req.query.bbox.split(",");
+    var polyarray1 = [];
+      var nw = [Number(poly1[0]), Number(poly1[1])] ;
+      var sw = [Number(poly1[2]), Number(poly1[1])] ;
+      var se = [Number(poly1[2]), Number(poly1[3])] ;
+      var ne = [Number(poly1[0]), Number(poly1[3])] ;
+      polyarray1.push(nw, sw, se, ne, nw);
+
+    // to close Loop forpolygon
+    query['geojson.geometry']=
+     {$geoWithin: {$geometry: {
+      type: "Polygon",
+      coordinates: [polyarray1]}}};
   }
     //find featrues by name
     Precipitationminutes.find(query, function(err, result){

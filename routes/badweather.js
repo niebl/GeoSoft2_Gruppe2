@@ -261,7 +261,7 @@ function loadUnwetter(){
                 warnkreise[i].properties.PARAMETERVALUE.push(kreis.properties.PARAMETERVALUE);
                 warnkreise[i].properties.PARAMETERNAME.push(kreis.properties.PARAMETERNAME);
               } catch(err){
-                console.log(err);
+                //console.log(err);
               }
             }
           }
