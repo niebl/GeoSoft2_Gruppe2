@@ -238,16 +238,7 @@ router.get("/precipitationDemo", async function (req, res ){
     });
 });
 
-/**
-  * requesting Specific values
-  * @author Dorian
-  * @query coordinates=<lng, lat>
-  * @query polygon=<lng, lat> BBox
-  * @query max=value max Prec threshold
-  * @query min=value min prec threshold
-  * @example url/radar/get1hradar?coordinates=9,53&max=20
-  *
-  */
+
 router.get("/getDemoradar", async function(req, res){
   var regions ={type:"FeatureCollection", features:[]};
   var query = {};

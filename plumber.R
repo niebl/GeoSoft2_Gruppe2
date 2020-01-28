@@ -737,7 +737,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
 #* @param north The NorthBound
 #* @param minPrec The minimum value for Preciption
 #* @json
-#* @get /radartest
+#* @get /radarDemo
 function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383, minPrec=0, operation="feature"){
   
   # values in query are strings so we need them as.numerics
