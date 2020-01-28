@@ -1,5 +1,4 @@
 /*jshint esversion: 8 */
-const token = require('./tokens.js');
 
 //load the additional script collections for the server
 var twitterApiExt = require('./twitApiExt.js');
@@ -187,6 +186,44 @@ configurations = utilities.loadConfigs(__dirname+'/config.yml');
 app.get('/tweets', async (req, res) => {
   res.send(await tweetSearch(req, res));
 });
+
+app.delete('/tweets', async (req, res) => {
+  await tweetDelete(req,res)
+});
+
+/**
+* @function tweetDelete middleware function
+* @desc function that is being called when a delete tweet call is made to the tweets endpoint
+* param: id_str the id of the tweet(s) to delete
+*/
+async function tweetDelete(req,res){
+  if(!req.query.id_str){
+    res.status(400);
+    res.send("could not delete: id_str undefined");
+  }
+
+  //get the id params
+  let ids = req.query.id_str;
+  ids = ids.split(",");
+
+  //delete each id
+  for(let id of ids){
+    console.log({
+      'id_str': id
+    })
+    await Tweet.remove({
+      'id_str': id
+    }, function(error){
+      if(error){
+        res.status(500)
+        res.send(`error in deleting tweet ${id}: ${error}`)
+      }
+    });
+  }
+
+  res.status(200)
+  res.send(`tweets deleted from cache`)
+}
 
 /**
 * @function tweetSearch middleware function

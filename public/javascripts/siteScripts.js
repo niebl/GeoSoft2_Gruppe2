@@ -206,6 +206,18 @@ async function main(err){
         }
       }
     }
+
+    //remove from the cache
+    $.ajax({
+      url:`http://localhost:3000/tweets?id_str=${idInput}`,
+      method: "DELETE",
+      success: function(result){
+        updateProgressIndicator(`deleted tweet ${idInput} from cache`);
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        updateProgressIndicator(`error in deleting tweet ${idInput} from cache`);
+      }
+    });
   });
 
   //confirm Coords
