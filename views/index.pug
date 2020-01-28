@@ -58,15 +58,26 @@ block sidebar
             p Sigma for density (Value between 0.001 and 99)
             input#densitysigma(type="number",placeholder="0.2", min="0.00001" max="100" step="any").form-control-sm.bboxForm
             button#density(type="button").btn.btn-secondary.btn-sm.sidebarButton Refresh Density of Tweets
+          hr
+          p Quadraticcount of Tweets
+          div.btn-group-vertical
+            p Breaks at longitude and latitude (Value between 1 and 99)
+            p along longitude:
+            input#xbreak(type="number",placeholder="5", min="1" max="100" step="any").form-control-sm.bboxForm
+            p along latitude:
+            input#ybreak(type="number",placeholder="5", min="1" max="100" step="any").form-control-sm.bboxForm
+            button#quadrat(type="button").btn.btn-secondary.btn-sm.sidebarButton Refresh Density of Tweets
+          hr
           p Function for Tweets
           div.btn-group-vertical
             button#wordcloud(type="button").btn.btn-secondary.btn-sm.sidebarButton Generate Wordcloud
-            button#timehist(type="button").btn.btn-secondary.btn-sm.sidebarButton Tweets over Time
+            button#timeline(type="button").btn.btn-secondary.btn-sm.sidebarButton Tweets over Time
             button#ann(type="button").btn.btn-secondary.btn-sm.sidebarButton Show Average Nearest Neighbour
             button#kest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show K-Function
             button#lest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show L-Function
             button#fest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show F-Function
             button#gest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show G-Function
+          hr
           a#linksummary
             img#imagesummary.img-responsive
           

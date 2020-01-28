@@ -437,6 +437,77 @@ async function getDensity(query){
   });
 }
 
+
+/**
+* @function getQuadrat
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getQuadrat(query){
+  //clear layer
+  densityLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "/summary/quadrat?";
+
+  if(query.xbreak){
+    requestURL = requestURL+`xbreak=${query.xbreak}&`;
+  }
+  if(query.ybreak){
+    requestURL = requestURL+`ybreak=${query.ybreak}&`;
+  }
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+  updateProgressIndicator("refreshing quadratic count map...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("Quadratic count map refreshed");
+      for(let feature of data){
+        densityLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.layer) {
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "transparent"};
+            case 1:  return {fillColor: "#ffffb2"};
+            case 2:  return {fillColor: "#fecc5c"};
+            case 3:  return {fillColor: "#fd8d3c"};
+            case 4:  return {fillColor: "#f03b20"};
+            case 5:  return {fillColor: "#bd0026"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed refreshing  Quadratic Count map</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
 /**
 * @function getWordcloud
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
@@ -467,6 +538,50 @@ async function getWordcloud(query){
     url: requestURL,
     success: async function(data){
       updateProgressIndicator("Wordcloud is loaded");
+      $("#imagesummary").attr("src", requestURL);
+      $("#linksummary").attr("href", requestURL);
+      $("#imagesummary").attr("width", "300px");
+      $("#imagesummary").attr("height", "300px");
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed refreshing tweet-density heatmap</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function getTimeline
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+*/
+async function getTimeline(query){
+
+  //set up request URL
+  var requestURL = "/summary/timeline?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+
+  updateProgressIndicator("refreshing timeline...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("timeline is loaded");
       $("#imagesummary").attr("src", requestURL);
       $("#linksummary").attr("href", requestURL);
       $("#imagesummary").attr("width", "300px");

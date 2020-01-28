@@ -93,6 +93,11 @@ async function main(err){
     var sigma =   $("densitysigma").val();
     getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, sigma : sigma});
   });
+  $("#quadrat").click(function(){
+    var xbreak =   $("xbreak").val();
+    var ybreak =   $("ybreak").val();
+    getQuadrat({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, xbreak: xbreak, ybreak: ybreak});
+  });
   $("#kest").click(function(){
     getKest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
   });
@@ -108,6 +113,9 @@ async function main(err){
 
   $("#wordcloud").click(function(){
     getWordcloud({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#timeline").click(function(){
+    getTimeline({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
   });
   $("#fest").click(function(){
     getFest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
