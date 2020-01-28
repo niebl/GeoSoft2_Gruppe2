@@ -253,12 +253,16 @@ function loadUnwetter(){
               districtfound = true;
 
               //append info
-              warnkreise[i].properties.EVENT.push(kreis.properties.EVENT);
-              warnkreise[i].properties.EC_GROUP.push(kreis.properties.EC_GROUP);
-              warnkreise[i].properties.HEADLINE.push(kreis.properties.HEADLINE);
-              warnkreise[i].properties.DESCRIPTION.push(kreis.properties.DESCRIPTION);
-              warnkreise[i].properties.PARAMETERVALUE.push(kreis.properties.PARAMETERVALUE);
-              warnkreise[i].properties.PARAMETERNAME.push(kreis.properties.PARAMETERNAME);
+              try{
+                warnkreise[i].properties.EVENT.push(kreis.properties.EVENT);
+                warnkreise[i].properties.EC_GROUP.push(kreis.properties.EC_GROUP);
+                warnkreise[i].properties.HEADLINE.push(kreis.properties.HEADLINE);
+                warnkreise[i].properties.DESCRIPTION.push(kreis.properties.DESCRIPTION);
+                warnkreise[i].properties.PARAMETERVALUE.push(kreis.properties.PARAMETERVALUE);
+                warnkreise[i].properties.PARAMETERNAME.push(kreis.properties.PARAMETERNAME);
+              } catch(err){
+                console.log(err)
+              }
             }
           }
           if(!districtfound){
