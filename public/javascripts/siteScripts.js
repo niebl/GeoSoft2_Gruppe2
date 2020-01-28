@@ -1,5 +1,19 @@
 /*jshint esversion: 8 */
 
+//see if we're in the legit app or the example scenario
+// citation: https://stackoverflow.com/a/3753570
+var url = window.location.href;
+var host = window.location.host;
+var siteState;
+if(url.indexOf(`http://${host}/geomergency`) != -1){
+  siteState = "home";
+}
+if(url.indexOf(`http://${host}/example`) != -1){
+  siteState = "example";
+}
+
+
+
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
@@ -25,6 +39,10 @@ var oneHourRadarUpdateInterval;
 main();
 
 async function main(err){
+
+
+
+
   configs = await getConfigs();
   console.log(configs);
 
