@@ -1,5 +1,19 @@
 /*jshint esversion: 8 */
 
+//see if we're in the legit app or the example scenario
+// citation: https://stackoverflow.com/a/3753570
+var url = window.location.href;
+var host = window.location.host;
+var siteState;
+if(url.indexOf(`http://${host}/geomergency`) != -1){
+  siteState = "geomergency";
+}
+if(url.indexOf(`http://${host}/example`) != -1){
+  siteState = "example";
+}
+
+
+
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
@@ -587,7 +601,34 @@ function updateTweetNotifs(arguments){
 * @returns boolean
 */
 function setWindowCoordinates(coords){
-  window.history.replaceState(false, "Geomergency", `/geomergency/${coords.lat},${coords.lon},${coords.zoom}`);
+  window.history.replaceState(false, "Geomergency", `/${siteState}/${coords.lat},${coords.lon},${coords.zoom}`);
+}
+
+/**
+* @function indicateStatus
+* @desc sends a POST request to the status API so processes can indicate status.
+* is used for certain cases of client-to-server communication
+* @param text String, the message of the status
+* @param messageType String, the type of message of the status
+*/
+async function indicateStatus(text,messageType){
+  //prepare form
+  var requestURL = "http://localhost:3000/statuses";
+  var form = {
+    message: text,
+    created_at: Date.now(),
+    messageType: messageType
+  }
+
+  //post form to status endpoint
+  $.post(requestURL,
+    form,
+    function(data, status){
+      if(status != "success"){
+        console.log("error in posting message: ",status)
+      }
+    }
+  )
 }
 
 /**

@@ -107,7 +107,7 @@ router.get("/quadrat", async function(req, res ){
   var url = 'http://localhost:8000/quadrat';
 
   if(req.query.xbreak && req.query.ybreak){
-    
+
     url = url + "?xbreak=" + req.query.xbreak + "&ybreak=" + req.query.ybreak;
   }
   let tweetRequestUrl = `http://localhost:3000/tweets?`;
