@@ -11,6 +11,8 @@ if(url.indexOf(`http://${host}/geomergency`) != -1){
 if(url.indexOf(`http://${host}/example`) != -1){
   siteState = "example";
 }
+//send the site-state to the status api so the server can know whether it's in demo mode or standard mode
+communicateSiteState();
 
 
 
@@ -636,5 +638,5 @@ async function indicateStatus(text,messageType){
 * sends the current state of the site to the tweets-backend, which will accordingly switch between normal operation and example mode
 */
 async function communicateSiteState(){
-  
+  indicateStatus(siteState,"siteState");
 }

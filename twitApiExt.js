@@ -1,6 +1,12 @@
 /*jshint esversion: 6 */
 //use twitter package. src: https://github.com/jdub/node-twitter
 const Twitter = require('twitter');
+var request = require('request');
+
+const Tweet = require('./models/tweet.js');
+var mongoose = require('mongoose');
+
+var exampleTweets = require('./public/jsons/exampleTweets.json');
 
 var utilities = require('./utilityFunctions.js');
 const configurations = utilities.loadConfigs(__dirname+'/config.yml');
@@ -31,13 +37,64 @@ module.exports = {
   * @param callback the function that is being called when new data is coming in
   * @param siteState String that indicates whether or not the current state is demo-scenario or standard mode
   */
-  tweetStreamExt : function(params, callback, siteState){
-    console.log(params)
-    console.log("initializing stream!!!!!!!!!!!!!!!")
-
+  tweetStreamExt : async function(params, callback, siteState){
+    //demo mode
     if(siteState == "example"){
-      //TODO: STREAM FROM EXAMPLE FILE
-    } else {
+      //delete all real tweets first before switching into demo mode
+      let deleteRequestURL = "http://localhost:3000/tweets";
+
+      var deleteRequestSettings = {
+        uri: deleteRequestURL,
+        method: 'DELETE',
+        encoding: null,
+      };
+      await request(deleteRequestSettings, function(error, response, body){
+        if(error){
+          console.log(error);
+        } else {return true};
+      });
+
+      //shuffle the order of the exampletweets
+      exampleTweets = this.shuffleArray(exampleTweets);
+
+      //send the example tweets to the database in bytes
+      let i = 0;
+      var tweetInterval = setInterval(function(){
+
+        //create the tweet object, because somehow the callback won't work
+        //FIXME, TODO: make callback work
+        Tweet.create({
+          id_str : exampleTweets[i].id_str,
+          text : exampleTweets[i].text,
+          created_at : Date.now()+1000,
+          embeddedTweet : exampleTweets[i].embeddedTweet,
+          geojson: {
+            type: "Feature",
+            properties: {
+            },
+            geometry: {
+              type : "Point",
+              coordinates : [exampleTweets[i].geojson.geometry.coordinates[0], exampleTweets[i].geojson.geometry.coordinates[1]]
+            }
+          }
+        },
+        function(err, tweet){
+          if(err){
+            console.log("error in saving tweet to DB");
+            console.log(err);
+            return false;
+          }
+        });
+
+        i++;
+        if(i >= exampleTweets.length-1) {
+          clearInterval(tweetInterval);
+        }
+      }, 2000);
+    }
+
+    //normal mode
+    else {
       this.stream = this.client.stream('statuses/filter', params);
       utilities.indicateStatus("starting twitter-API stream");
       this.stream.on('data', function(event){
@@ -128,6 +185,19 @@ module.exports = {
     }
     //console.log(response)
     return response;
+  },
+
+  /**
+  * @function shuffleArray
+  * implementation of the Durstenfeld-shuffle
+  * credit: https://stackoverflow.com/a/12646864
+  */
+  shuffleArray: function(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 }
 

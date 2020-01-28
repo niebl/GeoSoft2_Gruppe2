@@ -37,7 +37,7 @@ This Endpoint serves information of the tweets that are cached from the API that
 
   **Parameters**
 
-  * `id_str` the id string of the tweets to delete
+  * `id_str` the id string of the tweets to delete. if not given, all cached tweets are deleted.
 
 
 ## Parameters
@@ -69,7 +69,7 @@ This Endpoint serves information of the tweets that are cached from the API that
 
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
-|id_str|string array|required|array of one or more tweet-ids, separated by comma: `id_str={tweet1}` or `id_str={tweet1},{tweet2},...,{tweetN}`|
+|id_str|string array|optional|array of one or more tweet-ids, separated by comma: `id_str={tweet1}` or `id_str={tweet1},{tweet2},...,{tweetN}`. if not given, all tweets are deleted|
 
 <hr>
 

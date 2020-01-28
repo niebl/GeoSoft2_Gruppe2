@@ -1,7 +1,7 @@
 /*jshint esversion: 8 */
 
 var siteState;
-var siteStateCheck = Date.now();
+var siteStateCheck = Date.now()-10000;
 
 //load the additional script collections for the server
 var twitterApiExt = require('./twitApiExt.js');
@@ -77,44 +77,42 @@ async function(){
   })
 
   //if the state has changed, update it
-  //TODO:DELETE
   if(statuses.length > 0){
-    console.log(statuses)
     if(statuses[statuses.length -1].message != siteState){
       siteState = statuses[statuses.length -1].message;
-      console.log(siteState)
-    }
-  }
+      console.log("set new siteState: "+siteState);
 
-  siteStateCheck = Date.now();
-  // var requestURL = `http://localhost:3000/statuses?messageType=siteState&older_than=${siteStateCheck}&remove=true`;
-  //
-  // var requestSettings = {
-  //   uri: requestURL,
-  //   method: 'GET',
-  //   encoding: null,
-  // };
-  // await request(requestSettings, function(error, response, body){
-  //   if(error){
-  //     console.log(error);
-  //     }
-  //     else{
-  //     console.log(body)
-  //
-  //     //if the state has changed, update it
-  //     if(body.length > 0){
-  //       if(body[body.length - 1].message != siteState){
-  //         siteState = body[body.length - 1].message;
-  //       }
-  //     }
-  //     //update timestamp of last check
-  //     siteStateCheck = Date.now();
-  //   }
-  // });
+      //remove the siteStates after checking
+      rmStatuses({
+        messageType: "siteState"
+        // visible: visible
+      });
+
+      updateTweetStream(configurations.tweetParams,
+        function(tweet){
+          if(tweet.coordinates != null){
+          // call getEmbeddedTweet() -> postTweetToMongo()
+          getEmbeddedTweet(tweet);
+        }
+      },
+      siteState);
+    }
+    //set the timestamp of last check to current time - one sec
+    siteStateCheck = Date.now()-1000;
+  }
 },
-1000
+2000
 );
 
+//initialise tweet stream
+// updateTweetStream(configurations.tweetParams,
+//   function(tweet){
+//     if(tweet.coordinates != null){
+//     // call getEmbeddedTweet() -> postTweetToMongo()
+//     getEmbeddedTweet(tweet);
+//   }
+// },
+// "geomergency");
 
 /**
 * @function geomergencyRouter
@@ -132,7 +130,7 @@ function geomergencyRouter(){
       // call getEmbeddedTweet() -> postTweetToMongo()
       getEmbeddedTweet(tweet);
     }},
-    siteState
+    "geomergency"
   );
 
   return indexRouter;
@@ -148,11 +146,9 @@ function exampleScenarioRouter(){
   updateTweetStream(
     configurations.tweetParams,
     function(tweet){
-      if(tweet.coordinates != null){
-      // call getEmbeddedTweet() -> postTweetToMongo()
-      getEmbeddedTweet(tweet);
-    }},
-    siteState
+      return true
+    },
+    "example"
   );
 
   //return the router
@@ -166,21 +162,14 @@ function exampleScenarioRouter(){
 * @param callback callback function, what to do with the returned tweets
 * @param siteState String that indicates whether or not the site is currently in demo-scenario mode or standard mode
 */
-function updateTweetStream(params, callback, siteState){
+async function updateTweetStream(params, callback, siteState){
   //kill the running stream when called
   twitterApiExt.killStreamExt();
   //initialise a new one
+
   twitterApiExt.tweetStreamExt(params, callback, siteState);
 }
-//TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
-//initialise the tweet-scraper
-// console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
-//   function(tweet){
-//     if(tweet.coordinates != null){
-//     // call getEmbeddedTweet() -> postTweetToMongo()
-//     getEmbeddedTweet(tweet);
-//   }
-// }));
+
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use("/leafletdraw", express.static(__dirname + '/node_modules/leaflet-draw/dist'));
@@ -320,8 +309,17 @@ app.delete('/tweets', async (req, res) => {
 */
 async function tweetDelete(req,res){
   if(!req.query.id_str){
-    res.status(400);
-    res.send("could not delete: id_str undefined");
+    await Tweet.deleteMany(
+      {},
+      function(err){
+        if(err){
+          output = false;
+        } else {
+          output = true;
+        }
+      }
+    );
+    return true
   }
 
   //get the id params
@@ -585,6 +583,7 @@ module.exports = app;
 * @author Felix
 */
 function postTweetToMongo(tweet){
+  console.log(`posting ${tweet.text}`)
   //initialise embeddedTweet as false
   var embeddedTweet = false;
 
@@ -597,6 +596,44 @@ function postTweetToMongo(tweet){
     id_str : tweet.id_str,
     text : plaintext,
     created_at : Date.parse(tweet.created_at),
+    embeddedTweet : tweet.embeddedTweet,
+    geojson: {
+      type: "Feature",
+      properties: {
+      },
+      geometry: {
+        type : "Point",
+        coordinates : [tweet.coordinates.coordinates[0], tweet.coordinates.coordinates[1]]
+      }
+    }
+  },
+  function(err, tweet){
+    if(err){
+      console.log("error in saving tweet to DB");
+      console.log(err);
+      return false;
+    }
+  });
+
+  //indicate status
+  utilities.indicateStatus(`fetched tweet: ${tweet.id_str}`);
+}
+
+/**
+* @function postFakeTweetToMongo
+* @desc like postTweetToMongo but for the example tweets
+* @param tweet the tweet object
+* @param includes array containing strings that have to be contained in tweets
+* @param excludes array containing strings that mustn't be in tweets
+* @author Felix
+*/
+function postFakeTweetToMongo(tweet){
+  console.log(`posting ${tweet.text}`)
+
+  Tweet.create({
+    id_str : tweet.id_str,
+    text : tweet.text,
+    created_at : tweet.created_at,
     embeddedTweet : tweet.embeddedTweet,
     geojson: {
       type: "Feature",
@@ -715,7 +752,7 @@ async function getProcesses(req,res){
       created_at: {$gt: older_than},
       messageType: messageType
       // visible: visible
-    }, res);
+    });
   }
 
   //return the status messages
@@ -753,7 +790,7 @@ async function queryStatuses(queries, res){
 * @param res, express response for error handling
 * @return true or false
 */
-async function rmStatuses(queries, res){
+async function rmStatuses(queries){
   let output = false;
   await Status.deleteMany(
     queries,
