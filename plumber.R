@@ -568,7 +568,7 @@ function(req, neighbours = 2){
 #* @param south The SouthBound
 #* @param north The NorthBound
 #* @param minPrec The minimum value for Preciption
-#* @png (width = 500, height = 500)
+#* json
 #* @get /radar
 function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383, minPrec=0){
   
@@ -586,7 +586,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   rw_file <- dataDWD(rw_urls[length(rw_urls)], base=rw_base, joinbf=TRUE, dir=tempdir(), read=FALSE, quiet=TRUE, dbin=TRUE, dfargs=list(mode="wb"))
   
   # data & reproject
-  rw_orig <- dwdradar::readRadarFile(rw_file)
+  rw_orig <- dwdradar::readRadarFile("exampleRadar")
   rw_proj <- projectRasterDWD(raster::raster(rw_orig$dat), extent="radolan", quiet=TRUE)
   rw_proj <- flip(rw_proj, direction="y")
   
@@ -597,7 +597,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   
   
   # unit: 1/100 mm/5min#, thus *100 *2 for mm/10min (breaks /100 *2)
-  reclass = c(-Inf, 0, 0, 0,0.0,1, 0.01,0.034,2, 0.034,0.166,3, 0.166,10000,4)
+  reclass = c(-Inf, 0.1, 0, 0.1,0.25,1, 0.25,0.5,2, 0.5,2,3, 2,1000,4)
   
   # reclassify
   rw_proj_class = reclassify(rw_proj, reclass)
@@ -621,13 +621,13 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   
   # change Feature format to geojson
   geo <- sf_geojson(sf_data2)
-  geo
+  result <- geo
   
   # currently in for looking has to be deleted later
   # --> Delete Late
-  
-  plot(sf_data2)
-  addBorders()
+  result
+  #plot(rw_proj_class)
+  #addBorders()
   # <--
 }
 
@@ -644,7 +644,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
 #* @param minPrec The minimum value for Preciption
 #* @param operation Defines the Operation to do like statistics etc
 # available stats are: features(Geojson) countcells(in km²), meanraster(average value)
-# @png (width = 500, height = 500)
+#* json
 #* @get /radarhourly
 function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383, minPrec=0, operation="feature"){
   
@@ -670,7 +670,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   rw_proj[rw_proj < minPrec] <- NA
   
   # unit: 1/100 mm/5min#, thus *100 *2 for mm/10min (breaks /100 *2)
-  reclass = c(-Inf, 0, 0, 0,0.1,1, 0.01,0.034,2, 0.034,0.166,3, 0.166,10000,4)
+  reclass = c(0.1, 0.5, 0, 0.5,1,1, 1,2,2, 2,5,3, 5,1000,4)
   
   # reclassify
   rw_proj_class = reclassify(rw_proj, reclass)
@@ -717,6 +717,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
     result <- geo
   }
   result
+  #plot(rw_proj_class)
 }
 
 

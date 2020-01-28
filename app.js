@@ -1,5 +1,6 @@
 /*jshint esversion: 8 */
 const token = require('./tokens.js');
+var siteState;
 
 //load the additional script collections for the server
 var twitterApiExt = require('./twitApiExt.js');
@@ -66,6 +67,33 @@ app.use('/geomergency/:coords', indexRouter);
 app.use('/example', exampleRouter);
 app.use('/example/:coords', exampleRouter);
 
+/**
+* @function geomergencyRouter
+* sets the server internal siteState and returns the router.
+*/
+function geomergencyRouter(){
+  siteState = "geomergency";
+  return indexRouter;
+}
+
+/**
+* @function exampleScenarioRouter
+* sets the server internal siteState and returns the router.
+*/
+function exampleScenarioRouter(){
+  siteState = "example";
+  return exampleRouter;
+}
+
+//TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
+//initialise the tweet-scraper
+console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
+  function(tweet){
+    if(tweet.coordinates != null){
+    // call getEmbeddedTweet() -> postTweetToMongo()
+    getEmbeddedTweet(tweet);
+  }
+}));
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use("/leafletdraw", express.static(__dirname + '/node_modules/leaflet-draw/dist'));
@@ -98,6 +126,7 @@ var radarRouter = require("./routes/radar");
 app.use('/radar', radarRouter);
 
 var summaryRouter = require("./routes/summary");
+
 app.use('/summary', summaryRouter);
 /**
   * sets the default location of a pair of a location
@@ -450,16 +479,6 @@ async function tweetSearch(req,res){
 
 module.exports = app;
 
-//TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
-//initialise the tweet-scraper
-console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
-  function(tweet){
-    if(tweet.coordinates != null){
-    // call getEmbeddedTweet() -> postTweetToMongo()
-    getEmbeddedTweet(tweet);
-  }
-}))
-
 /**
 * @function postTweetToMongo
 * @param tweet the tweet object
@@ -682,13 +701,11 @@ async function postProcesses(req,res){
     },
     function(err, tweet){
       if(err){
-        res.status(400);
-        res.send("error in posting status: ", err);
+        res.status(400).send("error in posting status: ", err);
       }
     });
 
     //if it went well, tell them
-    res.status(200);
-    res.send(`Status successfully posted`);
+    res.status(200).send(`Status successfully posted`);
   }
 }
