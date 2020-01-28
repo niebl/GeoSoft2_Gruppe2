@@ -38,39 +38,6 @@ main();
 // endpoints
 ////////////////////////////////////////////////////////////////////////////////
 
-/** requesting GEJSOn of deutsche Kreise
-* @author Dorian
-* url?name=<placeholder>&coordinates=<lng,lat>
-* @example url/getBorders?coordinates=9,53
-*/
-router.get('/getBorders', (req, res) => {
-  var regions ={type:"FeatureCollection", features:[]};
-  var query = {};
-  if(req.query.name){
-    query['properties.name'] = req.query.name;
-  }
-  if(req.query.coordinates){
-    var coords = req.query.coordinates.split(",");
-    query['geometry'] =
-      {$geoIntersects: {$geometry: {
-        type: "Point",
-        coordinates: coords}}};
-      }
-    //find featrues by name
-    Kreis.find(query, function(err, result){
-      if(err){
-        console.log(err);
-      }
-
-      for(var i= 0; i < result.length; i++){
-        regions.features.push(result[i]);
-      }
-      res.json(regions);
-    }
-  );
-}
-);
-
 router.get('/deleteUnwetter', (req, res) => {
   UnwetterKreis.deleteMany({}, (err, result) => {
     next();
@@ -78,11 +45,10 @@ router.get('/deleteUnwetter', (req, res) => {
 });
 
 /** requesting GEJSOn of bad Weather events
-* @author Dorian
+* @event get weather
 * @url?name=<placeholder>&coordinates=<lng,lat>&event=<EVENT>
-* @example http://localhost:3000/getUnwetter?event=GLATTEIS&name=Münster
+* @example http://localhost:3000/weather?event=GLATTEIS&name=Münster
 */
-
 router.get("/", async(req, res)=>{
   let out = [];
 
@@ -172,9 +138,8 @@ router.get("/", async(req, res)=>{
 
 /**
 * @function loadBorders
-* loads the border-geoJSON into the mongoDB
+* @desc loads the border-geoJSON into the mongoDB
 * @returns boolean whether laoding all districts was successful
-* @Author Dorian, Felix
 */
 async function loadBorders(){
   //get a list of each district
@@ -211,10 +176,8 @@ async function loadBorders(){
 
 /**
 * @function loadUnwetter
-* function that loads new weather-alert-data into the database if called
+* @desc function that loads new weather-alert-data into the database if called
 * devnote: still very high runtime. might not be of high priority since it's not called often, but improvement is encouraged
-* @author Dorian, FELIX
-* //TODO: manche Kreise (Freiburg, Kreis Augsburg, Stadt münchen, etc) bekommen keine Warnungen. Grund: if(warning.regionName.includes(kreis.properties.GEN)) nicht genau genug
 */
 function loadUnwetter(){
   utilities.indicateStatus("updating weather warnings from DWD-API");
@@ -311,8 +274,7 @@ function loadUnwetter(){
 
 /**
 * @function queryUnwetter
-* Queries the districts that have bad weather warnings issued against them from the mongodb
-* @author Felix
+* @desc Queries the districts that have bad weather warnings issued against them from the mongodb
 * @param queries, Object of mongoose queries
 * @return mongoose docs
 */

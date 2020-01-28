@@ -56,7 +56,7 @@ async function oneHourRadar(){
 
   /**
     * requesting Specific values
-    * @author Dorian
+    * @event get get1hradar
     * @query coordinates=<lng, lat>
     * @query polygon=<lng, lat> BBox
     * @query max=value max Prec threshold
@@ -172,7 +172,6 @@ async function fiveMinRadar(){
 
 /**
   * requesting Specific values
-  * @author Dorian
   * @query coordinates=<lng, lat>
   * @query polygon=<lng, lat> BBox
   * @query max=value max Prec threshold

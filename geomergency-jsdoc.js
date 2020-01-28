@@ -129,3 +129,68 @@
 * @desc reads the config.yaml and returns an object containing the values
 * @returns object, containting several attributes and values that represent configuration arguments
 */
+
+////////////////////////////////////////////////////////////////////////////////
+// routes/badweather.js
+////////////////////////////////////////////////////////////////////////////////
+
+/** requesting GEJSOn of bad Weather events
+* @event get weather
+* @url?name=<placeholder>&coordinates=<lng,lat>&event=<EVENT>
+* @example http://localhost:3000/weather?event=GLATTEIS&name=Münster
+*/
+/**
+* @function loadBorders
+* @desc loads the border-geoJSON into the mongoDB
+* @returns boolean whether laoding all districts was successful
+*/
+/**
+* @function loadUnwetter
+* @desc function that loads new weather-alert-data into the database if called
+* devnote: still very high runtime. might not be of high priority since it's not called often, but improvement is encouraged
+*/
+/**
+* @function queryUnwetter
+* @desc Queries the districts that have bad weather warnings issued against them from the mongodb
+* @param queries, Object of mongoose queries
+* @return mongoose docs
+*/
+/**
+* @function periodicallyUpdateWeather
+* @desc periodically gets updates from the DWD weather warning API in the given interval if called
+* @param interval integer of interval length in milliseconds
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+// routes/summary.js
+////////////////////////////////////////////////////////////////////////////////
+/**
+* @function quadrat
+* Getting the density json from R /density
+* @return density json
+*/
+/**
+* @function density
+* Getting the density json from R /density
+* @return density json
+*/
+/**
+* @function kest
+* Getting the k- function from R
+* @return kest plot
+*/
+/**
+* @function lest
+* Getting the l- function from R
+* @return l function plot
+*/
+/**
+* @function gest
+* Getting the g- function from R
+* @return gest plot
+*/
+/**
+* @function fest
+* Getting the f- function from R
+* @return fest plot
+*/
