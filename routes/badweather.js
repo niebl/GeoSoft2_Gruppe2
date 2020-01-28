@@ -252,8 +252,6 @@ function loadUnwetter(){
             if(kreis.properties.AREADESC == existingDistricts[i]){
               districtfound = true;
 
-              console.log(warnkreise[i])
-
               //append info
               try{
                 warnkreise[i].properties.EVENT.push(kreis.properties.EVENT);
