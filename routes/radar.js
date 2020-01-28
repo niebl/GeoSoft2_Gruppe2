@@ -81,7 +81,7 @@ async function oneHourRadar(){
         type: "Point",
         coordinates: coords}}};
     }
-    if(req.query.polygon1){
+    if(req.query.polygon){
       var poly = req.query.polygon.split(",");
       var polyarray = [];
       for(var j =0; j < poly.length; j = j +2){
@@ -101,29 +101,32 @@ async function oneHourRadar(){
       var poly1 = req.query.bbox.split(",");
       console.log(poly1);
       var polyarray1 = [];
-        var nw = [Number(poly1[0]), Number(poly1[1])] ;
-        var sw = [Number(poly1[2]), Number(poly1[1])] ;
-        var se = [Number(poly1[2]), Number(poly1[3])] ;
-        var ne = [Number(poly1[0]), Number(poly1[3])] ;
-        polyarray1.push(nw, sw, se, ne, nw);
+      var nw = [Number(poly1[0]), Number(poly1[1])] ;
+      var sw = [Number(poly1[2]), Number(poly1[1])] ;
+      var se = [Number(poly1[2]), Number(poly1[3])] ;
+      var ne = [Number(poly1[0]), Number(poly1[3])] ;
+      var ws = [Number(poly1[1]), Number(poly1[2])] ;
+      var en = [Number(poly1[3]), Number(poly1[0])] ;
+      polyarray1.push(nw, sw, se, ne, nw);
       console.log(polyarray1)
 
       // to close Loop forpolygon
       query['geojson.geometry']=
-       {$geoWithin: {$geometry: {
-        type: "Polygon",
-        coordinates: [polyarray1]}}};
+       {$geoWithin: {$box:[
+         ws, en
+       ]}};
     }
+
       console.log("query " + query);
       Precipitation.find(query, function(err, result){
         if(err){
           console.log(err);
         }
-
+        console.log(result);
         for(var i= 0; i < result.length; i++){
             regions.features.push(result[i].geojson);
         }
-          res.json(regions.features);
+          res.send(regions.features);
       });
   });
 
@@ -194,7 +197,7 @@ router.get("/get5mradar", async function(req, res){
       type: "Point",
       coordinates: coords}}};
   }
-  if(req.query.polygon1){
+  if(req.query.polygon){
     var poly = req.query.polygon.split(",");
     var polyarray = [];
     for(var j =0; j < poly.length; j = j +2){
@@ -218,24 +221,26 @@ router.get("/get5mradar", async function(req, res){
       var sw = [Number(poly1[2]), Number(poly1[1])] ;
       var se = [Number(poly1[2]), Number(poly1[3])] ;
       var ne = [Number(poly1[0]), Number(poly1[3])] ;
-      polyarray1.push(nw, sw, se, ne, nw);
+      var ws =[Number(poly1[1]), Number(poly1[2])] ;
+      var en = [Number(poly1[3]), Number(poly1[0])] ;
+      //polyarray1.push(nw, sw, se, ne, nw);
 
     // to close Loop forpolygon
     query['geojson.geometry']=
-     {$geoWithin: {$geometry: {
-      type: "Polygon",
-      coordinates: [polyarray1]}}};
+     {$geoWithin: {$box:[
+         ws , en
+       ]}};
   }
     //find featrues by name
-    Precipitationminutes.find(query, function(err, result){
+    await Precipitationminutes.find(query, function(err, result){
       if(err){
         console.log(err);
       }
-
+      console.log(result);
       for(var i= 0; i < result.length; i++){
           regions.features.push(result[i].geojson);
       }
-        res.json(regions.features);
+        res.send(regions.features);
     });
 });
 module.exports = router;
