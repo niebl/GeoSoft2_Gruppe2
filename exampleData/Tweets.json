@@ -1,0 +1,524 @@
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "ID_NUMBER",
+        "text" : "TEXT",
+        "created_at" : TIMESTAMP,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> TEXT </p>&mdash;
+							AUTOR (@AUTOR) <a href=\"https://twitter.com/status/example\">MONTH DAY, YEAR</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "1234567890",
+        "text" : "Starkregenereignis vor meiner Haustür! Ich hab noch nie so viel Regen gesehen!!",
+        "created_at" : 1547737200,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Starkregenereignis vor meiner Haustür! Ich hab noch nie so viel Regen gesehen!! </p>&mdash;
+							Peter (@Peter) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "27356083765",
+        "text" : "Wenn es so weiter regnet bekommen wir noch ein Hochwasser",
+        "created_at" : 1547734200,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Wenn es so weiter regnet bekommen wir noch ein Hochwasser </p>&mdash;
+							Ingrid (@Ingrid) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "52486929875",
+        "text" : "Es wurde viel Regen angekündigt. Hoffentlich läuft mein Keller nicht voll...",
+        "created_at" : 1547726550,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Es wurde viel Regen angekündigt. Hoffentlich läuft mein Keller nicht voll... </p>&mdash;
+							Dieter (@Dieter) <a href=\"https://twitter.com/status/example\">January 6, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "0924756970423",
+        "text" : "Heute ist mit Niederschlag zu rechnen. Experten warnen vor Hochwasser.",
+        "created_at" : 1547726400,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Heute ist mit Niederschlag zu rechnen. Experten warnen vor Hochwasser. </p>&mdash;
+							Wetterbericht (@Wetterbericht) <a href=\"https://twitter.com/status/example\">January 6, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "9827459423506",
+        "text" : "Mein Keller läuft gerade voll. Hat jemand eine Pumpe? Ich brauche Hilfe beim abpumpen.",
+        "created_at" : 1547746400,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Mein Keller läuft gerade voll. Hat jemand eine Pumpe? Ich brauche Hilfe beim abpumpen. </p>&mdash;
+							Markus (@Markus) <a href=\"https://twitter.com/status/example\">January 6, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "348959384756",
+        "text" : "Hilfe! Mein Dach hat den Wassermassen nicht standgehalten und ich kann den Notruf nicht erreichen. Ich weiß nicht was ich tun soll ",
+        "created_at" : 1547746500,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Hilfe! Mein Dach hat den Wassermassen nicht standgehalten und ich kann den Notruf nicht erreichen. Ich weiß nicht was ich tun soll </p>&mdash;
+							Gisela (@Gisela) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "427536092345",
+        "text" : "Ich hatte auf den überfluteten Staßen einen Unfall. Die Rettungsdienste kommen nicht zu mir durch. Als wäre es gerade das Ende der Welt",
+        "created_at" : 1547755439,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Ich hatte auf den überfluteten Staßen einen Unfall. Die Rettungsdienste kommen nicht zu mir durch. Als wäre es gerade das Ende der Welt </p>&mdash;
+							Frank (@Frank) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "247506243750",
+        "text" : "Hilfe ich bin im Keller und das Wasser drückt die Tür zu. Der Pegel steigt, Ich brauche dringend Hilfe und kann den Notruf nicht erreichen",
+        "created_at" : 1547756132,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Hilfe ich bin im Keller und das Wasser drückt die Tür zu. Der Pegel steigt, Ich brauche dringend Hilfe und kann den Notruf nicht erreichen </p>&mdash;
+							Gertrud (@Gertrud) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "927459624029",
+        "text" : "Hier wurde jemand von herabfallenden Ästen getroffen und es hat ewig gedauert bis Hilfe kam, wer hätte gedacht es Regen so schlimm sein kann.",
+        "created_at" : 1547757432,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Hier wurde jemand von herabfallenden Ästen getroffen und es hat ewig gedauert bis Hilfe kam, wer hätte gedacht es Regen so schlimm sein kann. </p>&mdash;
+							Jens (@Jens) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "39487624622",
+        "text" : "Ich stecke in meinem Auto fest, weil da ein Baum drauf gefallen ist, die Feuerwehr kommt nicht durch und ich weiß nicht was ich tun soll",
+        "created_at" : 1547755912,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Ich stecke in meinem Auto fest, weil da ein Baum drauf gefallen ist, die Feuerwehr kommt nicht durch und ich weiß nicht was ich tun soll </p>&mdash;
+							Anke (@Anke) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "2035909751134",
+        "text" : "Die Notruf Hotlines sind überlastet, an wen kann ich mich richten, ich habe einen Notfall?",
+        "created_at" : 1547756275,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Die Notruf Hotlines sind überlastet, an wen kann ich mich richten, ich habe einen Notfall? </p>&mdash;
+							Willy (@Willy) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "0183657965157",
+        "text" : "Es gibt einen Stromausfall im Altenheim und die Notstromgeneratoren springen nicht an. Wir brauchen sofort technische Hilfe, die Bewohner haben Angst!",
+        "created_at" : 1547758331,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Es gibt einen Stromausfall im Altenheim und die Notstromgeneratoren springen nicht an. Wir brauchen sofort technische Hilfe, die Bewohner haben Angst! </p>&mdash;
+							Altenheim123 (@Altenheim123) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "1754182548141",
+        "text" : "Mein Erdgeschoss steht unter Wasser und ich bin im ersten Stock gefangen. Ich kann den Notruf nicht erreichen. Hilfe! ",
+        "created_at" : 1547761202,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Mein Erdgeschoss steht unter Wasser und ich bin im ersten Stock gefangen. Ich kann den Notruf nicht erreichen. Hilfe! </p>&mdash;
+							Julia (@Julia) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "312756918376",
+        "text" : "Mein Auto steht in einer Tiefgerage, die voll mit Wasser ist. Das wird teuer. Und wie komme ich jetzt nach Hause?",
+        "created_at" : 1547731331,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Mein Auto steht in einer Tiefgerage, die voll mit Wasser ist. Das wird teuer. Und wie komme ich jetzt nach Hause? </p>&mdash;
+							Georg (@Georg) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "12495265491",
+        "text" : "Ich steck mit meinem Auto bei einer überschwemmten Unterführung fest und das Wasser steigt schnell an. Ich brauche sofort Hilfe!",
+        "created_at" : 1547745612,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Ich steck mit meinem Auto bei einer überschwemmten Unterführung fest und das Wasser steigt schnell an. Ich brauche sofort Hilfe! </p>&mdash;
+							Hannelore (@Hannelore) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "135631576135",
+        "text" : "Durch das Hochwasser wurde mein Keller überflutet, aber ich kann die Feuerwehr nicht erreichen, damit die das Wasser abpumpt. Ich brauche Hilfe!",
+        "created_at" : 1547753433,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Durch das Hochwasser wurde mein Keller überflutet, aber ich kann die Feuerwehr nicht erreichen, damit die das Wasser abpumpt. Ich brauche Hilfe! </p>&mdash;
+							Rüdiger (@Ruediger) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "13571039513553",
+        "text" : "Aufgrund des Unwetters fahren die Busse und Bahnen nicht mehr. Wie komme ich nach Hause?",
+        "created_at" : 1547732112,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> ufgrund des Unwetters fahren die Busse und Bahnen nicht mehr. Wie komme ich nach Hause? </p>&mdash;
+							Fritz (@Fritz) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "9028438597352",
+        "text" : "Die Häuser in dieser Straße stehen unter Wasser! Die Leute haben sich auf Dächer gerettet. Wir brauchen Hilfe!",
+        "created_at" : 1547762131,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Die Häuser in dieser Straße stehen unter Wasser! Die Leute haben sich auf Dächer gerettet. Wir brauchen Hilfe! </p>&mdash;
+							Doris (@Doris) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "2398572398562",
+        "text" : "Die ganze Straße wurde überflutet. Wie sollen die Rettungsdienste im Notfall hier durchkommen?",
+        "created_at" : 1547732796,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Die ganze Straße wurde überflutet. Wie sollen die Rettungsdienste im Notfall hier durchkommen? </p>&mdash;
+							Martin (@Martin) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "13895639782156",
+        "text" : "Mein Nachbar hat sich durch die Überschwemmungen verletzt, aber ich komme beim Notruf nicht durch!",
+        "created_at" : 1547757391,   
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Mein Nachbar hat sich durch die Überschwemmungen verletzt, aber ich komme beim Notruf nicht durch! </p>&mdash;
+							Herbert (@Herbert) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+----------------
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "9420675059423",
+        "text" : "Guten Morgen!!!",
+        "created_at" : 1547725000,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Guten Morgen!!! </p>&mdash;
+							Inge (@Inge) <a href=\"https://twitter.com/status/example\">January 6, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "92756302534",
+        "text" : "heute morgen verschlafen könnte mich  schon wieder total auf regen ",
+        "created_at" : 1547730450,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> heute morgen verschlafen könnte mich  schon wieder total auf regen </p>&mdash;
+							Alfred (@Alfred) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "239588572385",
+        "text" : "Wer glaubt den noch an die Globale Erwärmung!? Es ist doch kalt draußen!!",
+        "created_at" : 1547735562,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Wer glaubt den noch an die Globale Erwärmung!? Es ist doch kalt draußen!! </p>&mdash;
+							User12345 (@User12345) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "9247657245",
+        "text" : "Hello World!",
+        "created_at" : 1547733333,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Hello World! </p>&mdash;
+							twitterBot10011 (@twitterBot10011) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}
+
+{
+        "geojson" : {
+                "geometry" : {
+                        "coordinates" : [
+                                COORDINATES,
+                                COORDINATES
+                        ],
+                        "type" : "Point"
+                },
+                "type" : "Feature"
+        },
+        "id_str" : "8769234593769",
+        "text" : "Mein Internet ist ausgefallen! Das ist ein echter Notfall, eine ernste Lage...",
+        "created_at" : 1547750123,
+        "embeddedTweet" :  "<blockquote class=\"twitter-tweet\">
+							<p lang=\"de\" dir=\"ltr\"> Mein Internet ist ausgefallen! Das ist ein echter Notfall!!! </p>&mdash;
+							Ernst (@Ernst) <a href=\"https://twitter.com/status/example\">January 17, 2020</a></blockquote>
+							\n<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>\n",
+}

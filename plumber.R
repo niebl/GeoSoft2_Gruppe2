@@ -597,7 +597,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   
   
   # unit: 1/100 mm/5min#, thus *100 *2 for mm/10min (breaks /100 *2)
-  reclass = c(-Inf, 0.1, 0, 0.1,0.25,1, 0.25,0.5,2, 0.5,1,3, 2,10,4)
+  reclass = c(-Inf, 0.1, 0, 0.1,0.25,1, 0.25,0.5,2, 0.5,1,3, 2,100,4)
   
   # reclassify
   rw_proj_class = reclassify(rw_proj, reclass)
@@ -670,7 +670,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   rw_proj[rw_proj < minPrec] <- NA
   
   # unit: 1/100 mm/5min#, thus *100 *2 for mm/10min (breaks /100 *2)
-  reclass = c(0.1, 0.5, 0, 0.5,1,1, 1,2,2, 2,5,3, 5,100,4)
+  reclass = c(0.1, 0.5, 0, 0.5,1,1, 1,2,2, 2,5,3, 5,1000,4)
   
   # reclassify
   rw_proj_class = reclassify(rw_proj, reclass)
