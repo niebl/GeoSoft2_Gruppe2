@@ -19,7 +19,7 @@ setInterval(
 );
 //
 async function oneHourRadar(){
-  utilities.indicateStatus(`Started downloading new 1h precipitation data`);
+  utilities.indicateStatus(`refreshing 5m Precipitation data in cache`);
   var url = 'http://localhost:8000/radarhourly';
   var requestSettings = {
         url: url,
@@ -50,7 +50,7 @@ async function oneHourRadar(){
           addRadar.save();
         }
     });
-    utilities.indicateStatus(`Successfully downloaded new 1h precipitation data`);
+    utilities.indicateStatus(`Successfully cached new 5m precipitation data`);
 }
 
 
@@ -132,7 +132,7 @@ async function oneHourRadar(){
 //
 async function fiveMinRadar(){
   var url = 'http://localhost:8000/radar';
-  utilities.indicateStatus(`Started downloading new 5m Precipitation data`);
+  utilities.indicateStatus(`refreshing 5m Precipitation data in cache`);
   var requestSettings = {
         url: url,
         method: 'GET',
@@ -162,7 +162,7 @@ async function fiveMinRadar(){
           });
           addRadar.save();
         }
-        utilities.indicateStatus(`Successfully downloaded new 5m precipitation data`);
+        utilities.indicateStatus(`Successfully cached new 5m precipitation data`);
         console.log('Radar of germany  in 5 min intervalls added into db');
     });
 }

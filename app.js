@@ -12,6 +12,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
+var exampleRouter = require('./routes/exampleIndex');
 var mongoose = require('mongoose');
 var request = require('request');
 var nodeHTMLParser = require('node-html-parser');
@@ -49,6 +50,7 @@ mongoose.connect('mongodb://localhost:27017/geomergency', {useNewUrlParser: true
   console.log(mongoose.connection.port);
 });
 
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -60,6 +62,36 @@ app.use('/', indexRouter);
 app.use('/geomergency', indexRouter);
 app.use('/geomergency/:coords', indexRouter);
 
+app.use('/example', exampleRouter);
+app.use('/example/:coords', exampleRouter);
+
+/**
+* @function geomergencyRouter
+* sets the server internal siteState and returns the router.
+*/
+function geomergencyRouter(){
+  siteState = "geomergency";
+  return indexRouter;
+}
+
+/**
+* @function exampleScenarioRouter
+* sets the server internal siteState and returns the router.
+*/
+function exampleScenarioRouter(){
+  siteState = "example";
+  return exampleRouter;
+}
+
+//TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
+//initialise the tweet-scraper
+console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
+  function(tweet){
+    if(tweet.coordinates != null){
+    // call getEmbeddedTweet() -> postTweetToMongo()
+    getEmbeddedTweet(tweet);
+  }
+}));
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use("/leafletdraw", express.static(__dirname + '/node_modules/leaflet-draw/dist'));
@@ -92,6 +124,7 @@ var radarRouter = require("./routes/radar");
 app.use('/radar', radarRouter);
 
 var summaryRouter = require("./routes/summary");
+
 app.use('/summary', summaryRouter);
 /**
   * sets the default location of a pair of a location
@@ -544,7 +577,7 @@ app.get('/statuses', async (req,res)=> {
   res.send(await getProcesses(req, res));
 });
 app.post('/statuses', async (req,res)=> {
-  res.send(await postProcesses(req, res));
+  postProcesses(req, res);
 });
 
 //functions
@@ -686,7 +719,7 @@ async function postProcesses(req,res){
     },
     function(err, tweet){
       if(err){
-        res.status(400).send("error in posting status: ", err);
+        // res.status(400).send("error in posting status: ", err);
       }
     });
 
