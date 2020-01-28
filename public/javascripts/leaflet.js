@@ -48,6 +48,7 @@ var kreisLayer = L.featureGroup(false);
 var radar1hLayer =  L.featureGroup(false);
 var radar5mLayer =  L.featureGroup(false);
 var densityLayer =  L.featureGroup(false);
+var quadratLayer =  L.featureGroup(false);
 
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
@@ -56,6 +57,7 @@ var overlayMaps = {
   "1h Radar": radar1hLayer,
   "Minute Radar": radar5mLayer,
   "Tweet Density": densityLayer,
+  "Tweet Quadraticcount": quadratLayer,
   "Selection": drawnRect
 };
 
@@ -447,7 +449,7 @@ async function getDensity(query){
 */
 async function getQuadrat(query){
   //clear layer
-  densityLayer.clearLayers();
+quadratLayer.clearLayers();
 
   //set up request URL
   var requestURL = "/summary/quadrat?";
@@ -478,7 +480,7 @@ async function getQuadrat(query){
     success: async function(data){
       updateProgressIndicator("Quadratic count map refreshed");
       for(let feature of data){
-        densityLayer.addLayer(L.geoJson(feature,{
+        quadratLayer.addLayer(L.geoJson(feature,{
           style: function(feature) {
         switch (feature.properties.layer) {
             case null: return {fillColor: "transparent"};
