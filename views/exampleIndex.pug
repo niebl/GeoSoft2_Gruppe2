@@ -1,16 +1,16 @@
-extends layout
+extends exampleLayout
 
 block sidebar
   //https://startbootstrap.com/templates/simple-sidebar/
   //sidebar
   nav#sidebar-wrapper.bg-light.border-right
     div#sidebar-scroll-wrapper.list-group.list-group-flush
-      div#sidebarOptions.list-group-item.list-group-item-action
-        button#updateURLCoords(type="button").btn.btn-outline-dark.btn-sm.sidebarButton Update URL coordinates
+      div#sidebarOptions.list-group-item.list-group-item-action.bg-light
+        button#updateURLCoords(type="button").btn.btn-secondary.btn-sm.sidebarButton update URL coordinates
         //p some buttons
       
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
-        button#parameter-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton Toggle parameter options
+        button#parameter-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle parameter-options
       div#browser-controls.list-group-item.list-group-item-action.bg-light.toggled
         div#bboxCoordSelection
           p Bounding-Box border coordinates
@@ -19,24 +19,37 @@ block sidebar
             input#bboxWest(name='bboxWest',placeholder="West").form-control-sm.bboxForm
             input#bboxEast(name='bboxEast',placeholder="East").form-control-sm.bboxForm
             input#bboxSouth(name='bboxSouth',placeholder="South").form-control-sm.bboxForm
-          button#confirmCoords(type="button").btn.btn-secondary.btn-sm.sidebarButton Confirm selection
-          button#clearCoords(type="button").btn.btn-secondary.btn-sm.sidebarButton Clear selection
+          button#confirmCoords(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm selection
+          button#clearCoords(type="button").btn.btn-secondary.btn-sm.sidebarButton clear selection
           hr
         div#Keywords
-          p Include keywords:
+          p include keywords:
           input#includeKeywords(name='includeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
-          p Exclude keywords:
+          p exclude keywords:
           input#excludeKeywords(name='excludeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
           button#confirmFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
           hr
         div#events
-          p Weather event filter
+          p weather event filter
           input#eventFilter(name='eventFilter',placeholder="separated by comma").form-control-sm.bboxForm
           button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
           button#resetEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton reset
+      // from here on Precipitation
+      div.list-group-item.list-group-item-action.bg-dark.toggle-bar
+        button#parameter-toggle2(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle Precipitation Filter
+      div#browser-controls2.list-group-item.list-group-item-action.bg-light.toggled
+        div#bboxCoordSelection2
+          p Bounding-Box border coordinates
+          div.form-group
+            input#bboxNorth2(name='bboxNorth',placeholder="North").form-control-sm.bboxForm
+            input#bboxWest2(name='bboxWest',placeholder="West").form-control-sm.bboxForm
+            input#bboxEast2(name='bboxEast',placeholder="East").form-control-sm.bboxForm
+            input#bboxSouth2(name='bboxSouth',placeholder="South").form-control-sm.bboxForm
+          button#confirmCoords2(type="button").btn.btn-secondary.btn-sm.sidebarButton Save Parameters
+          button#deleteCoords2(type="button").btn.btn-secondary.btn-sm.sidebarButton Delete Parameters
           hr
         div#LevelsPre
-          p Min Precipitation level
+          p Minimim Precipitation level
           input#LevelsPreMin(type="number").form-control-sm
           p Max Precipitation level
           input#LevelsPreMax(type="number").form-control-sm
@@ -46,48 +59,32 @@ block sidebar
           hr
         div#getPrec
           button#getPrec(type="button").btn.btn-secondary.btn-sm.sidebarButton Get updated Precipitation
-      // from here on Precipitation
-
       //From here on summary stats
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
-        button#parameter-toggle1(type="button").btn.btn-outline-light.btn-sm.sidebarButton Toggle summary statistics
+        button#parameter-toggle1(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle Summary Statistics
       div#browser-controls1.list-group-item.list-group-item-action.bg-light.toggled
         div#bboxCoordSelection1
-          p Density of Tweets
+          p Statistics
           div.btn-group-vertical
-            p Sigma for density (Value between 0.001 and 99)
-            input#densitysigma(type="number",placeholder="0.2", min="0.00001" max="100" step="any").form-control-sm.bboxForm
             button#density(type="button").btn.btn-secondary.btn-sm.sidebarButton Refresh Density of Tweets
-          hr
-          p Quadraticcount of Tweets
-          div.btn-group-vertical
-            p Breaks at longitude and latitude (Value between 1 and 256)
-            p along longitude:
-            input#xbreak(type="number",placeholder="5", min="1" max="256" step="any").form-control-sm.bboxForm
-            p along latitude:
-            input#ybreak(type="number",placeholder="5", min="1" max="256" step="any").form-control-sm.bboxForm
-            button#quadrat(type="button").btn.btn-secondary.btn-sm.sidebarButton Get Quadraticcount of Tweets
-          hr
-          p Function for Tweets
-          div.btn-group-vertical
-            button#wordcloud(type="button").btn.btn-secondary.btn-sm.sidebarButton Generate Wordcloud
-            button#timeline(type="button").btn.btn-secondary.btn-sm.sidebarButton Tweets over Time
-            button#ann(type="button").btn.btn-secondary.btn-sm.sidebarButton Show Average Nearest Neighbour
             button#kest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show K-Function
             button#lest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show L-Function
             button#fest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show F-Function
             button#gest(type="button").btn.btn-secondary.btn-sm.sidebarButton Show G-Function
-          hr
           a#linksummary
             img#imagesummary.img-responsive
           
         //p browser controls. forms and such here
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
-        button#browser-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton Toggle tweet-browser
+        button#browser-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton toggle tweet-browser
       div#tweet-browser.list-group-item.list-group-item-action.bg-light.toggled
         //this is where a scrollable list of tweets on the map appears
-      div#impressum.list-group-item.list-group-item-action.bg-dark
-        p Geomergency 2020      
+
+    
+    div#impressum.list-group-item.list-group-item-action.bg-light
+      p Geomergency 2020
+        
+            
   
 block content
   div#map

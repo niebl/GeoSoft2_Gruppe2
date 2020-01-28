@@ -109,6 +109,7 @@ low priority, but fix when solution is found*/
   height: calc( 100vh - 8em);
 }
 #impressum{
+  color: white;
   font-size: 10px;
   height: 7em;
 
