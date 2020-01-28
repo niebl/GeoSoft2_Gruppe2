@@ -106,17 +106,19 @@
 low priority, but fix when solution is found*/
 #sidebar-scroll-wrapper{
   overflow-y: auto;
-  height: calc( 100vh - 8em);
+  height: calc( 100vh - 9em);
 }
+
 #impressum{
   color: white;
   font-size: 10px;
-  height: 7em;
+  height: 3em;
+  float: left;
 
   display:inline;
   position:fixed;
   bottom: 0;
-  width: 400px;
+  width: 20%;
 }
 
 /*based on https://startbootstrap.com/templates/simple-sidebar/ */
@@ -125,9 +127,10 @@ body {
 }
 #sidebar-wrapper {
   max-width: 50%;
-  width: 400px;
+  width: 27%;
   float:left;
-  height: calc( 100vh - 4em);
+  height: calc( 100vh - 23em);
+  text-align: left;
 
   /* z-index to layer sidebar over map*/
   position: absolute;
@@ -138,6 +141,11 @@ body {
   -moz-transition: margin .25s ease-out;
   -o-transition: margin .25s ease-out;
   transition: margin .25s ease-out;
+}
+
+#sidebarOptions {
+  text-align: center;
+  background-color: #6f6f6f;
 }
 
 #sidebar-wrapper .sidebar-heading {
@@ -193,7 +201,7 @@ body {
 }
 #progressIndicator{
   height: 60px;
-  width: 50%;
+  width: 35%;
   float: right;
   margin-right: 50px;
   margin-top: 10px;

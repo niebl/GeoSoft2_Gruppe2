@@ -6,7 +6,7 @@ block sidebar
   nav#sidebar-wrapper.bg-light.border-right
     div#sidebar-scroll-wrapper.list-group.list-group-flush
       div#sidebarOptions.list-group-item.list-group-item-action
-        button#updateURLCoords(type="button").btn.btn-outline-dark.btn-sm.sidebarButton Update URL coordinates
+        button#updateURLCoords(type="button").btn.btn-outline-light.btn-sm.sidebarButton Update URL coordinates
         //p some buttons
       
       div.list-group-item.list-group-item-action.bg-dark.toggle-bar
@@ -27,13 +27,26 @@ block sidebar
           input#includeKeywords(name='includeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
           p Exclude keywords:
           input#excludeKeywords(name='excludeKeywords',placeholder="separated by comma").form-control-sm.bboxForm
-          button#confirmFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
+          button#confirmFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton Confirm
           hr
         div#events
           p Weather event filter
           input#eventFilter(name='eventFilter',placeholder="separated by comma").form-control-sm.bboxForm
-          button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton confirm
-          button#resetEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton reset
+          button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton Confirm
+          button#resetEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton Reset
+      // from here on Precipitation
+      div.list-group-item.list-group-item-action.bg-dark.toggle-bar
+        button#parameter-toggle2(type="button").btn.btn-outline-light.btn-sm.sidebarButton Toggle precipitation filter
+      div#browser-controls2.list-group-item.list-group-item-action.bg-light.toggled
+        div#bboxCoordSelection2
+          p Bounding-Box border coordinates
+          div.form-group
+            input#bboxNorth2(name='bboxNorth',placeholder="North").form-control-sm.bboxForm
+            input#bboxWest2(name='bboxWest',placeholder="West").form-control-sm.bboxForm
+            input#bboxEast2(name='bboxEast',placeholder="East").form-control-sm.bboxForm
+            input#bboxSouth2(name='bboxSouth',placeholder="South").form-control-sm.bboxForm
+          button#confirmCoords2(type="button").btn.btn-secondary.btn-sm.sidebarButton Save Parameters
+          button#deleteCoords2(type="button").btn.btn-secondary.btn-sm.sidebarButton Delete Parameters
           hr
         div#LevelsPre
           p Min Precipitation level
@@ -86,10 +99,15 @@ block sidebar
         button#browser-toggle(type="button").btn.btn-outline-light.btn-sm.sidebarButton Toggle tweet-browser
       div#tweet-browser.list-group-item.list-group-item-action.bg-light.toggled
         //this is where a scrollable list of tweets on the map appears
-      div#impressum.list-group-item.list-group-item-action.bg-dark
-        p Geomergency 2020      
+
+    
+    
+        
+            
   
 block content
   div#map
   div#progressIndicatorBar.bg-dark
     div#progressIndicator.border.rounded
+  div#impressum.list-group-item.list-group-item-action.bg-light
+    p Geomergency 2020

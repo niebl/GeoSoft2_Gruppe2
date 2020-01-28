@@ -675,8 +675,99 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   rw_proj[rw_proj < minPrec] <- NA
 
 
-  # unit: 1/100 mm/5min#, thus *100 *2 for mm/10min (breaks /100 *2)
-  reclass = c(-Inf, 0, 0, 0,0.01,1, 0.01,0.034,2, 0.034,0.166,3, 0.166,Inf,4)
+  # reclass options
+  reclass = c(-Inf, 0.1, 0, 0.1,0.25,1, 0.25,0.5,2, 0.5,2,3, 2,1000,4)
+
+  # reclassify
+  rw_proj_class = reclassify(rw_proj, reclass)
+
+  # testing raster::crop :
+  # -->
+  ## extent format (xmin,xmax,ymin,ymax)
+  e <- as(extent(west, east, south, north), 'SpatialPolygons')
+  crs(e) <- "+proj=longlat +datum=WGS84 +no_defs"
+  rw_proj_class <- crop(rw_proj_class, e)
+  # <--
+
+  result <- "invalid Operation"
+
+  if(operation == "meanraster"){
+    result <- cellStats(rw_proj, mean)
+  }
+  if(operation == "minraster"){
+    result <- cellStats(rw_proj, min)
+  }
+  if(operation == "maxraster"){
+    result <- cellStats(rw_proj, max)
+  }
+  if(operation == "sumraster"){
+    result <- cellStats(rw_proj, sum)
+  }
+
+  if(operation == "countcells"){
+    result <- freq(rw_proj_class)
+  }
+
+  if(operation == "feature"){
+    cstars <- st_as_stars(rw_proj_class)
+    # transfer raster to feature class
+    sf_data <- st_as_sf(cstars,as_points=FALSE, merge=TRUE, na.rm = FALSE)
+    # set reference system
+    new = st_crs(3857)
+
+    # transform to reference system
+    sf_data2 <- st_transform(sf_data, new)
+
+    # change Feature format to geojson
+    geo <- sf_geojson(sf_data)
+    result <- geo
+  }
+  result
+}
+
+# Historic Precipitation
+# Ueberpruefen nach Koordinaten System
+# url call url?west=Number&east=Number&south=Number&north=Number
+# example url: http://localhost:8000/radar?west=9&east=10&south=50&north=51
+#* Radar data Output
+# BBox of preciption data
+#* @param west The WestBound
+#* @param east The EastBound
+#* @param south The SouthBound
+#* @param north The NorthBound
+#* @param minPrec The minimum value for Preciption
+#* @json
+#* @get /radarDemo
+function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383, minPrec=0, operation="feature"){
+
+  # values in query are strings so we need them as.numerics
+  west <- as.numeric(west)
+  east <- as.numeric(east)
+  south <- as.numeric(south)
+  north <- as.numeric(north)
+  minPrec <- as.numeric(minPrec)
+
+  # link to file
+  rw_base <- "ftp://ftp-cdc.dwd.de/weather/radar/radolan/ry"
+  #getFile from the last 5 min preciption data
+  rw_urls <- indexFTP(base=rw_base, dir=tempdir(), folder="", quiet=TRUE)
+  rw_file <- dataDWD(rw_urls[length(rw_urls)], base=rw_base, joinbf=TRUE, dir=tempdir(), read=FALSE, quiet=TRUE, dbin=TRUE, dfargs=list(mode="wb"))
+
+  # data & reproject
+  rw_orig <- dwdradar::readRadarFile("exampleRadar")
+  rw_proj <- projectRasterDWD(raster::raster(rw_orig$dat), extent="radolan", quiet=TRUE)
+  rw_proj <- flip(rw_proj, direction="y")
+
+  #crs(rw_proj) <- "EPSG:3857"
+
+
+  # replace < 0 and 0 with NA, so they're no part of the final product
+  rw_proj[rw_proj == 0] <- NA
+  rw_proj[rw_proj < minPrec] <- NA
+
+
+  # reclass options
+  reclass = c(-Inf, 0.1, 0, 0.1,0.25,1, 0.25,0.5,2, 0.5,2,3, 2,1000,4)
 
   # reclassify
   rw_proj_class = reclassify(rw_proj, reclass)
@@ -763,7 +854,7 @@ function(req, west = 2.00348, east= 15.79388, south = 46.88463, north= 54.97383,
   rw_proj[rw_proj == 0] <- NA
   rw_proj[rw_proj < minPrec] <- NA
 
-  # unit: 1/100 mm/5min#, thus *100 *2 for mm/10min (breaks /100 *2)
+  # reclass options
   #reclass = c(-Inf, 0, 0, 0,0.01,1, 0.01,0.034,2, 0.034,0.166,3, 0.166, Inf,4)
   reclass = c(-Inf, 0.5, 0, 0.5,1,1, 1,2,2, 2,5,3, 5,Inf,4)
 

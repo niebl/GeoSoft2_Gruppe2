@@ -57,7 +57,11 @@ async function main(err){
     min : min_precipitation,
     max : max_precipitation
   });
-  getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  getDemoRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
+  getDensity();
   setInterval(
     get1hRadar(),
     oneHourRadarUpdateInterval
@@ -147,6 +151,11 @@ async function main(err){
       min : min_precipitation,
       max : max_precipitation,
       bbox : bbox
+    });
+    getDemoRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      bbox : radarbbox
     });
   });
 
