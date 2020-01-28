@@ -117,6 +117,7 @@ async function(){
 /**
 * @function geomergencyRouter
 * sets the server internal siteState and returns the router.
+* @returns indexRouter as defined in app.js
 */
 function geomergencyRouter(){
   siteState = "geomergency";
@@ -139,6 +140,7 @@ function geomergencyRouter(){
 /**
 * @function exampleScenarioRouter
 * sets the server internal siteState and returns the router.
+* @returns exampleRouter as defined in app.js
 */
 function exampleScenarioRouter(){
   siteState = "example";
@@ -159,7 +161,7 @@ function exampleScenarioRouter(){
 * @function updateTweetStream
 * @desc initialises the tweet stream with given parameters and current Site-state
 * @param params the params of the stream
-* @param callback callback function, what to do with the returned tweets
+* @param callback callback function, what to do with the returned tweets. only works when page in standard mode
 * @param siteState String that indicates whether or not the site is currently in demo-scenario mode or standard mode
 */
 async function updateTweetStream(params, callback, siteState){
@@ -204,65 +206,9 @@ app.use('/radar', radarRouter);
 var summaryRouter = require("./routes/summary");
 
 app.use('/summary', summaryRouter);
-/**
-  * sets the default location of a pair of a location
-  * e.g. a default Map view postion
-  *
-  * @author Dorian
-  * @problems what happens if cookie is empty??
-  */
-app.get('/getdefaultlocation', function(req, res) {
-    var location = req.cookies.coords;
-    res.send(location);
-});
-
-/**
-  * sets the default location of a pair of a location
-  * e.g. a default Map view postion
-  *
-  * @author Dorian
-  * @problems  function has to be changed to post???? --> UI
-  */
-app.get('/setdefaultlocation/:lat/:lng', function(req, res){
-  //res.clearCookie("coords");
-  var position = [];
-  position.push(req.params.lat);
-  position.push(req.params.lng);
-  res.cookie('coords', position, {});
-  res.redirect('/getdefaultlocation');
-});
-
-/**
-* get Tweets in rectangle
-* @author Dorian, heavily modified by Felix
-* @param rectangular [N, W, S, E], WGS84
-* @return Array
-*/
-async function getTweetsInRect(rectangular){
-  let output
-  await Tweet.find({
-    'geojson.geometry.coordinates': {
-      $geoWithin: {
-        $box : [
-          [rectangular[1],rectangular[2]], //West-Sount
-          [rectangular[3],rectangular[0]] //East-North
-        ]
-      }
-    }
-  },
-  function(err, docs){
-    if(err){
-      console.log("~~~~~! error in mongoDB query !~~~~~")
-      console.log(error)
-    }
-    output = docs;
-  });
-  return output;
-}
 
 /**
 * @function queryTweets
-* @author Felix
 * @param queries, Object of mongoose queries
 * @return mongoose docs
 */
@@ -356,7 +302,6 @@ async function tweetDelete(req,res){
 *         latest: whether or not to only show the latest tweet
 * @param req
 * @param res
-* @author Felix
 */
 async function tweetSearch(req,res){
   let outJSON = {tweets : []};
@@ -580,7 +525,6 @@ module.exports = app;
 * @param tweet the tweet object
 * @param includes array containing strings that have to be contained in tweets
 * @param excludes array containing strings that mustn't be in tweets
-* @author Felix
 */
 function postTweetToMongo(tweet){
   console.log(`posting ${tweet.text}`)
@@ -620,50 +564,10 @@ function postTweetToMongo(tweet){
 }
 
 /**
-* @function postFakeTweetToMongo
-* @desc like postTweetToMongo but for the example tweets
-* @param tweet the tweet object
-* @param includes array containing strings that have to be contained in tweets
-* @param excludes array containing strings that mustn't be in tweets
-* @author Felix
-*/
-function postFakeTweetToMongo(tweet){
-  console.log(`posting ${tweet.text}`)
-
-  Tweet.create({
-    id_str : tweet.id_str,
-    text : tweet.text,
-    created_at : tweet.created_at,
-    embeddedTweet : tweet.embeddedTweet,
-    geojson: {
-      type: "Feature",
-      properties: {
-      },
-      geometry: {
-        type : "Point",
-        coordinates : [tweet.coordinates.coordinates[0], tweet.coordinates.coordinates[1]]
-      }
-    }
-  },
-  function(err, tweet){
-    if(err){
-      console.log("error in saving tweet to DB");
-      console.log(err);
-      return false;
-    }
-  });
-
-  //indicate status
-  utilities.indicateStatus(`fetched tweet: ${tweet.id_str}`);
-}
-
-/**
 * @function getEmbeddedTweet
 * @desc sends a request to the twitter Oembed API to get an embedded tweet https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
 * then calls postTweetToMongo in order to add the tweet to the database
 * @param tweet the tweet-object
-* @Author Felix
-* TODO: handle case where embedded tweet is not found
 */
 async function getEmbeddedTweet(tweet){
   var output;
@@ -702,7 +606,6 @@ app.post('/statuses', async (req,res)=> {
 * @desc middleware function that looks for running processes
 * @param req
 * @param res
-* @author Felix
 */
 async function getProcesses(req,res){
   let outJSON = {messages: []};
@@ -810,7 +713,6 @@ async function rmStatuses(queries){
 * @desc middleware function that takes the attributes in a function body (x-www-form-urlencoded)
 * @param req
 * @param res
-* @author Felix
 */
 async function postProcesses(req,res){
   var created_at = req.body.created_at;

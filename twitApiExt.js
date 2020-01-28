@@ -34,8 +34,9 @@ module.exports = {
   /**
   * @function tweetStreamExt
   * @param params an object that contains the parameters for a twitter-search query. more info on https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
-  * @param callback the function that is being called when new data is coming in
+  * @param callback the function that is being called when new data is coming in. only works on non-example data
   * @param siteState String that indicates whether or not the current state is demo-scenario or standard mode
+  * @see updateTweetStream
   */
   tweetStreamExt : async function(params, callback, siteState){
     //demo mode
@@ -123,33 +124,10 @@ module.exports = {
   },
 
   /**
-  * @function periodicTweetSearchExt repeat a search periodically, add results to mongodb
-  * @param params an object that contains the parameters for a twitter-search query. more info on https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
-  * @param cycles the amount of times the query is to be repeated, infinite if TRUE
-  * @param interval the interval in milliseconds
-  * @see searchTweetExt
-  * //TODO: log of output still returns undefined. possibly because return function call searchTweetExt is not waited on
-  * BROKEN
-  */
-  periodicTweetSearchExt : function(params, cycles, interval){
-    let output = this.tweetSearchExt(params);
-    {
-      // setInterval(
-      //   function(){
-      //     let output = await searchTweetExt(params);
-      //     console.log(output);
-      //   }, interval
-      // );
-    }
-    return output;
-  },
-
-  /**
   * @function TweetSearchExt search for tweets using twitters api (the external twitter api)
   * @param params an object that contains the parameters for a twitter-search query. more info on https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
   * @returns Object containing statuses:[(array of tweets)]  and search_metadata:{(various metadata)}
   * @see filterGeotagged
-  * @author Felix
   */
   tweetSearchExt : function(params){
     let tweetPromise = new Promise(function(resolve, reject){
@@ -171,9 +149,8 @@ module.exports = {
   },
 
   /**
-  * @function filterGeotagged filter the response of the Twitter api to only return geo-tagged tweets
+  * @function filterGeotagged filter the response of the Twitter api to only return geo-tagged tweets.
   * @param response the response the api got
-  * @author Felix
   */
   filterGeotagged: function(response){
     //traverse the tweets from the back
