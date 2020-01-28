@@ -6,6 +6,7 @@ var router = express.Router();
 
 var Precipitation = require("../models/precipitation");
 var Precipitationminutes = require("../models/precipitationminutes");
+var PrecipitationDemo = require("../models/precipitationDemo");
 
 
 //hourly Radar
