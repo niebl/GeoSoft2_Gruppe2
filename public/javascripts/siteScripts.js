@@ -654,3 +654,11 @@ async function indicateStatus(text,messageType){
     }
   )
 }
+
+/**
+* @function communicateSiteState
+* sends the current state of the site to the tweets-backend, which will accordingly switch between normal operation and example mode
+*/
+async function communicateSiteState(){
+  
+}

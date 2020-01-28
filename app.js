@@ -1,6 +1,8 @@
 /*jshint esversion: 8 */
 const token = require('./tokens.js');
+
 var siteState;
+var siteStateCheck = Date.now();
 
 //load the additional script collections for the server
 var twitterApiExt = require('./twitApiExt.js');
@@ -67,12 +69,73 @@ app.use('/geomergency/:coords', indexRouter);
 app.use('/example', exampleRouter);
 app.use('/example/:coords', exampleRouter);
 
+//loop that checks the site status in the status-api each seconds
+setInterval(
+async function(){
+  var statuses = await queryStatuses({
+    messageType:"siteState",
+    created_at: { $gt: siteStateCheck}
+  })
+
+  //if the state has changed, update it
+  //TODO:DELETE
+  if(statuses.length > 0){
+    console.log(statuses)
+    if(statuses[statuses.length -1].message != siteState){
+      siteState = statuses[statuses.length -1].message;
+      console.log(siteState)
+    }
+  }
+
+  siteStateCheck = Date.now();
+  // var requestURL = `http://localhost:3000/statuses?messageType=siteState&older_than=${siteStateCheck}&remove=true`;
+  //
+  // var requestSettings = {
+  //   uri: requestURL,
+  //   method: 'GET',
+  //   encoding: null,
+  // };
+  // await request(requestSettings, function(error, response, body){
+  //   if(error){
+  //     console.log(error);
+  //     }
+  //     else{
+  //     console.log(body)
+  //
+  //     //if the state has changed, update it
+  //     if(body.length > 0){
+  //       if(body[body.length - 1].message != siteState){
+  //         siteState = body[body.length - 1].message;
+  //       }
+  //     }
+  //     //update timestamp of last check
+  //     siteStateCheck = Date.now();
+  //   }
+  // });
+},
+1000
+);
+
+
 /**
 * @function geomergencyRouter
 * sets the server internal siteState and returns the router.
 */
 function geomergencyRouter(){
   siteState = "geomergency";
+
+  console.log("attempting stream init!!!")
+  updateTweetStream(
+    configurations.tweetParams,
+    function(tweet){
+      console.log(tweet.id_str)
+      if(tweet.coordinates != null){
+      // call getEmbeddedTweet() -> postTweetToMongo()
+      getEmbeddedTweet(tweet);
+    }},
+    siteState
+  );
+
   return indexRouter;
 }
 
@@ -82,18 +145,43 @@ function geomergencyRouter(){
 */
 function exampleScenarioRouter(){
   siteState = "example";
+
+  updateTweetStream(
+    configurations.tweetParams,
+    function(tweet){
+      if(tweet.coordinates != null){
+      // call getEmbeddedTweet() -> postTweetToMongo()
+      getEmbeddedTweet(tweet);
+    }},
+    siteState
+  );
+
+  //return the router
   return exampleRouter;
 }
 
+/**
+* @function updateTweetStream
+* @desc initialises the tweet stream with given parameters and current Site-state
+* @param params the params of the stream
+* @param callback callback function, what to do with the returned tweets
+* @param siteState String that indicates whether or not the site is currently in demo-scenario mode or standard mode
+*/
+function updateTweetStream(params, callback, siteState){
+  //kill the running stream when called
+  twitterApiExt.killStreamExt();
+  //initialise a new one
+  twitterApiExt.tweetStreamExt(params, callback, siteState);
+}
 //TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
 //initialise the tweet-scraper
-console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
-  function(tweet){
-    if(tweet.coordinates != null){
-    // call getEmbeddedTweet() -> postTweetToMongo()
-    getEmbeddedTweet(tweet);
-  }
-}));
+// console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
+//   function(tweet){
+//     if(tweet.coordinates != null){
+//     // call getEmbeddedTweet() -> postTweetToMongo()
+//     getEmbeddedTweet(tweet);
+//   }
+// }));
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use("/leafletdraw", express.static(__dirname + '/node_modules/leaflet-draw/dist'));

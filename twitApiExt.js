@@ -19,23 +19,46 @@ module.exports = {
 
   //create a Twitter object that is used for the queries
   client : new Twitter(token.twitter),
+  stream : null,
 
   /**
   * @function tweetStreamExt
   * @param params an object that contains the parameters for a twitter-search query. more info on https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
   * @param callback the function that is being called when new data is coming in
+  * @param siteState String that indicates whether or not the current state is demo-scenario or standard mode
   */
-  tweetStreamExt : function(params, callback){
-    var stream = this.client.stream('statuses/filter', params);
-    utilities.indicateStatus("starting twitter-API stream")
-    stream.on('data', function(event){
-      callback(event);
-    });
+  tweetStreamExt : function(params, callback, siteState){
+    console.log(params)
+    console.log("initializing stream!!!!!!!!!!!!!!!")
 
-    stream.on('error', function(error) {
-      console.log(error);
-      utilities.indicateStatus(error)
-    });
+    if(siteState == "example"){
+      //TODO: STREAM FROM EXAMPLE FILE
+    } else {
+      this.stream = this.client.stream('statuses/filter', params);
+      utilities.indicateStatus("starting twitter-API stream");
+      this.stream.on('data', function(event){
+        callback(event);
+      });
+
+      this.stream.on('error', function(error) {
+        console.log(error);
+        utilities.indicateStatus(error);
+      });
+    }
+  },
+
+  /**
+  * @function killStreamExt
+  * @desc function that kills the running function listening to the twitter stream api
+  * @returns boolean whether it was successful
+  */
+  killStreamExt : function(){
+    try{
+    this.stream = null;
+    } catch(error){
+      return false;
+    }
+    return true;
   },
 
   /**
