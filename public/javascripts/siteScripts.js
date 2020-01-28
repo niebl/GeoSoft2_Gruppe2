@@ -66,6 +66,10 @@ async function main(err){
     min : min_precipitation,
     max : max_precipitation
   });
+  getDemoRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
   getDensity();
   setInterval(
     get1hRadar(),
@@ -128,6 +132,11 @@ async function main(err){
       bbox : radarbbox
     });
     get5mRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      bbox : radarbbox
+    });
+    getDemoRadar({
       min : min_precipitation,
       max : max_precipitation,
       bbox : radarbbox

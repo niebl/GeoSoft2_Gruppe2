@@ -47,6 +47,7 @@ var drawnRect = new L.FeatureGroup();
 var kreisLayer = L.featureGroup(false);
 var radar1hLayer =  L.featureGroup(false);
 var radar5mLayer =  L.featureGroup(false);
+var radarDemoLayer =  L.featureGroup(false);
 var densityLayer =  L.featureGroup(false);
 
 var overlayMaps = {
@@ -55,6 +56,7 @@ var overlayMaps = {
   "District-Warnings": kreisLayer,
   "1h Radar": radar1hLayer,
   "Minute Radar": radar5mLayer,
+  "Demo Radar": radarDemoLayer,
   "Tweet Density": densityLayer,
   "Selection": drawnRect
 };
@@ -372,6 +374,79 @@ async function get5mRadar(query){
   });
 }
 
+/**
+* @function getDemoradar
+*/
+
+async function getDemoRadar(query){
+  //clear layer
+  radarDemoLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "/radar/getDemoradar";
+  console.log("min:  " + query.min);
+  console.log("max:  " + query.max);
+  if(query != undefined){
+      //variable to let the URL builder know whether a parameter was already entered in the query
+    var noPriorParam = true;
+
+    if(query.min != undefined && query.min != []){
+      requestURL = requestURL+`?min=${query.min}`;
+      noPriorParam = false;
+    }
+    if(query.max != undefined && query.max != []){
+      if(noPriorParam){
+        requestURL = requestURL+`?max=${query.max}`;
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+`&max=${query.max}`;
+      }
+    }
+    if(query.bbox != undefined && query.bbox != []){
+      if(noPriorParam){
+        requestURL = requestURL+ '?';
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+'&';
+      }
+      requestURL = requestURL + `polygon=${query.bbox}`;
+    }
+    console.log(requestURL);
+  }
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      console.log("The radar data getting loaded");
+      console.log(data);
+      for(let feature of data){
+        radarDemoLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.level) {
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "#b3cde3"};
+            case 1:  return {fillColor: "#8c96c6"};
+            case 2:  return {fillColor: "#8856a7"};
+            case 3:  return {fillColor: "#810f7c"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in getDemoradar");
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
 
 /**
 * @function getDensity
