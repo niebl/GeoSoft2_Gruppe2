@@ -13,4 +13,4 @@ var precipitationDemoSchema = mongoose.Schema({
     }
   });
 
-var PrecipitationDemo = module.exports = mongoose.model('Precipitationminutes', precipitationDemoSchema);
+var PrecipitationDemo = module.exports = mongoose.model('PrecipitationDemo', precipitationDemoSchema);
