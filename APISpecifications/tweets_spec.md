@@ -32,6 +32,13 @@ This Endpoint serves information of the tweets that are cached from the API that
   * `latest` if TRUE, return only the latest tweet. *defaults to false*
   * `fields` specify which fields to return in the response JSON.  
 
+* #### DELETE `/tweets`  
+  Delete tweets with a given ID from the database
+
+  **Parameters**
+
+  * `id_str` the id string of the tweets to delete
+
 
 ## Parameters
 ### __end-point: Tweet-Search__
@@ -51,6 +58,18 @@ This Endpoint serves information of the tweets that are cached from the API that
 |exclude|string|optional|a string that is not to be contained within the returned tweets' texts. A tweet is excluded if it contains substring1 OR substring2|
 |latest|Boolean|optional|If true, only the latest tweet that meets all the queries will be returned. defaults to false|
 |fields|string array|optional|The fields that are to be included in the returned tweets' JSON. formatted as an array of strings: `fields=field1,field2,...,fieldN`|
+
+#### Request
+
+| **Name** | **Method** | **Description**|
+|----------|------------|----------------|
+|`/tweets`| DELETE |Delete tweets with a given id_str
+
+#### General Search Parameters
+
+| **Name** | **Data Type** |**Required / Optional**| **Description**|
+|----------|---------------|-----------------------|----------------|
+|id_str|string array|required|array of one or more tweet-ids, separated by comma: `id_str={tweet1}` or `id_str={tweet1},{tweet2},...,{tweetN}`|
 
 <hr>
 
@@ -110,4 +129,16 @@ Status: 200 OK
         }
     ]
 }
+```
+
+### DELETE `/tweets`
+#### request example
+`localhost:3000/tweets?id_str=1222061888596512768`
+
+
+### response example
+```
+Status: 200 OK
+
+tweets deleted from cache
 ```
