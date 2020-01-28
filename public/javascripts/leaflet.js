@@ -272,10 +272,11 @@ async function get1hRadar(query){
           style: function(feature) {
         switch (feature.properties.level) {
             case null: return {fillColor: "transparent"};
-            case 0:  return {fillColor: "#b3cde3"};
-            case 1:  return {fillColor: "#8c96c6"};
-            case 2:  return {fillColor: "#8856a7"};
-            case 3:  return {fillColor: "#810f7c"};
+            case 0:  return {fillColor: "#f1eef6"};
+            case 1:  return {fillColor: "#bdc9e1"};
+            case 2:  return {fillColor: "#74a9cf"};
+            case 3:  return {fillColor: "#2b8cbe"};
+            case 4:  return {fillColor: "#045a8d"};
         }
     },
           fillOpacity: 0.7,
@@ -348,11 +349,12 @@ async function get5mRadar(query){
         radar5mLayer.addLayer(L.geoJson(feature,{
           style: function(feature) {
         switch (feature.properties.level) {
-            case null: return {fillColor: "transparent"};
-            case 0:  return {fillColor: "#b3cde3"};
-            case 1:  return {fillColor: "#8c96c6"};
-            case 2:  return {fillColor: "#8856a7"};
-            case 3:  return {fillColor: "#810f7c"};
+          case null: return {fillColor: "transparent"};
+          case 0:  return {fillColor: "#f1eef6"};
+          case 1:  return {fillColor: "#bdc9e1"};
+          case 2:  return {fillColor: "#74a9cf"};
+          case 3:  return {fillColor: "#2b8cbe"};
+          case 4:  return {fillColor: "#045a8d"};
         }
     },
           fillOpacity: 0.7,
@@ -480,6 +482,7 @@ quadratLayer.clearLayers();
     success: async function(data){
       updateProgressIndicator("Quadratic count map refreshed");
       for(let feature of data){
+        console.log("in feature layer quadrat");
         quadratLayer.addLayer(L.geoJson(feature,{
           style: function(feature) {
         switch (feature.properties.layer) {

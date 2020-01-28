@@ -90,12 +90,13 @@ async function main(err){
 
   // summary Statistics:
   $("#density").click(function(){
-    var sigma =   $("densitysigma").val();
+    var sigma =  $("#densitysigma").val();
+    console.log(sigma);
     getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, sigma : sigma});
   });
   $("#quadrat").click(function(){
-    var xbreak =   $("xbreak").val();
-    var ybreak =   $("ybreak").val();
+    var xbreak =   $("#xbreak").val();
+    var ybreak =   $("#ybreak").val();
     getQuadrat({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, xbreak: xbreak, ybreak: ybreak});
   });
   $("#kest").click(function(){
