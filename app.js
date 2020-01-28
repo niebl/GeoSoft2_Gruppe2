@@ -1,5 +1,4 @@
 /*jshint esversion: 8 */
-const token = require('./tokens.js');
 
 //load the additional script collections for the server
 var twitterApiExt = require('./twitApiExt.js');
