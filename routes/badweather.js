@@ -261,7 +261,7 @@ function loadUnwetter(){
                 warnkreise[i].properties.PARAMETERVALUE.push(kreis.properties.PARAMETERVALUE);
                 warnkreise[i].properties.PARAMETERNAME.push(kreis.properties.PARAMETERNAME);
               } catch(err){
-                console.log(err)
+                console.log(err);
               }
             }
           }
@@ -299,7 +299,7 @@ function loadUnwetter(){
       //finally, save the warnings to the db
       for(let kreisWarnung of warnkreise){
         if(kreisWarnung != null){
-          kreisWarnung.properties.created_at = Date.now()
+          kreisWarnung.properties.created_at = Date.now();
           kreisWarnung.save();
         }
       }
@@ -328,7 +328,7 @@ async function queryUnwetter(queries){
           if(err){
             console.log("~~~~~! error in mongoDB query !~~~~~");
             console.log(error);
-            return reject()
+            return reject();
           } else {
             return resolve(docs);
           }
