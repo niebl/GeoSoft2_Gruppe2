@@ -6,7 +6,7 @@ var url = window.location.href;
 var host = window.location.host;
 var siteState;
 if(url.indexOf(`http://${host}/geomergency`) != -1){
-  siteState = "home";
+  siteState = "geomergency";
 }
 if(url.indexOf(`http://${host}/example`) != -1){
   siteState = "example";
@@ -625,7 +625,7 @@ function updateTweetNotifs(arguments){
 * @returns boolean
 */
 function setWindowCoordinates(coords){
-  window.history.replaceState(false, "Geomergency", `/geomergency/${coords.lat},${coords.lon},${coords.zoom}`);
+  window.history.replaceState(false, "Geomergency", `/${siteState}/${coords.lat},${coords.lon},${coords.zoom}`);
 }
 
 /**
