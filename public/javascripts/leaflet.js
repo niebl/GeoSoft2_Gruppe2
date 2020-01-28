@@ -48,6 +48,7 @@ var kreisLayer = L.featureGroup(false);
 var radar1hLayer =  L.featureGroup(false);
 var radar5mLayer =  L.featureGroup(false);
 var densityLayer =  L.featureGroup(false);
+var quadratLayer =  L.featureGroup(false);
 
 var overlayMaps = {
   "Radar": leafletRadarAttribution,
@@ -56,6 +57,7 @@ var overlayMaps = {
   "1h Radar": radar1hLayer,
   "Minute Radar": radar5mLayer,
   "Tweet Density": densityLayer,
+  "Tweet Quadraticcount": quadratLayer,
   "Selection": drawnRect
 };
 
@@ -255,7 +257,7 @@ async function get1hRadar(query){
       }else{
         requestURL = requestURL+'&';
       }
-      requestURL = requestURL + `polygon=${query.bbox}`;
+      requestURL = requestURL + `bbox=${query.bbox}`;
     }
     console.log(requestURL);
   }
@@ -267,6 +269,162 @@ async function get1hRadar(query){
       console.log(data);
       for(let feature of data){
         radar1hLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.level) {
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "#f1eef6"};
+            case 1:  return {fillColor: "#bdc9e1"};
+            case 2:  return {fillColor: "#74a9cf"};
+            case 3:  return {fillColor: "#2b8cbe"};
+            case 4:  return {fillColor: "#045a8d"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in get1hradar");
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function get5mRadar
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function get5mRadar(query){
+  //clear layer
+  radar5mLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "/radar/get5mradar";
+  console.log("min:  " + query.min);
+  console.log("max:  " + query.max);
+  if(query != undefined){
+      //variable to let the URL builder know whether a parameter was already entered in the query
+    var noPriorParam = true;
+
+    if(query.min != undefined && query.min != []){
+      requestURL = requestURL+`?min=${query.min}`;
+      noPriorParam = false;
+    }
+    if(query.max != undefined && query.max != []){
+      if(noPriorParam){
+        requestURL = requestURL+`?max=${query.max}`;
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+`&max=${query.max}`;
+      }
+    }
+    if(query.bbox != undefined && query.bbox != []){
+      if(noPriorParam){
+        requestURL = requestURL+ '?' + `bbox=${query.bbox}`;
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+'&';
+      }
+      requestURL = requestURL + `bbox=${query.bbox}`;
+    }
+    console.log(requestURL);
+  }
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      console.log("The radar data getting loaded");
+      console.log(data);
+      for(let feature of data){
+        radar5mLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.level) {
+          case null: return {fillColor: "transparent"};
+          case 0:  return {fillColor: "#f1eef6"};
+          case 1:  return {fillColor: "#bdc9e1"};
+          case 2:  return {fillColor: "#74a9cf"};
+          case 3:  return {fillColor: "#2b8cbe"};
+          case 4:  return {fillColor: "#045a8d"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      console.log("error in get5mradar");
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function get5mRadar
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function get5mRadar(query){
+  //clear layer
+  radar5mLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "/radar/get5mradar";
+  console.log("min:  " + query.min);
+  console.log("max:  " + query.max);
+  if(query != undefined){
+      //variable to let the URL builder know whether a parameter was already entered in the query
+    var noPriorParam = true;
+
+    if(query.min != undefined && query.min != []){
+      requestURL = requestURL+`?min=${query.min}`;
+      noPriorParam = false;
+    }
+    if(query.max != undefined && query.max != []){
+      if(noPriorParam){
+        requestURL = requestURL+`?max=${query.max}`;
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+`&max=${query.max}`;
+      }
+    }
+    if(query.bbox != undefined && query.bbox != []){
+      if(noPriorParam){
+        requestURL = requestURL+ '?';
+        noPriorParam = false;
+      }else{
+        requestURL = requestURL+'&';
+      }
+      requestURL = requestURL + `polygon=${query.bbox}`;
+    }
+    console.log(requestURL);
+  }
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      console.log("The radar data getting loaded");
+      console.log(data);
+      for(let feature of data){
+        radar5mLayer.addLayer(L.geoJson(feature,{
           style: function(feature) {
         switch (feature.properties.level) {
             case null: return {fillColor: "transparent"};
@@ -286,7 +444,7 @@ async function get1hRadar(query){
 
     },
     error: function(xhr, ajaxOptions, thrownError){
-      console.log("error in get1hradar");
+      console.log("error in get5mradar");
       console.log(xhr.status);
       console.log(requestURL);
       console.log(thrownError);
@@ -385,15 +543,29 @@ async function getDensity(query){
   densityLayer.clearLayers();
 
   //set up request URL
-  var requestURL = "/summary/density";
+  var requestURL = "/summary/density?";
+  if(query.sigma){
+    requestURL = requestURL+`sigma=${query.sigma}&`;
+  }
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`
+  }
 
-
+  updateProgressIndicator("refreshing tweet-density heatmap...");
 
   return await $.ajax({
     url: requestURL,
     success: async function(data){
-      console.log("The density is getting loaded");
-      console.log(data);
+      updateProgressIndicator("tweet-density heatmap refreshed");
       for(let feature of data){
         densityLayer.addLayer(L.geoJson(feature,{
           style: function(feature) {
@@ -417,7 +589,387 @@ async function getDensity(query){
 
     },
     error: function(xhr, ajaxOptions, thrownError){
-      console.log("error in density");
+      updateProgressIndicator('<font color="red">failed refreshing tweet-density heatmap</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+
+/**
+* @function getQuadrat
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getQuadrat(query){
+  //clear layer
+quadratLayer.clearLayers();
+
+  //set up request URL
+  var requestURL = "/summary/quadrat?";
+
+  if(query.xbreak){
+    requestURL = requestURL+`xbreak=${query.xbreak}&`;
+  }
+  if(query.ybreak){
+    requestURL = requestURL+`ybreak=${query.ybreak}&`;
+  }
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+  updateProgressIndicator("refreshing quadratic count map...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("Quadratic count map refreshed");
+      for(let feature of data){
+        console.log("in feature layer quadrat");
+        quadratLayer.addLayer(L.geoJson(feature,{
+          style: function(feature) {
+        switch (feature.properties.layer) {
+            case null: return {fillColor: "transparent"};
+            case 0:  return {fillColor: "transparent"};
+            case 1:  return {fillColor: "#ffffb2"};
+            case 2:  return {fillColor: "#fecc5c"};
+            case 3:  return {fillColor: "#fd8d3c"};
+            case 4:  return {fillColor: "#f03b20"};
+            case 5:  return {fillColor: "#bd0026"};
+        }
+    },
+          fillOpacity: 0.7,
+          color: "transparent",
+
+          //color: 'green'
+        })
+      );
+    }
+
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed refreshing  Quadratic Count map</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function getWordcloud
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getWordcloud(query){
+
+  //set up request URL
+  var requestURL = "/summary/wordcloud?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+  updateProgressIndicator("refreshing tweet-Wordcloud...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("Wordcloud is loaded");
+      $("#imagesummary").attr("src", requestURL);
+      $("#linksummary").attr("href", requestURL);
+      $("#imagesummary").attr("width", "300px");
+      $("#imagesummary").attr("height", "300px");
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed refreshing tweet-density heatmap</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function getTimeline
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+*/
+async function getTimeline(query){
+
+  //set up request URL
+  var requestURL = "/summary/timeline?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+
+  updateProgressIndicator("refreshing timeline...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("timeline is loaded");
+      $("#imagesummary").attr("src", requestURL);
+      $("#linksummary").attr("href", requestURL);
+      $("#imagesummary").attr("width", "300px");
+      $("#imagesummary").attr("height", "300px");
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed refreshing tweet-density heatmap</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function getKest
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getKest(query){
+
+  //set up request URL
+  var requestURL = "/summary/kest?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+  updateProgressIndicator("refreshing tweet-Wordcloud...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("KFunction is loaded");
+      $("#imagesummary").attr("src", requestURL);
+      $("#linksummary").attr("href", requestURL);
+      $("#imagesummary").attr("width", "300px");
+      $("#imagesummary").attr("height", "300px");
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed K function</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function getLest
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getLest(query){
+
+  //set up request URL
+  var requestURL = "/summary/lest?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+  updateProgressIndicator("refreshing tweet-Wordcloud...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("LFunction is loaded");
+      $("#imagesummary").attr("src", requestURL);
+      $("#linksummary").attr("href", requestURL);
+      $("#imagesummary").attr("width", "300px");
+      $("#imagesummary").attr("height", "300px");
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed K function</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function getGest
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getGest(query){
+
+  //set up request URL
+  var requestURL = "/summary/gest?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+  updateProgressIndicator("refreshing tweet-Wordcloud...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("GFunction is loaded");
+      $("#imagesummary").attr("src", requestURL);
+      $("#linksummary").attr("href", requestURL);
+      $("#imagesummary").attr("width", "300px");
+      $("#imagesummary").attr("height", "300px");
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed K function</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function getFest
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getFest(query){
+
+  //set up request URL
+  var requestURL = "/summary/fest?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+  updateProgressIndicator("refreshing tweet-Wordcloud...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("FFunction is loaded");
+      $("#imagesummary").attr("src", requestURL);
+      $("#linksummary").attr("href", requestURL);
+      $("#imagesummary").attr("width", "300px");
+      $("#imagesummary").attr("height", "300px");
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed K function</font>');
+      console.log(xhr.status);
+      console.log(requestURL);
+      console.log(thrownError);
+    }
+  });
+}
+
+/**
+* @function getAnn
+* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* also clears the layer first
+* @param query Object containing the query parameters
+* @author Dorian
+*/
+async function getAnn(query){
+
+  //set up request URL
+  var requestURL = "/summary/ann?";
+  if(query.bbox){
+    requestURL = requestURL+`bbox=${query.bbox}&`;
+  }
+  if(query.older_than){
+    requestURL =requestURL+`older_than=${query.older_than}&`;
+  }
+  if(query.include){
+    requestURL = requestURL+`include=${query.include}&`;
+  }
+  if(query.exclude){
+    requestURL = requestURL+`exclude=${query.exclude}&`;
+  }
+
+  updateProgressIndicator("refreshing tweet-Wordcloud...");
+
+  return await $.ajax({
+    url: requestURL,
+    success: async function(data){
+      updateProgressIndicator("ANN is loaded");
+      $("#imagesummary").attr("src", requestURL);
+      $("#linksummary").attr("href", requestURL);
+      $("#imagesummary").attr("width", "300px");
+      $("#imagesummary").attr("height", "300px");
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      updateProgressIndicator('<font color="red">failed ANN function</font>');
       console.log(xhr.status);
       console.log(requestURL);
       console.log(thrownError);
@@ -526,8 +1078,8 @@ async function makeTweet(tweet){
   };
 
   var embedPromise = new Promise(async function(resolve,reject){
-    var embedded = await getEmbeddedTweet(tweet.id_str)
-    resolve(embedded)
+    var embedded = await getEmbeddedTweet(tweet.id_str);
+    resolve(embedded);
   })
 
   return embedPromise.then(function(embedded){

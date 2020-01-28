@@ -17,7 +17,7 @@ if(url.indexOf(`http://${host}/example`) != -1){
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
-var radarbbox;
+
 var include = [];
 var exclude = [];
 var eventfilter = [];
@@ -25,6 +25,8 @@ var eventfilter = [];
 var older_than;
 var older_thanCheck;
 var older_thanStatusCheck;
+var initTimeHeatmap = Date.now() - 300000;
+
 var min_precipitation;
 var max_precipitation;
 
@@ -39,43 +41,12 @@ var oneHourRadarUpdateInterval;
 main();
 
 async function main(err){
+  //set the standard configurations of interval refreshes, bounding boxes, filters, etc
+  setStandardConfigs();
 
+  //TODO: update site-filter inputs with standard values on launch
 
-
-
-  configs = await getConfigs();
-  console.log(configs);
-
-  if(!configs){
-    setStandardConfigs();
-  }else{
-    if(configs.defaultbbox != null){
-      defaultBbox = configs.defaultbbox.toString();
-      bbox = defaultBbox;
-      bboxArray = defaultBbox;
-    }
-    if(configs.defaultinclude != null){
-      include = configs.defaultinclude;
-    }
-    if(configs.defaultexclude != null){
-      exclude = configs.defaultexclude;
-    }
-    nearestTweetRadius = configs.nearestTweetRadius;
-
-    updateCheckInterval = configs.intervals.tweetCheck;
-    statusCheckInterval = configs.intervals.statusCheck;
-    warningUpdateInterval = configs.intervals.warningUpdate;
-
-    //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
-    older_than = Date.now() - configs.intervals.tweetCheckOffset;
-    older_thanCheck = older_than;
-    //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
-    older_thanStatusCheck = Date.now() - configs.intervals.statusCheckOffset;
-  oneHourRadarUpdateInterval = 300000;
-
-    //initialise all check intervals with the new values
-    initialiseIntervals();
-  }
+  //load first data and initialise interval loops
   get1hRadar({
     min : min_precipitation,
     max : max_precipitation
@@ -84,7 +55,7 @@ async function main(err){
     min : min_precipitation,
     max : max_precipitation
   });
-  getDensity();
+  getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
   setInterval(
     get1hRadar(),
     oneHourRadarUpdateInterval
@@ -133,39 +104,48 @@ async function main(err){
 
   // summary Statistics:
   $("#density").click(function(){
-    getDensity();
+    var sigma =  $("#densitysigma").val();
+    console.log(sigma);
+    getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, sigma : sigma});
+  });
+  $("#quadrat").click(function(){
+    var xbreak =   $("#xbreak").val();
+    var ybreak =   $("#ybreak").val();
+    getQuadrat({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, xbreak: xbreak, ybreak: ybreak});
   });
   $("#kest").click(function(){
-    $("#imagesummary").attr("src", "/summary/kest");
-    $("#linksummary").attr("href", "/summary/kest");
+    getKest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#fest").click(function(){
+    getFest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#lest").click(function(){
+    getLest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#gest").click(function(){
+    getGest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+
+  $("#wordcloud").click(function(){
+    getWordcloud({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#timeline").click(function(){
+    getTimeline({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#fest").click(function(){
+    getFest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
   });
   $("#getPrec").click(function(){
     get1hRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : radarbbox
+      bbox : bbox
     });
     get5mRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : radarbbox
+      bbox : bbox
     });
-  });
-  $("#confirmCoords2").click(function(){
-    var north = $("#bboxNorth2").val();
-    var west = $("#bboxWest2").val();
-    var south = $("#bboxSouth2").val();
-    var east = $("#bboxEast2").val();
-    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
-    radarbbox = bboxURL;
-  });
-  $("#deleteCoords2").click(function(){
-    var north = $("#bboxNorth2").val();
-    var west = $("#bboxWest2").val();
-    var south = $("#bboxSouth2").val();
-    var east = $("#bboxEast2").val();
-    var bboxURL = "" + west + "," + north + ","+ east + ","+ north + ","+ east + ","+ south + ","+ west + ","+ south;
-    radarbbox = [];
   });
 
 
@@ -196,7 +176,6 @@ async function main(err){
         tweetLayer._layers[marker].openPopup();
       }
     }
-    //todo: open the popup
   });
   //remove the tweet from map
   $("#tweet-browser, #map").on('click', '.removeTweet', function(e){
@@ -241,6 +220,18 @@ async function main(err){
         }
       }
     }
+
+    //remove from the cache
+    $.ajax({
+      url:`http://localhost:3000/tweets?id_str=${idInput}`,
+      method: "DELETE",
+      success: function(result){
+        updateProgressIndicator(`deleted tweet ${idInput} from cache`);
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        updateProgressIndicator(`error in deleting tweet ${idInput} from cache`);
+      }
+    });
   });
 
   //confirm Coords
@@ -333,26 +324,6 @@ async function main(err){
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
-* @function getConfigs
-* function that gets the client side configs from the server at '/configs'
-*/
-async function getConfigs(){
-  var requestURL = "/configs"
-  output = await $.ajax({
-    url: requestURL,
-    success: function(data){
-      return data
-    },
-    error: function(xhr, ajaxOptions, thrownError){
-      console.log(thrownError)
-      updateProgressIndicator(`<font color="red">failed to fetch client configs. falling back to defaults</font> see browser log for details`);
-      setStandardConfigs();
-    }
-  })
-  return output
-}
-
-/**
 * @function initialiseIntervals
 * @desc initialises periodic checks on updates with the intervals that are specified in the global variables
 */
@@ -377,6 +348,9 @@ function initialiseIntervals(){
 * @desc fallback-function that gets called when getting the config parameters from the server failed
 */
 function setStandardConfigs(){
+  include = []
+  exclude = []
+
   nearestTweetRadius = 50;
 
   updateCheckInterval= 10000;
@@ -388,6 +362,8 @@ function setStandardConfigs(){
   older_thanCheck = older_than;
   //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
   older_thanStatusCheck = Date.now() - 10000;
+
+  oneHourRadarUpdateInterval = 300000;
 
   //initialise all check intervals with the new values
   initialiseIntervals();
