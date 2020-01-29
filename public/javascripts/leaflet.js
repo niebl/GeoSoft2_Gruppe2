@@ -40,7 +40,7 @@ var leafletRadarAttribution = L.tileLayer.wms("https://maps.dwd.de/geoserver/dwd
 * create an empty layer for the tweets
 * leaning on https://stackoverflow.com/a/33221018
 * @see onEachDot
-* @author Felix, nathansnider(inspiration)
+* credit: nathansnider(inspiration)
 */
 var tweetLayer = L.geoJson(false,{
   pointToLayer: tweetToLayer,
@@ -175,7 +175,6 @@ initialiseView();
 * @desc queries the /weather endpoint for new district weather warnings and adds them to the map
 * also clears the Kreiswarnings-layer first
 * @param query Object containing the query parameters
-* @author Felix
 */
 async function getWarnings(query){
   //clear kreisLayer
@@ -243,7 +242,6 @@ async function getWarnings(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function get1hRadar(query){
   //clear layer
@@ -323,7 +321,6 @@ async function get1hRadar(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function get5mRadar(query){
   //clear layer
@@ -401,7 +398,6 @@ async function get5mRadar(query){
 * @desc queries the 5m Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function get5mRadar(query){
   //clear layer
@@ -552,7 +548,6 @@ async function getDemoRadar(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function getDensity(query){
   //clear layer
@@ -619,7 +614,6 @@ async function getDensity(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function getQuadrat(query){
   //clear layer
@@ -690,7 +684,6 @@ quadratLayer.clearLayers();
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function getWordcloud(query){
 
@@ -778,7 +771,6 @@ async function getTimeline(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function getKest(query){
 
@@ -822,7 +814,6 @@ async function getKest(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function getLest(query){
 
@@ -866,7 +857,6 @@ async function getLest(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function getGest(query){
 
@@ -910,7 +900,6 @@ async function getGest(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function getFest(query){
 
@@ -954,7 +943,6 @@ async function getFest(query){
 * @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
-* @author Dorian
 */
 async function getAnn(query){
 
@@ -1002,7 +990,7 @@ async function getAnn(query){
 * @param feature the tweet that is being added
 * @param latlng the coordinates of the tweet
 * @see nearestTweetRadius
-* @author Felix, nathansnider(inspiration)
+* credit: nathansnider
 */
 function tweetToLayer(feature, latlng){
   var tweetdiv = `
@@ -1059,7 +1047,7 @@ function tweetToLayer(feature, latlng){
 * @desc gets called whenever a new marker is added to the map.
 * binds the embedded tweet into the popup.
 * devnote: potential for more functionality
-* @author Felix, nathansnider(inspiration)
+* credit: nathansnider
 */
 function onEachTweet(feature, layer){
   var tweetdiv = `
@@ -1166,7 +1154,6 @@ async function addTweetToMap(tweet){
 * @param bbox an array or string with 4 coordinates, representing the bounding box containing the tweets
 * @param include array of substrings that are to be included in the tweets
 * @param exclude array of substrings that are to be excluded frin the tweets
-* @Author Felix
 */
 function removeTweetsOutOfSelection(bbox, include, exclude){
   //case differentiation if bbox is string or array
@@ -1192,8 +1179,6 @@ function removeTweetsOutOfSelection(bbox, include, exclude){
 * @param include array of substrings that are to be included in the tweets
 * @param exclude array of substrings that are to be excluded frin the tweets
 * @see removeTweetsOutOfSelection
-* @author Felix
-* //TODO:case insensitive keywords
 */
 async function rmTweetsByKeywords(bbox, include, exclude){
   //build the request string

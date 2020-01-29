@@ -50,8 +50,6 @@ async function main(err){
   //set the standard configurations of interval refreshes, bounding boxes, filters, etc
   setStandardConfigs();
 
-  //TODO: update site-filter inputs with standard values on launch
-
   //load first data and initialise interval loops
   get1hRadar({
     min : min_precipitation,
@@ -316,7 +314,7 @@ async function main(err){
   //reset event filter
   $('#resetEventFilter').on('click', function(e){
     eventFilter = eventfilterStandard;
-    $("input[name='eventFilter']").val(eventFilter)
+    $("input[name='eventFilter']").val(eventFilter);
     getWarnings({bbox : bbox, events: eventFilter});
   });
 
@@ -369,8 +367,11 @@ function initialiseIntervals(){
 function setStandardConfigs(){
   include = includeStandard
   exclude = excludeStandard
+  $("input[name='includeKeywords']").val(include)
+  $("input[name='excludeKeywords']").val(exclude)
 
   eventFilter = eventfilterStandard
+  $("input[name='eventFilter']").val(eventFilter)
 
   nearestTweetRadius = 50;
 
@@ -379,7 +380,7 @@ function setStandardConfigs(){
   warningUpdateInterval = 300000;
 
   //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
-  older_than = Date.now() - 300000;
+  older_than = Date.now();
   older_thanCheck = older_than;
   //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
   older_thanStatusCheck = Date.now() - 10000;

@@ -100,6 +100,10 @@ module.exports = {
 
     //normal mode
     else {
+      //kill stream
+      this.stream = null;
+
+      //initialise new stream
       this.stream = this.client.stream('statuses/filter', params);
       utilities.indicateStatus("starting twitter-API stream");
       this.stream.on('data', function(event){
