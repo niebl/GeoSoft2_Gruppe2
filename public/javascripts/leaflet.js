@@ -381,7 +381,7 @@ async function get5mRadar(query){
 
 /**
 * @function get5mRadar
-* @desc queries the 1h Radar data endpoint for new district weather warnings and adds them to the map
+* @desc queries the 5m Radar data endpoint for new district weather warnings and adds them to the map
 * also clears the layer first
 * @param query Object containing the query parameters
 * @author Dorian

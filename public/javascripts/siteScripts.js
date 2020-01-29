@@ -29,8 +29,8 @@ var older_thanCheck;
 var older_thanStatusCheck;
 var initTimeHeatmap = Date.now() - 300000;
 
-var min_precipitation;
-var max_precipitation;
+var min_precipitation = 0;
+var max_precipitation = 100;
 
 
 //the minimal distance a map-tag is allowed to have to another in meters without being merged.
@@ -145,17 +145,17 @@ async function main(err){
     get1hRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : bbox
+      //bbox : bbox
     });
     get5mRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : bbox
+      //bbox : bbox
     });
     getDemoRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : radarbbox
+      //bbox : radarbbox
     });
   });
 
@@ -286,14 +286,14 @@ async function main(err){
   });
 
   $('#saveLevels').on('click', function(e){
-    var min =  $('#LevelsPreMin').val();
-    var max =  $('#LevelsPreMax').val();
+    var min =  $("input[name='LevelsPreMin']").val();
+    var max =  $("input[name='LevelsPreMax']").val();
     if(min <= max){
       min_precipitation = min;
       max_precipitation = max;
-      $('#PrecLevelError').text("Parameters setted");
+      updateProgressIndicator("precipitation level parameters set")
     } else{
-      $('#PrecLevelError').text("Invalid Parameters");
+      updateProgressIndicator("<font color='red'>invalid precipitation level parameters</font>")
     }
   });
   //FILTER words
