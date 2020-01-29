@@ -431,7 +431,7 @@ async function get5mRadar(query){
       }else{
         requestURL = requestURL+'&';
       }
-      requestURL = requestURL + `polygon=${query.bbox}`;
+      requestURL = requestURL + `bbox=${query.bbox}`;
     }
     console.log(requestURL);
   }
@@ -504,7 +504,7 @@ async function getDemoRadar(query){
       }else{
         requestURL = requestURL+'&';
       }
-      requestURL = requestURL + `polygon=${query.bbox}`;
+      requestURL = requestURL + `bbox=${query.bbox}`;
     }
     console.log(requestURL);
   }
