@@ -20,9 +20,13 @@ var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
 
+const includeStandard = ["notfall","Notfall","NOTFALL","Notruf","notruf","kalt","Überschwemmung","überschwemmung","Stromausfall","Feuerwehr","feuerwehr","Notdienst","notdienst"]
+const excludeStandard = []
+const eventfilterStandard = ["GEWITTER","STARKES GEWITTER","STURMBÖEN","SCHWERE STURMBÖEN","ORKANARTIGE BÖEN","ORKANBÖEN","EXTREME ORKANBÖEN","STURM","STARKREGEN","HEFTIGER STARKREGEN","EXTREM ERGIEBIGER DAUERREGEN ","EXTREM HEFTIGER STARKREGEN","STARKER SCHNEEFALL","EXTREM STARKER SCHNEEFALL"]
+
 var include = [];
 var exclude = [];
-var eventfilter = [];
+var eventFilter = eventfilterStandard;
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
@@ -311,7 +315,8 @@ async function main(err){
   });
   //reset event filter
   $('#resetEventFilter').on('click', function(e){
-    eventFilter = [];
+    eventFilter = eventfilterStandard;
+    $("input[name='eventFilter']").val(eventFilter)
     getWarnings({bbox : bbox, events: eventFilter});
   });
 
@@ -344,11 +349,14 @@ function initialiseIntervals(){
   checkStatusUpdates(statusCheckInterval);
 
   //initialise the periodic update of the district weather warnings
-  getWarnings();
+  getWarnings({
+    bbox : bbox,
+    events : eventfilterStandard,
+  });
   setInterval(
     getWarnings({
       bbox : bbox,
-      events : eventFilter
+      events : eventfilterStandard,
     }),
     warningUpdateInterval
   );
@@ -359,8 +367,10 @@ function initialiseIntervals(){
 * @desc fallback-function that gets called when getting the config parameters from the server failed
 */
 function setStandardConfigs(){
-  include = []
-  exclude = []
+  include = includeStandard
+  exclude = excludeStandard
+
+  eventFilter = eventfilterStandard
 
   nearestTweetRadius = 50;
 
