@@ -309,6 +309,9 @@ async function main(err){
   //FILTER events
   $('#confirmEventFilter').on('click', function(e){
     eventFilter = $("input[name='eventFilter']").val().split(",");
+    if(eventFilter == [""]){
+      eventFilter = []
+    }
     getWarnings({bbox : bbox, events: eventFilter});
   });
   //reset event filter

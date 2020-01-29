@@ -78,6 +78,7 @@ if(siteState == "geomergency"){
 }
 if(siteState == "example"){
   overlayMaps["Demo Radar"] = radarDemoLayer;
+  getDemoRadar();
 }
 
 var baseMaps = {
@@ -479,8 +480,7 @@ async function getDemoRadar(query){
 
   //set up request URL
   var requestURL = "/radar/getDemoradar";
-  console.log("min:  " + query.min);
-  console.log("max:  " + query.max);
+
   if(query != undefined){
       //variable to let the URL builder know whether a parameter was already entered in the query
     var noPriorParam = true;
