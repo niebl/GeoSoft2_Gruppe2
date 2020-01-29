@@ -34,10 +34,7 @@ block sidebar
           input#eventFilter(name='eventFilter',placeholder="separated by comma").form-control-sm.bboxForm
           button#confirmEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton Confirm
           button#resetEventFilter(type="button").btn.btn-secondary.btn-sm.sidebarButton Reset
-      // from here on Precipitation
-      div.list-group-item.list-group-item-action.bg-dark.toggle-bar
-        button#parameter-toggle2(type="button").btn.btn-outline-light.btn-sm.sidebarButton Toggle precipitation filter
-      div#browser-controls2.list-group-item.list-group-item-action.bg-light.toggled
+          hr
         //- div#bboxCoordSelection2
         //-   p Bounding-Box border coordinates
         //-   div.form-group
@@ -59,6 +56,11 @@ block sidebar
           hr
         div#getPrec
           button#getPrec(type="button").btn.btn-secondary.btn-sm.sidebarButton Get updated Precipitation
+          br
+      //- // from here on Precipitation
+      //- div.list-group-item.list-group-item-action.bg-dark.toggle-bar
+      //-   button#parameter-toggle2(type="button").btn.btn-outline-light.btn-sm.sidebarButton Toggle precipitation filter
+
       // from here on Precipitation
 
       //From here on summary stats

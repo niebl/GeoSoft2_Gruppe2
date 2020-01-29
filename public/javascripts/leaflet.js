@@ -1,5 +1,15 @@
 /*jshint esversion: 8 */
 
+var url = window.location.href;
+var host = window.location.host;
+var siteState;
+if(url.indexOf(`http://${host}/geomergency`) != -1){
+  siteState = "geomergency";
+}
+if(url.indexOf(`http://${host}/example`) != -1){
+  siteState = "example";
+}
+
 var street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
   id: 'map',
@@ -52,16 +62,23 @@ var densityLayer =  L.featureGroup(false);
 var quadratLayer =  L.featureGroup(false);
 
 var overlayMaps = {
-  "Radar": leafletRadarAttribution,
+  // "Radar": leafletRadarAttribution,
   "Tweets": tweetLayer,
   "District-Warnings": kreisLayer,
-  "1h Radar": radar1hLayer,
-  "Minute Radar": radar5mLayer,
-  "Demo Radar": radarDemoLayer,
+  // "1h Radar": radar1hLayer,
+  // "5min Radar": radar5mLayer,
+  // "Demo Radar": radarDemoLayer,
   "Tweet Density": densityLayer,
   "Tweet Quadraticcount": quadratLayer,
   "Selection": drawnRect
 };
+if(siteState == "geomergency"){
+  overlayMaps["1h Radar"] = radar1hLayer;
+  overlayMaps["5min Radar"] = radar5mLayer;
+}
+if(siteState == "example"){
+  overlayMaps["Demo Radar"] = radarDemoLayer;
+}
 
 var baseMaps = {
   "Topographic": topo,

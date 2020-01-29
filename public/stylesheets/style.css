@@ -67,7 +67,7 @@
   transition: max-height .5s ease-out;
 }
 #browser-controls{
-  max-height: 256px;
+  max-height: 400px;
   overflow-y: scroll;
 
   transition: max-height .5s ease-out;
@@ -126,11 +126,18 @@ low priority, but fix when solution is found*/
 body {
   overflow-x: hidden;
 }
+
+.sidebar-element{
+  -webkit-box-shadow: 23px 13px 52px -32px rgba(0,0,0,0.43);
+  -moz-box-shadow: 23px 13px 52px -32px rgba(0,0,0,0.43);
+  box-shadow: 23px 13px 52px -32px rgba(0,0,0,0.43);
+}
+
 #sidebar-wrapper {
   max-width: 50%;
   width: 400px;
   float:left;
-  height: 17.5em;
+  height: 0em;
   text-align: left;
 
   /* z-index to layer sidebar over map*/
