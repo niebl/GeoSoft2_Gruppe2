@@ -31,29 +31,29 @@ async function oneHourRadar(){
       console.log("deleted");
     });
     request(requestSettings, function(error, response, body) {
+      try{
+          var rbody= (JSON.parse(JSON.parse(body)));
+          rbody = rbody;
 
-        var rbody= (JSON.parse(JSON.parse(body)));
-        rbody = rbody;
-
-        for(let feature of rbody.features){
-          var addRadar = new Precipitation({
-            geojson:{
-              type: feature.type,
-              properties: {
-                level: feature.properties.layer
-              },
-              geometry: {
-                type: feature.geometry.type,
-                coordinates: feature.geometry.coordinates
+          for(let feature of rbody.features){
+            var addRadar = new Precipitation({
+              geojson:{
+                type: feature.type,
+                properties: {
+                  level: feature.properties.layer
+                },
+                geometry: {
+                  type: feature.geometry.type,
+                  coordinates: feature.geometry.coordinates
+                }
               }
-            }
-          });
-          addRadar.save();
-        }
+            });
+            addRadar.save();
+          }
+        } catch(error){console.log(error)}
     });
     utilities.indicateStatus(`Successfully cached new 5m precipitation data`);
 }
-
 
   /**
     * requesting Specific values
