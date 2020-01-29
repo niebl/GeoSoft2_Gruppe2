@@ -13,7 +13,7 @@ if(url.indexOf(`http://${host}/example`) != -1){
 }
 //send the site-state to the status api so the server can know whether it's in demo mode or standard mode
 communicateSiteState();
-
+updateProgressIndicator(`site-state: ${siteState}`)
 
 
 var defaultBbox = "55.22,5.00,47.15,15.20";
@@ -387,9 +387,9 @@ function setStandardConfigs(){
 */
 function updateProgressIndicator(message, currentTime){
   if (currentTime==undefined){
-    currentTime = "timestamp: " + Date.now();
+    currentTime = "timestamp: " + convertUNIXtoTime(Date.now());
   } else {
-    currentTime = "timestamp: " + currentTime;
+    currentTime = "timestamp: " + convertUNIXtoTime(currentTime);
   }
   $("#progressIndicator").prepend(currentTime+"&nbsp;&nbsp;"+message+"<br>");
 }

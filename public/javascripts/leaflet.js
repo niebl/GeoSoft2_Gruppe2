@@ -1347,13 +1347,13 @@ function convertUNIXtoTime(timestamp){
   var year = date.getFullYear();
 
   // Month
-  var month = date.getMonth()+1;
+  var month = "0" +date.getMonth()+1;
 
   // Day
-  var day = date.getDate();
+  var day = "0" +date.getDate();
 
   // Hours
-  var hours = date.getHours();
+  var hours = "0" +date.getHours();
 
   // Minutes
   var minutes = "0" + date.getMinutes();
@@ -1362,7 +1362,7 @@ function convertUNIXtoTime(timestamp){
   var seconds = "0" + date.getSeconds();
 
   // Display date time in MM-dd-yyyy h:m:s format
-  var dateTime = year+'-'+month+'-'+day+' '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+  var dateTime = year+'-'+month.substr(-2)+'-'+day.substr(-2)+' '+hours.substr(-2) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 
   return dateTime
 }

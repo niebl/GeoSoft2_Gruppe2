@@ -41,6 +41,10 @@ module.exports = {
   tweetStreamExt : async function(params, callback, siteState){
     //demo mode
     if(siteState == "example"){
+      utilities.indicateStatus("starting example-tweet stream");
+      //kill stream
+      this.stream = null;
+
       //delete all real tweets first before switching into demo mode
       let deleteRequestURL = "http://localhost:3000/tweets";
 
@@ -91,7 +95,7 @@ module.exports = {
         if(i >= exampleTweets.length-1) {
           clearInterval(tweetInterval);
         }
-      }, 2000);
+      }, 5000);
     }
 
     //normal mode

@@ -126,13 +126,6 @@ low priority, but fix when solution is found*/
 body {
   overflow-x: hidden;
 }
-
-.sidebar-element{
-  -webkit-box-shadow: 23px 13px 52px -32px rgba(0,0,0,0.43);
-  -moz-box-shadow: 23px 13px 52px -32px rgba(0,0,0,0.43);
-  box-shadow: 23px 13px 52px -32px rgba(0,0,0,0.43);
-}
-
 #sidebar-wrapper {
   max-width: 50%;
   width: 400px;
@@ -209,7 +202,7 @@ body {
 }
 #progressIndicator{
   height: 60px;
-  width: 35%;
+  width: 50%;
   float: right;
   margin-right: 50px;
   margin-top: 10px;
@@ -218,6 +211,7 @@ body {
   padding-left: 15px;
 
   overflow: hidden;
+  overflow-y: scroll;
   font-size: 10px;
   color: white;
 }
