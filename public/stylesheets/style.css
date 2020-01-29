@@ -45,6 +45,7 @@
 }
 
 .toggle-bar{
+  height: 3.5em;
   position:absolute;
   z-index: 1;
 
@@ -127,9 +128,9 @@ body {
 }
 #sidebar-wrapper {
   max-width: 50%;
-  width: 27%;
+  width: 400px;
   float:left;
-  height: calc( 100vh - 23em);
+  height: 17.5em;
   text-align: left;
 
   /* z-index to layer sidebar over map*/
