@@ -1,7 +1,17 @@
+# GeoSoft2_Gruppe2 wiki
+
+This is the index page of the Wiki for the project of Group 2 - GeosoftwareII, titled tweetYourBeacon.
+
 <a><img src="https://github.com/Dingensen/GeoSoft2_Gruppe2/blob/master/GEOmergency.png" width="260" height="160"></a>
 
 # TweetYourBeacon
 GEOmergency is a server-based application used to get an overview of extreme weather events in Germany, including context-relevant posts by Twitter users in affected areas.
+
+## API-specification
+public:
+* [tweets](https://github.com/Dingensen/GeoSoft2_Gruppe2/wiki/api%E2%80%90specification-%E2%80%90-tweets)
+* [weather](https://github.com/Dingensen/GeoSoft2_Gruppe2/wiki/api%E2%80%90specification-%E2%80%90-weather)
+* [status](https://github.com/Dingensen/GeoSoft2_Gruppe2/wiki/api%E2%80%90specification-%E2%80%90-status)
 
 ## Getting started
 These instructions will guide you to get the application running on your local machine
@@ -19,45 +29,9 @@ For testing:
 * <a href ="https://jmeter.apache.org/download_jmeter.cgi">JMeter</a>
 
 ### Installing
-Step by step instructions to get the application started
+* [installing within CLI](https://github.com/Dingensen/GeoSoft2_Gruppe2/wiki/installation:-CLI)
 
-* Open the command line
-> navigate to the folder where the repository/project is downloaded into and install the dependencies
-
-```
-cd "your project path"
-npm install
-```
-
-* Open a second command line
-> set the path of your mongod.exe and set your project folder as the database path
-
-```
-"your mongod.exe path" --dbpath="your project path"
-```
-
-* Open a third command line
-> run mongo
-
-```
-mongo
-```
-
-* Go back to the first command line
-> create a package.json file, install all dependencies and run the application
-
-```
-npm init    //press Enter until the file is created
-npm install
-npm start
-```
-
-* For the final step, open your browser
-> access the application
-
-```
-localhost:3000/geomergency
-```
+* [installing within Docker](https://github.com/Dingensen/GeoSoft2_Gruppe2/wiki/installation:-Docker)
 
 ### Example
 Beispielbild der App
@@ -80,4 +54,3 @@ and open the jmeter.bat file
 * Dorian
 * Marius
 * Rene
- 
