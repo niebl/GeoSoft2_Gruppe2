@@ -14,7 +14,6 @@ module.exports = {
   * @function indicateStatus
   * @desc sends a POST request to the status API so the client side can know what the server is doing.
   * @param text String, the message of the status
-  * @Author Felix
   */
   indicateStatus : async function(text){
     var output;

@@ -2,6 +2,8 @@
 
 // const token = require('./tokens.js');
 var address = "mongo"
+var siteState;
+var siteStateCheck = Date.now()-10000;
 
 //load the additional script collections for the server
 var twitterApiExt = require('./twitApiExt.js');
@@ -15,6 +17,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
+var exampleRouter = require('./routes/exampleIndex');
 var mongoose = require('mongoose');
 var request = require('request');
 var nodeHTMLParser = require('node-html-parser');
@@ -52,6 +55,7 @@ mongoose.connect(`mongodb://${address}:27017/geomergency`, {useNewUrlParser: tru
   console.log(mongoose.connection.port);
 });
 
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -62,6 +66,113 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/geomergency', indexRouter);
 app.use('/geomergency/:coords', indexRouter);
+
+app.use('/example', exampleRouter);
+app.use('/example/:coords', exampleRouter);
+
+//loop that checks the site status in the status-api each seconds
+setInterval(
+async function(){
+  var statuses = await queryStatuses({
+    messageType:"siteState",
+    created_at: { $gt: siteStateCheck}
+  })
+
+  //if the state has changed, update it
+  if(statuses.length > 0){
+    if(statuses[statuses.length -1].message != siteState){
+      siteState = statuses[statuses.length -1].message;
+      console.log("set new siteState: "+siteState);
+
+      //remove the siteStates after checking
+      rmStatuses({
+        messageType: "siteState"
+        // visible: visible
+      });
+
+      updateTweetStream(configurations.tweetParams,
+        function(tweet){
+          if(tweet.coordinates != null){
+          // call getEmbeddedTweet() -> postTweetToMongo()
+          getEmbeddedTweet(tweet);
+        }
+      },
+      siteState);
+    }
+    //set the timestamp of last check to current time - one sec
+    siteStateCheck = Date.now()-1000;
+  }
+},
+2000
+);
+
+//initialise tweet stream
+// updateTweetStream(configurations.tweetParams,
+//   function(tweet){
+//     if(tweet.coordinates != null){
+//     // call getEmbeddedTweet() -> postTweetToMongo()
+//     getEmbeddedTweet(tweet);
+//   }
+// },
+// "geomergency");
+
+/**
+* @function geomergencyRouter
+* sets the server internal siteState and returns the router.
+* @returns indexRouter as defined in app.js
+*/
+function geomergencyRouter(){
+  siteState = "geomergency";
+
+  console.log("attempting stream init!!!")
+  updateTweetStream(
+    configurations.tweetParams,
+    function(tweet){
+      console.log(tweet.id_str)
+      if(tweet.coordinates != null){
+      // call getEmbeddedTweet() -> postTweetToMongo()
+      getEmbeddedTweet(tweet);
+    }},
+    "geomergency"
+  );
+
+  return indexRouter;
+}
+
+/**
+* @function exampleScenarioRouter
+* sets the server internal siteState and returns the router.
+* @returns exampleRouter as defined in app.js
+*/
+function exampleScenarioRouter(){
+  siteState = "example";
+
+  updateTweetStream(
+    configurations.tweetParams,
+    function(tweet){
+      return true
+    },
+    "example"
+  );
+
+  //return the router
+  return exampleRouter;
+}
+
+/**
+* @function updateTweetStream
+* @desc initialises the tweet stream with given parameters and current Site-state
+* @param params the params of the stream
+* @param callback callback function, what to do with the returned tweets. only works when page in standard mode
+* @param siteState String that indicates whether or not the site is currently in demo-scenario mode or standard mode
+*/
+async function updateTweetStream(params, callback, siteState){
+  //kill the running stream when called
+  twitterApiExt.killStreamExt();
+  //initialise a new one
+
+  twitterApiExt.tweetStreamExt(params, callback, siteState);
+}
 
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
@@ -95,66 +206,11 @@ var radarRouter = require("./routes/radar");
 app.use('/radar', radarRouter);
 
 var summaryRouter = require("./routes/summary");
+
 app.use('/summary', summaryRouter);
-/**
-  * sets the default location of a pair of a location
-  * e.g. a default Map view postion
-  *
-  * @author Dorian
-  * @problems what happens if cookie is empty??
-  */
-app.get('/getdefaultlocation', function(req, res) {
-    var location = req.cookies.coords;
-    res.send(location);
-});
-
-/**
-  * sets the default location of a pair of a location
-  * e.g. a default Map view postion
-  *
-  * @author Dorian
-  * @problems  function has to be changed to post???? --> UI
-  */
-app.get('/setdefaultlocation/:lat/:lng', function(req, res){
-  //res.clearCookie("coords");
-  var position = [];
-  position.push(req.params.lat);
-  position.push(req.params.lng);
-  res.cookie('coords', position, {});
-  res.redirect('/getdefaultlocation');
-});
-
-/**
-* get Tweets in rectangle
-* @author Dorian, heavily modified by Felix
-* @param rectangular [N, W, S, E], WGS84
-* @return Array
-*/
-async function getTweetsInRect(rectangular){
-  let output
-  await Tweet.find({
-    'geojson.geometry.coordinates': {
-      $geoWithin: {
-        $box : [
-          [rectangular[1],rectangular[2]], //West-Sount
-          [rectangular[3],rectangular[0]] //East-North
-        ]
-      }
-    }
-  },
-  function(err, docs){
-    if(err){
-      console.log("~~~~~! error in mongoDB query !~~~~~")
-      console.log(error)
-    }
-    output = docs;
-  });
-  return output;
-}
 
 /**
 * @function queryTweets
-* @author Felix
 * @param queries, Object of mongoose queries
 * @return mongoose docs
 */
@@ -190,6 +246,53 @@ app.get('/tweets', async (req, res) => {
   res.send(await tweetSearch(req, res));
 });
 
+app.delete('/tweets', async (req, res) => {
+  await tweetDelete(req,res)
+});
+
+/**
+* @function tweetDelete middleware function
+* @desc function that is being called when a delete tweet call is made to the tweets endpoint
+* param: id_str the id of the tweet(s) to delete
+*/
+async function tweetDelete(req,res){
+  if(!req.query.id_str){
+    await Tweet.deleteMany(
+      {},
+      function(err){
+        if(err){
+          output = false;
+        } else {
+          output = true;
+        }
+      }
+    );
+    return true
+  }
+
+  //get the id params
+  let ids = req.query.id_str;
+  ids = ids.split(",");
+
+  //delete each id
+  for(let id of ids){
+    console.log({
+      'id_str': id
+    })
+    await Tweet.remove({
+      'id_str': id
+    }, function(error){
+      if(error){
+        res.status(500)
+        res.send(`error in deleting tweet ${id}: ${error}`)
+      }
+    });
+  }
+
+  res.status(200)
+  res.send(`tweets deleted from cache`)
+}
+
 /**
 * @function tweetSearch middleware function
 * @desc callback function that looks at the arguments passed in the tweet API request and returns the according response.
@@ -201,7 +304,6 @@ app.get('/tweets', async (req, res) => {
 *         latest: whether or not to only show the latest tweet
 * @param req
 * @param res
-* @author Felix
 */
 async function tweetSearch(req,res){
   let outJSON = {tweets : []};
@@ -420,25 +522,14 @@ async function tweetSearch(req,res){
 
 module.exports = app;
 
-//TO CHANGE: provisional initialiser of tweetStreamExt. make a proper one with custom parameters
-//initialise the tweet-scraper
-console.log(configurations.tweetParams)
-console.log(twitterApiExt.tweetStreamExt(configurations.tweetParams,
-  function(tweet){
-    if(tweet.coordinates != null){
-    // call getEmbeddedTweet() -> postTweetToMongo()
-    getEmbeddedTweet(tweet);
-  }
-}))
-
 /**
 * @function postTweetToMongo
 * @param tweet the tweet object
 * @param includes array containing strings that have to be contained in tweets
 * @param excludes array containing strings that mustn't be in tweets
-* @author Felix
 */
 function postTweetToMongo(tweet){
+  console.log(`posting ${tweet.text}`)
   //initialise embeddedTweet as false
   var embeddedTweet = false;
 
@@ -479,8 +570,6 @@ function postTweetToMongo(tweet){
 * @desc sends a request to the twitter Oembed API to get an embedded tweet https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
 * then calls postTweetToMongo in order to add the tweet to the database
 * @param tweet the tweet-object
-* @Author Felix
-* TODO: handle case where embedded tweet is not found
 */
 async function getEmbeddedTweet(tweet){
   var output;
@@ -510,7 +599,7 @@ app.get('/statuses', async (req,res)=> {
   res.send(await getProcesses(req, res));
 });
 app.post('/statuses', async (req,res)=> {
-  res.send(await postProcesses(req, res));
+  postProcesses(req, res);
 });
 
 //functions
@@ -519,7 +608,6 @@ app.post('/statuses', async (req,res)=> {
 * @desc middleware function that looks for running processes
 * @param req
 * @param res
-* @author Felix
 */
 async function getProcesses(req,res){
   let outJSON = {messages: []};
@@ -569,7 +657,7 @@ async function getProcesses(req,res){
       created_at: {$gt: older_than},
       messageType: messageType
       // visible: visible
-    }, res);
+    });
   }
 
   //return the status messages
@@ -607,7 +695,7 @@ async function queryStatuses(queries, res){
 * @param res, express response for error handling
 * @return true or false
 */
-async function rmStatuses(queries, res){
+async function rmStatuses(queries){
   let output = false;
   await Status.deleteMany(
     queries,
@@ -627,7 +715,6 @@ async function rmStatuses(queries, res){
 * @desc middleware function that takes the attributes in a function body (x-www-form-urlencoded)
 * @param req
 * @param res
-* @author Felix
 */
 async function postProcesses(req,res){
   var created_at = req.body.created_at;
@@ -653,14 +740,11 @@ async function postProcesses(req,res){
     },
     function(err, tweet){
       if(err){
-        res.status(400).send("error in posting status: ", err);
-        //return;
+        // res.status(400).send("error in posting status: ", err);
       }
     });
 
     //if it went well, tell them
-    res.status(200);
-    res.send(`Status successfully posted`);
-    //return;
+    res.status(200).send(`Status successfully posted`);
   }
 }

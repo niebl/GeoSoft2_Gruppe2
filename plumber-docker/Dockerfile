@@ -28,6 +28,8 @@ RUN R -e 'install.packages("stars")'
 RUN R -e 'install.packages("sf")'
 RUN R -e 'install.packages("rgdal")'
 RUN R -e 'install.packages("tm")'
+RUN R -e 'install.packages("lubridate")'
+RUN R -e 'install.packages("anytime")'
 
 COPY . /usr/local/src/myscripts
 
@@ -37,4 +39,4 @@ COPY . /usr/local/src/myscripts
 # EXPOSE 8000
 # ENTRYPOINT ["R", "-e", "pr <- plumber::plumb(commandArgs()[4]); pr$run(host='0.0.0.0', port=8000)"]
 
-CMD ["/usr/local/src/myscripts/plumberDocker.R"]
+CMD ["/usr/local/src/myscripts/plumber.R"]

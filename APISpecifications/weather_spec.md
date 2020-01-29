@@ -22,7 +22,7 @@ The specification of the API that serves the cached data on weather warnings for
  returns shapes of German districts that have issued warnings of weather against them by the DWD.
  **Parameters**
  * `bbox` the geographical boundaries with which the resulting district borders can overlap. (WGS84)
- * `events` list of types of events to to filter results for.
+ * `events` list of types of events to to filter results for. AND-relation.
 
 
 ## Parameters
@@ -39,7 +39,7 @@ The specification of the API that serves the cached data on weather warnings for
 | **Name** | **Data Type** |**Required / Optional**| **Description**|
 |----------|---------------|-----------------------|----------------|
 |bbox|number array|optional|bounding box of 2 coordinates in the WGS84 format, represented as an array of four numbers: `bbox={lat northwest corner},{lon northwest corner},{lat southeast corner},{lon southeast corner}`|
-|events|string array|optional|The types of events to look for. for types of events, refer to <a href="https://www.dwd.de/DE/leistungen/opendata/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2">DWD documentation</a> chapter 3.1.1|
+|events|string array|optional|The types of events to look for. AND-relation. for types of events, refer to <a href="https://www.dwd.de/DE/leistungen/opendata/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2">DWD documentation</a> chapter 3.1.1|
 
 <hr>
 

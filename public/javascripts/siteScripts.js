@@ -1,20 +1,40 @@
 /*jshint esversion: 8 */
 
+//see if we're in the legit app or the example scenario
+// citation: https://stackoverflow.com/a/3753570
+var url = window.location.href;
+var host = window.location.host;
+var siteState;
+if(url.indexOf(`http://${host}/geomergency`) != -1){
+  siteState = "geomergency";
+}
+if(url.indexOf(`http://${host}/example`) != -1){
+  siteState = "example";
+}
+//send the site-state to the status api so the server can know whether it's in demo mode or standard mode
+communicateSiteState();
+updateProgressIndicator(`site-state: ${siteState}`)
+
+
 var defaultBbox = "55.22,5.00,47.15,15.20";
 var bbox = "55.22,5.00,47.15,15.20";
 var bboxArray = [55.22,5.00,47.15,15.20];
 
+const includeStandard = ["notfall","Notfall","NOTFALL","Notruf","notruf","kalt","Überschwemmung","überschwemmung","Stromausfall","Feuerwehr","feuerwehr","Notdienst","notdienst"]
+const excludeStandard = []
+const eventfilterStandard = ["GEWITTER","STARKES GEWITTER","STURMBÖEN","SCHWERE STURMBÖEN","ORKANARTIGE BÖEN","ORKANBÖEN","EXTREME ORKANBÖEN","STURM","STARKREGEN","HEFTIGER STARKREGEN","EXTREM ERGIEBIGER DAUERREGEN ","EXTREM HEFTIGER STARKREGEN","STARKER SCHNEEFALL","EXTREM STARKER SCHNEEFALL"]
+
 var include = [];
 var exclude = [];
-var eventfilter = [];
+var eventFilter = eventfilterStandard;
 //the timestamps. older_than for updateMapTweets, older_thanCheck for checkTweetUpdates
 var older_than;
 var older_thanCheck;
 var older_thanStatusCheck;
 var initTimeHeatmap = Date.now() - 300000;
 
-var min_precipitation;
-var max_precipitation;
+var min_precipitation = 0;
+var max_precipitation = 100;
 
 
 //the minimal distance a map-tag is allowed to have to another in meters without being merged.
@@ -30,8 +50,6 @@ async function main(err){
   //set the standard configurations of interval refreshes, bounding boxes, filters, etc
   setStandardConfigs();
 
-  //TODO: update site-filter inputs with standard values on launch
-
   //load first data and initialise interval loops
   get1hRadar({
     min : min_precipitation,
@@ -41,7 +59,11 @@ async function main(err){
     min : min_precipitation,
     max : max_precipitation
   });
-  getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  getDemoRadar({
+    min : min_precipitation,
+    max : max_precipitation
+  });
+  getDensity();
   setInterval(
     get1hRadar(),
     oneHourRadarUpdateInterval
@@ -90,22 +112,52 @@ async function main(err){
 
   // summary Statistics:
   $("#density").click(function(){
-    getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+    var sigma =  $("#densitysigma").val();
+    console.log(sigma);
+    getDensity({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, sigma : sigma});
+  });
+  $("#quadrat").click(function(){
+    var xbreak =   $("#xbreak").val();
+    var ybreak =   $("#ybreak").val();
+    getQuadrat({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude, xbreak: xbreak, ybreak: ybreak});
   });
   $("#kest").click(function(){
-    $("#imagesummary").attr("src", "/summary/kest");
-    $("#linksummary").attr("href", "/summary/kest");
+    getKest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#fest").click(function(){
+    getFest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#lest").click(function(){
+    getLest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#gest").click(function(){
+    getGest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+
+  $("#wordcloud").click(function(){
+    getWordcloud({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#timeline").click(function(){
+    getTimeline({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
+  });
+  $("#fest").click(function(){
+    getFest({older_than: initTimeHeatmap, bbox: bbox, include: include, exclude: exclude});
   });
   $("#getPrec").click(function(){
     get1hRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : bbox
+      //bbox : bbox
     });
     get5mRadar({
       min : min_precipitation,
       max : max_precipitation,
-      bbox : bbox
+      //bbox : bbox
+    });
+    getDemoRadar({
+      min : min_precipitation,
+      max : max_precipitation,
+      //bbox : radarbbox
     });
   });
 
@@ -181,6 +233,18 @@ async function main(err){
         }
       }
     }
+
+    //remove from the cache
+    $.ajax({
+      url:`http://localhost:3000/tweets?id_str=${idInput}`,
+      method: "DELETE",
+      success: function(result){
+        updateProgressIndicator(`deleted tweet ${idInput} from cache`);
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        updateProgressIndicator(`error in deleting tweet ${idInput} from cache`);
+      }
+    });
   });
 
   //confirm Coords
@@ -224,14 +288,14 @@ async function main(err){
   });
 
   $('#saveLevels').on('click', function(e){
-    var min =  $('#LevelsPreMin').val();
-    var max =  $('#LevelsPreMax').val();
+    var min =  $("input[name='LevelsPreMin']").val();
+    var max =  $("input[name='LevelsPreMax']").val();
     if(min <= max){
       min_precipitation = min;
       max_precipitation = max;
-      $('#PrecLevelError').text("Parameters setted");
+      updateProgressIndicator("precipitation level parameters set")
     } else{
-      $('#PrecLevelError').text("Invalid Parameters");
+      updateProgressIndicator("<font color='red'>invalid precipitation level parameters</font>")
     }
   });
   //FILTER words
@@ -249,7 +313,8 @@ async function main(err){
   });
   //reset event filter
   $('#resetEventFilter').on('click', function(e){
-    eventFilter = [];
+    eventFilter = eventfilterStandard;
+    $("input[name='eventFilter']").val(eventFilter);
     getWarnings({bbox : bbox, events: eventFilter});
   });
 
@@ -282,11 +347,14 @@ function initialiseIntervals(){
   checkStatusUpdates(statusCheckInterval);
 
   //initialise the periodic update of the district weather warnings
-  getWarnings();
+  getWarnings({
+    bbox : bbox,
+    events : eventfilterStandard,
+  });
   setInterval(
     getWarnings({
       bbox : bbox,
-      events : eventFilter
+      events : eventfilterStandard,
     }),
     warningUpdateInterval
   );
@@ -297,8 +365,13 @@ function initialiseIntervals(){
 * @desc fallback-function that gets called when getting the config parameters from the server failed
 */
 function setStandardConfigs(){
-  include = []
-  exclude = []
+  include = includeStandard
+  exclude = excludeStandard
+  $("input[name='includeKeywords']").val(include)
+  $("input[name='excludeKeywords']").val(exclude)
+
+  eventFilter = eventfilterStandard
+  $("input[name='eventFilter']").val(eventFilter)
 
   nearestTweetRadius = 50;
 
@@ -307,7 +380,7 @@ function setStandardConfigs(){
   warningUpdateInterval = 300000;
 
   //initialise with the current timestamp, -5 minutes. so more tweets have a chance of appearing on initialisation
-  older_than = Date.now() - 300000;
+  older_than = Date.now();
   older_thanCheck = older_than;
   //initialise status check timestamp with -5 seconds so statuses declared before site was loaded can be found
   older_thanStatusCheck = Date.now() - 10000;
@@ -325,9 +398,9 @@ function setStandardConfigs(){
 */
 function updateProgressIndicator(message, currentTime){
   if (currentTime==undefined){
-    currentTime = "timestamp: " + Date.now();
+    currentTime = "timestamp: " + convertUNIXtoTime(Date.now());
   } else {
-    currentTime = "timestamp: " + currentTime;
+    currentTime = "timestamp: " + convertUNIXtoTime(currentTime);
   }
   $("#progressIndicator").prepend(currentTime+"&nbsp;&nbsp;"+message+"<br>");
 }
@@ -550,7 +623,7 @@ function updateTweetNotifs(arguments){
 * @returns boolean
 */
 function setWindowCoordinates(coords){
-  window.history.replaceState(false, "Geomergency", `/geomergency/${coords.lat},${coords.lon},${coords.zoom}`);
+  window.history.replaceState(false, "Geomergency", `/${siteState}/${coords.lat},${coords.lon},${coords.zoom}`);
 }
 
 /**
@@ -578,4 +651,12 @@ async function indicateStatus(text,messageType){
       }
     }
   )
+}
+
+/**
+* @function communicateSiteState
+* sends the current state of the site to the tweets-backend, which will accordingly switch between normal operation and example mode
+*/
+async function communicateSiteState(){
+  indicateStatus(siteState,"siteState");
 }

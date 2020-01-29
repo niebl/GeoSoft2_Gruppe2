@@ -45,6 +45,7 @@
 }
 
 .toggle-bar{
+  height: 3.5em;
   position:absolute;
   z-index: 1;
 
@@ -66,7 +67,7 @@
   transition: max-height .5s ease-out;
 }
 #browser-controls{
-  max-height: 256px;
+  max-height: 400px;
   overflow-y: scroll;
 
   transition: max-height .5s ease-out;
@@ -106,16 +107,19 @@
 low priority, but fix when solution is found*/
 #sidebar-scroll-wrapper{
   overflow-y: auto;
-  height: calc( 100vh - 8em);
+  height: calc( 100vh - 9em);
 }
+
 #impressum{
+  color: white;
   font-size: 10px;
-  height: 7em;
+  height: 3em;
+  float: left;
 
   display:inline;
   position:fixed;
   bottom: 0;
-  width: 400px;
+  width: 20%;
 }
 
 /*based on https://startbootstrap.com/templates/simple-sidebar/ */
@@ -126,7 +130,8 @@ body {
   max-width: 50%;
   width: 400px;
   float:left;
-  height: calc( 100vh - 4em);
+  height: 0em;
+  text-align: left;
 
   /* z-index to layer sidebar over map*/
   position: absolute;
@@ -137,6 +142,11 @@ body {
   -moz-transition: margin .25s ease-out;
   -o-transition: margin .25s ease-out;
   transition: margin .25s ease-out;
+}
+
+#sidebarOptions {
+  text-align: center;
+  background-color: #6f6f6f;
 }
 
 #sidebar-wrapper .sidebar-heading {
@@ -201,6 +211,7 @@ body {
   padding-left: 15px;
 
   overflow: hidden;
+  overflow-y: scroll;
   font-size: 10px;
   color: white;
 }
