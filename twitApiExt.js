@@ -95,7 +95,7 @@ module.exports = {
         if(i >= exampleTweets.length-1) {
           clearInterval(tweetInterval);
         }
-      }, 5000);
+      }, 3000);
     }
 
     //normal mode
