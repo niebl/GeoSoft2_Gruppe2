@@ -33,9 +33,6 @@ For testing:
 
 * [installing within Docker](https://github.com/Dingensen/GeoSoft2_Gruppe2/wiki/installation:-Docker)
 
-### Example
-Beispielbild der App
-
 
 ### Testing
 Instructions to test the running application
