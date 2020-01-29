@@ -146,7 +146,7 @@ async function fiveMinRadar(){
       console.log("deleted");
     });
     request(requestSettings, function(error, response, body) {
-
+      try{
         var rbody= (JSON.parse(JSON.parse(body)));
         rbody = rbody;
 
@@ -168,6 +168,7 @@ async function fiveMinRadar(){
         }
         utilities.indicateStatus(`Successfully cached new 5m precipitation data`);
         console.log('Radar of germany  in 5 min intervalls added into db');
+      }catch(error){console.log(error)}
     });
 }
 
@@ -258,7 +259,7 @@ router.get("/precipitationDemo", async function (req, res ){
       console.log("deleted");
     });
     request(requestSettings, function(error, response, body) {
-
+      try{
         var rbody= (JSON.parse(JSON.parse(body)));
         rbody = rbody;
 
@@ -279,9 +280,9 @@ router.get("/precipitationDemo", async function (req, res ){
           addRadar.save();
         }
         res.send('Demo radar of germany  added into db');
+        }catch(err){console.log(err);}
     });
 });
-
 
 router.get("/getDemoradar", async function(req, res){
   var regions ={type:"FeatureCollection", features:[]};
